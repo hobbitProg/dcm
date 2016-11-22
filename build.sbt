@@ -20,7 +20,8 @@
           "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.4",
           "org.jbehave" % "jbehave-core" % "4.0.5",
           "org.jbehave" % "jbehave-scala" % "4.0.5",
-          "org.scalatest" %% "scalatest" % "2.2.1" % "test"),
+          "org.scalatest" %% "scalatest" % "2.2.1" % "test",
+          "org.eu.acolyte" % "jdbc-scala_2.11" % "1.0.42-j7p"),
         // make sure that MultiJvm test are compiled by the default test compilation
         compile in MultiJvm <<= (compile in MultiJvm) triggeredBy (compile in Test),
         // disable parallel tests
