@@ -22,11 +22,17 @@
           "org.jbehave" % "jbehave-core" % "4.0.5",
           "org.jbehave" % "jbehave-scala" % "4.0.5",
           "org.scalatest" %% "scalatest" % "2.2.1" % "test",
-          "org.eu.acolyte" % "jdbc-scala_2.11" % "1.0.42-j7p"),
+          "org.eu.acolyte" % "jdbc-scala_2.11" % "1.0.42-j7p",
+          "org.scalamock" % "scalamock-scalatest-support_2.11" % "3.3.0",
+          "org.testfx" % "testfx-junit" % "4.0.4-alpha",
+          "org.scalafx" % "scalafx_2.11" % "8.0.102-R11"),
         // make sure that MultiJvm test are compiled by the default test compilation
         compile in MultiJvm <<= (compile in MultiJvm) triggeredBy (compile in Test),
         // disable parallel tests
         parallelExecution in Test := false,
+        // Generate html test results
+        testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-h",
+          "target/test-reports"),
         // make sure that MultiJvm tests are executed by the default test target,
         // and combine the results from ordinary test and multi-jvm tests
         executeTests in Test <<= (executeTests in Test, executeTests in MultiJvm) map {
