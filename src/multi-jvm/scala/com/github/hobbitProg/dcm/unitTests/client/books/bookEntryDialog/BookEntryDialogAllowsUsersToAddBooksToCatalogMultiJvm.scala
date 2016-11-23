@@ -66,6 +66,13 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
               )
 
               "and the user enters the description of the new book" - {
+                activateControl(
+                  BookEntryDialog.descriptionControlId
+                )
+                enterDataIntoControl(
+                  validNewBook.description
+                )
+
                 "and the user selects the cover image for the new book" - {
                   "and the user requests to associate categories with the new" +
                     " book" - {

@@ -1,7 +1,7 @@
 package com.github.hobbitProg.dcm.client.books.dialog
 
 import scalafx.scene.Scene
-import scalafx.scene.control.{Label, TextField}
+import scalafx.scene.control.{Label, TextArea, TextField}
 import scalafx.scene.layout.AnchorPane
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
 
@@ -107,6 +107,36 @@ class BookEntryDialog
     BookEntryDialog.textFieldLeftBorder
   )
 
+  // Create control for entering book description
+  val descriptionLabel: Label =
+    new Label(
+      "Description:"
+    )
+  AnchorPane.setTopAnchor(
+    descriptionLabel,
+    BookEntryDialog.descriptionTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    descriptionLabel,
+    BookEntryDialog.labelLeftBorder
+  )
+
+  val descriptionControl: TextArea =
+    new TextArea
+  descriptionControl.id =
+    BookEntryDialog.descriptionControlId
+  descriptionControl.text.onChange {
+    bookBeingEdited.description = descriptionControl.text.value
+  }
+  AnchorPane.setTopAnchor(
+    descriptionControl,
+    BookEntryDialog.descriptionTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    descriptionControl,
+    BookEntryDialog.textFieldLeftBorder
+  )
+
   // Set pane for dialog
   content =
     new AnchorPane {
@@ -117,7 +147,9 @@ class BookEntryDialog
           authorLabel,
           authorControl,
           isbnLabel,
-          isbnControl
+          isbnControl,
+          descriptionLabel,
+          descriptionControl
         )
     }
 }
@@ -126,13 +158,15 @@ object BookEntryDialog {
   val titleControlId: String = "bookTitleControl"
   val authorControlId: String = "bookAuthorControl"
   val isbnControlId: String = "bookISBNControl"
+  val descriptionControlId: String = "bookDescriptionControl"
 
   private val titleTopBorder: Double = 2.0
   private val authorTopBorder: Double = 30.0
   private val isbnTopBorder: Double = 58.0
+  private val descriptionTopBorder: Double = 86.0
   private val labelLeftBorder: Double = 2.0
-  private val textFieldLeftBorder: Double = 45.0
+  private val textFieldLeftBorder: Double = 90.0
 
-  private val dialogWidth: Double = 225.0
-  private val dialogHeight: Double = 100.0
+  private val dialogWidth: Double = 650.0
+  private val dialogHeight: Double = 350.0
 }
