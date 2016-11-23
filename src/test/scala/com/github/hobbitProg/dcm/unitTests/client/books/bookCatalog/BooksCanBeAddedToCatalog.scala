@@ -65,6 +65,13 @@ class BooksCanBeAddedToCatalog
       )
 
     "and a listener for book addition events" - {
+      var bookThatWasBroadcast: Book =
+        null
+      originalBookCatalog onAdd {
+        addedBook =>
+          bookThatWasBroadcast = addedBook
+      }
+
       "and a book to add to the catalog" - {
         val newBook: Book =
           (
@@ -97,13 +104,15 @@ class BooksCanBeAddedToCatalog
                 }
                 )
             enteredBook shouldEqual newBook
+            (addedCategoryAssociations map {
+              categoryAssociation =>
+                categoryAssociation._1
+            }) shouldEqual Set[String](newBook.isbn)
           }
-          (addedCategoryAssociations map {
-            categoryAssociation =>
-              categoryAssociation._1
-          }) shouldEqual Set[String](newBook.isbn)
 
-          "and the book is given to the listener" in pending
+          "and the book is given to the listener" in {
+            bookThatWasBroadcast shouldEqual newBook
+          }
         }
       }
     }

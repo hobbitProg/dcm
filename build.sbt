@@ -12,6 +12,7 @@
         name := "dcm",
         version := "0.1",
         scalaVersion := "2.11.8",
+        unmanagedBase := baseDirectory.value / "lib",
         libraryDependencies ++= Seq(
           "com.typesafe.akka" %% "akka-actor" % akkaVersion,
           "com.typesafe.akka" %% "akka-remote" % akkaVersion,
