@@ -1,10 +1,6 @@
 package com.github.hobbitProg.dcm.client.books.dialog
 
-import javafx.event.EventHandler
-import javafx.scene.input.InputMethodEvent
-
-import scala.collection.Seq
-import scalafx.scene.{Node, Scene}
+import scalafx.scene.Scene
 import scalafx.scene.control.{Label, TextField}
 import scalafx.scene.layout.AnchorPane
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
@@ -82,7 +78,36 @@ class BookEntryDialog
     BookEntryDialog.textFieldLeftBorder
   )
 
-  // Set pane for dialot
+  // Create control for entering ISBN for book
+  private val isbnLabel: Label =
+    new Label(
+      "ISBN:"
+    )
+  AnchorPane.setTopAnchor(
+    isbnLabel,
+    BookEntryDialog.isbnTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    isbnLabel,
+    BookEntryDialog.labelLeftBorder
+  )
+
+  val isbnControl: TextField =
+    new TextField
+  isbnControl.text.onChange(
+    bookBeingEdited.isbn = isbnControl.text.value
+  )
+  isbnControl.id = BookEntryDialog.isbnControlId
+  AnchorPane.setTopAnchor(
+    isbnControl,
+    BookEntryDialog.isbnTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    isbnControl,
+    BookEntryDialog.textFieldLeftBorder
+  )
+
+  // Set pane for dialog
   content =
     new AnchorPane {
       children =
@@ -90,7 +115,9 @@ class BookEntryDialog
           titleLabel,
           titleControl,
           authorLabel,
-          authorControl
+          authorControl,
+          isbnLabel,
+          isbnControl
         )
     }
 }
@@ -98,12 +125,14 @@ class BookEntryDialog
 object BookEntryDialog {
   val titleControlId: String = "bookTitleControl"
   val authorControlId: String = "bookAuthorControl"
+  val isbnControlId: String = "bookISBNControl"
 
   private val titleTopBorder: Double = 2.0
   private val authorTopBorder: Double = 30.0
+  private val isbnTopBorder: Double = 58.0
   private val labelLeftBorder: Double = 2.0
   private val textFieldLeftBorder: Double = 45.0
 
-  private val dialogWidth: Double = 500.0
-  private val dialogHeight: Double = 500
+  private val dialogWidth: Double = 225.0
+  private val dialogHeight: Double = 100.0
 }
