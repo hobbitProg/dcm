@@ -19,6 +19,10 @@ import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
   */
 class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
   extends FreeSpec {
+  // Robot to automate entering in information
+  val newBookRobot: FxRobotInterface =
+    new FxRobot
+
   // Valid new book to add
   private val validNewBook: Book =
     ("Ground Zero",
@@ -38,25 +42,21 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
           BookAdditionDialog
 
         "when the user enters the title of the new book" - {
-          val newBookRobot: FxRobotInterface =
-            new FxRobot
-          newBookRobot.clickOn(
-            NodeQueryUtils hasId BookEntryDialog.titleControlId,
-            MouseButton.PRIMARY
+          activateControl(
+            BookEntryDialog.titleControlId
           )
-          validNewBook.title.toCharArray foreach {
-            case current@upperCase if current.isLetter && current.isUpper =>
-              newBookRobot push(
-                KeyCode.SHIFT,
-                KeyCode getKeyCode upperCase.toString
-              )
-            case current@space if current == ' ' =>
-              newBookRobot push KeyCode.SPACE
-            case current =>
-              newBookRobot push (KeyCode getKeyCode current.toUpper.toString)
-          }
+          enterDataIntoControl(
+            validNewBook.title
+          )
 
           "and the user enters the author of the new book" - {
+            activateControl(
+              BookEntryDialog.authorControlId
+            )
+            enterDataIntoControl(
+              validNewBook.author
+            )
+
             "and the user enters the ISBN of the new book" - {
               "and the user enters the description of the new book" - {
                 "and the user selects the cover image for the new book" - {
@@ -89,7 +89,43 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
   }
 
   /**
+    * Activate control to edit
+    * @param controlId ID of control to activate
+    */
+  private def activateControl(
+    controlId: String
+  ) = {
+    newBookRobot.clickOn(
+      NodeQueryUtils hasId controlId,
+      MouseButton.PRIMARY
+    )
+  }
+
+  /**
+    * Enter data into currently active control
+    * @param dataToEnter Data to place into control
+    */
+  private def enterDataIntoControl(
+    dataToEnter: String
+  ) = {
+    dataToEnter.toCharArray foreach {
+      case current@upperCase if current.isLetter && current.isUpper =>
+        newBookRobot push(
+          KeyCode.SHIFT,
+          KeyCode getKeyCode upperCase.toString
+        )
+      case current@space if current == ' ' =>
+        newBookRobot push KeyCode.SPACE
+      case current@period if current == '.' =>
+        newBookRobot push KeyCode.PERIOD
+      case current =>
+        newBookRobot push (KeyCode getKeyCode current.toUpper.toString)
+    }
+  }
+
+  /**
     * Create dialog to add book to catalog
+    *
     * @return Dialog to add book to catalog
     */
   private def BookAdditionDialog: Scene = {
