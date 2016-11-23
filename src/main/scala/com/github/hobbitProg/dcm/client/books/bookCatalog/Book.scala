@@ -16,12 +16,12 @@ import scala.collection.Set
   * @param categories Categories associated with book
   */
 class Book(
-  val title: String,
-  val author: String,
-  val isbn: String,
-  val description: String,
-  val coverImage: String,
-  val categories: Set[String]
+  var title: String = "",
+  var author: String = "",
+  var isbn: String = "",
+  var description: String = "",
+  var coverImage: String = "",
+  var categories: Set[String] = Set[String]()
 ) {
   override def equals(
     obj: Any
