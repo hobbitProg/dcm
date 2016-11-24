@@ -1,12 +1,20 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookEntryDialog
 
-import java.util.function.Supplier
+import java.io.File
+import java.util.function.{Consumer, Supplier}
 import javafx.application.Application
-import javafx.scene.Scene
 import javafx.scene.input.{KeyCode, MouseButton}
+import javafx.stage.FileChooser.ExtensionFilter
+import javafx.stage.Stage
 
+import scalafx.Includes._
+import scalafx.collections.ObservableBuffer
+import scalafx.scene.Scene
+import scalafx.stage.{FileChooser, Stage}
+import scalafx.stage.Stage._
 import org.testfx.api.{FxRobot, FxRobotInterface, FxToolkit}
 import org.testfx.util.NodeQueryUtils
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.FreeSpec
 
 import scala.collection.Set
@@ -18,7 +26,8 @@ import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
   * Verifies dialog that allows books to be edited can add books to catalog
   */
 class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
-  extends FreeSpec {
+  extends FreeSpec
+    with MockFactory {
   // Robot to automate entering in information
   val newBookRobot: FxRobotInterface =
     new FxRobot
@@ -74,6 +83,10 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
                 )
 
                 "and the user selects the cover image for the new book" - {
+                  activateControl(
+                    BookEntryDialog.bookCoverButtonId
+                  )
+
                   "and the user requests to associate categories with the new" +
                     " book" - {
                     "and the user selects the first category with the new " +
@@ -143,6 +156,10 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
     * @return Dialog to add book to catalog
     */
   private def BookAdditionDialog: Scene = {
+    // Create mock file choolser
+    val coverImageChooser =
+      mock[FileChooser]
+
     // Create test application
     FxToolkit.registerPrimaryStage()
     FxToolkit.setupApplication(
@@ -155,12 +172,33 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
     FxToolkit.showStage()
 
     // Create dialog to add book to catalog
-    FxToolkit.setupScene(
-      new Supplier[Scene] {
-        override def get(): Scene = {
-          new BookEntryDialog
+    val bookEntryDialog =
+      new BookEntryDialog(
+        coverImageChooser
+      )
+    val bookEntryStage: javafx.stage.Stage =
+      FxToolkit.setupStage(
+        new Consumer[javafx.stage.Stage] {
+          override def accept(t: javafx.stage.Stage): Unit = {
+            t.scene = bookEntryDialog
+          }
         }
-      }
+      )
+
+    // Create expectations for mock file chooser
+    (coverImageChooser.showOpenDialog _).expects(
+      jfxStage2sfx(
+        bookEntryStage
+      )
+    ).returning(
+      new File(
+        getClass.getResource(
+          "/" +
+          validNewBook.coverImage
+        ).toURI
+      )
     )
+
+    bookEntryDialog
   }
 }
