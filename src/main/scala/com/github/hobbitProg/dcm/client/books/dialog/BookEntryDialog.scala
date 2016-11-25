@@ -1,18 +1,19 @@
 package com.github.hobbitProg.dcm.client.books.dialog
 
-import java.io.{File, FileInputStream}
+import java.io.FileInputStream
 
+import javafx.collections.FXCollections
 import javafx.scene.layout.{Border, BorderStroke, BorderStrokeStyle, CornerRadii}
 import javafx.scene.paint.Color
-import javafx.stage.FileChooser.ExtensionFilter
-
 import scalafx.Includes._
+import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
 import scalafx.scene.Scene
-import scalafx.scene.control.{Button, Label, TextArea, TextField}
+import scalafx.scene.control.{Button, Label, ListView, TextArea, TextField}
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.{AnchorPane, VBox}
 import scalafx.stage.FileChooser
+
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
 
 /**
@@ -207,7 +208,37 @@ class BookEntryDialog(
   )
   AnchorPane.setTopAnchor(
     coverImageSelectionButton,
-    BookEntryDialog.coverImageSelectionTopBorser
+    BookEntryDialog.coverImageSelectionTopBorder
+  )
+
+  // Create control to display categories associated with book
+  private val categoryLabel: Label =
+    new Label(
+      "Associated Categories:"
+    )
+  AnchorPane.setTopAnchor(
+    categoryLabel,
+    BookEntryDialog.categoryLabelTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    categoryLabel,
+    BookEntryDialog.categoryControlLeftBorder
+  )
+  private val associatedCategories: ObservableBuffer[String] =
+    new ObservableBuffer[String](
+      FXCollections.observableArrayList()
+    )
+  private val categoryControl: ListView[String] =
+    new ListView[String](
+      associatedCategories
+    )
+  AnchorPane.setTopAnchor(
+    categoryControl,
+    BookEntryDialog.categoryControlTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    categoryControl,
+    BookEntryDialog.categoryControlLeftBorder
   )
 
   // Set pane for dialog
@@ -224,7 +255,9 @@ class BookEntryDialog(
           descriptionLabel,
           descriptionControl,
           coverImagePane,
-          coverImageSelectionButton
+          coverImageSelectionButton,
+          categoryLabel,
+          categoryControl
         )
     }
 }
@@ -246,8 +279,12 @@ object BookEntryDialog {
   private val textFieldLeftBorder: Double = 90.0
   private val coverImageLeftBorder: Double = 2.0
   private val coverImageTopBorder: Double = 296.0
-  private val coverImageSelectionLeftBorder: Double = 145.0
-  private val coverImageSelectionTopBorser: Double = 598.0
+  private val coverImageSelectionLeftBorder: Double = 75.0
+  private val coverImageSelectionTopBorder: Double = 598.0
+  private val categoryLabelLeftBorder: Double = 354.0
+  private val categoryLabelTopBorder: Double = 296.0
+  private val categoryControlLeftBorder: Double = 354.0
+  private val categoryControlTopBorder: Double = 324.0
 
   private val dialogWidth: Double = 650.0
   private val dialogHeight: Double = 750.0

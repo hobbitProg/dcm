@@ -1,6 +1,5 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog
 
-import scala.Any
 import scala.collection.Set
 
 /**
