@@ -4,14 +4,10 @@ import java.io.File
 import java.util.function.{Consumer, Supplier}
 import javafx.application.Application
 import javafx.scene.input.{KeyCode, MouseButton}
-import javafx.stage.FileChooser.ExtensionFilter
-import javafx.stage.Stage
 
 import scalafx.Includes._
-import scalafx.collections.ObservableBuffer
 import scalafx.scene.Scene
-import scalafx.stage.{FileChooser, Stage}
-import scalafx.stage.Stage._
+import scalafx.stage.FileChooser
 import org.testfx.api.{FxRobot, FxRobotInterface, FxToolkit}
 import org.testfx.util.NodeQueryUtils
 import org.scalamock.scalatest.MockFactory

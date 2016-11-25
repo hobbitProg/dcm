@@ -36,6 +36,19 @@ class BookEntryDialog(
   private val bookBeingEdited =
     new Book
 
+  // Defined categories that are not associated with book
+  val unassociatedCategories: ObservableBuffer[String] =
+    new ObservableBuffer[String](
+      FXCollections.observableArrayList(
+        definedCategories.toList.sortWith(
+          (leftCategory, rightCategory) =>
+            leftCategory.compareTo(
+              rightCategory
+            ) < 0
+        ):_*
+      )
+    )
+
   // Create control for entering in title of book
   private val titleLabel =
     new Label(
@@ -244,6 +257,24 @@ class BookEntryDialog(
     BookEntryDialog.categoryControlLeftBorder
   )
 
+  // Create button to update what categories are associated with book
+  private val updateCategoriesButton =
+    new Button(
+      "Update Associated Categories"
+    )
+  unassociatedCategories onChange {
+    updateCategoriesButton.disable =
+      unassociatedCategories.length == 0
+  }
+  AnchorPane.setTopAnchor(
+    updateCategoriesButton,
+    BookEntryDialog.categoryUpdateButtonTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    updateCategoriesButton,
+    BookEntryDialog.categoryUpdateButtonLeftBorder
+  )
+
   // Set pane for dialog
   content =
     new AnchorPane {
@@ -260,7 +291,8 @@ class BookEntryDialog(
           coverImagePane,
           coverImageSelectionButton,
           categoryLabel,
-          categoryControl
+          categoryControl,
+          updateCategoriesButton
         )
     }
 }
@@ -284,13 +316,15 @@ object BookEntryDialog {
   private val coverImageTopBorder: Double = 296.0
   private val coverImageSelectionLeftBorder: Double = 75.0
   private val coverImageSelectionTopBorder: Double = 598.0
-  private val categoryLabelLeftBorder: Double = 354.0
+  private val categoryLabelLeftBorder: Double = 310.0
   private val categoryLabelTopBorder: Double = 296.0
-  private val categoryControlLeftBorder: Double = 354.0
+  private val categoryControlLeftBorder: Double = 310.0
   private val categoryControlTopBorder: Double = 324.0
+  private val categoryUpdateButtonLeftBorder: Double = 325.0
+  private val categoryUpdateButtonTopBorder: Double = 725.0
 
   private val dialogWidth: Double = 650.0
-  private val dialogHeight: Double = 750.0
+  private val dialogHeight: Double = 800.0
   private val coverImageWidth: Double = 300.0
   private val coverImageHeight: Double = 300.0
 }
