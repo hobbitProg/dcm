@@ -46,9 +46,19 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
 
   "Given a book catalog" - {
     "and a collection of defined categories" - {
+      val definedCategories: Set[String] =
+        Set[String](
+          "sci-fi",
+          "conspiracy",
+          "fantasy",
+          "thriller"
+        )
+
       "and dialog to fill with details of book to add to catalog" - {
         val bookAdditionDialog: Scene =
-          BookAdditionDialog
+          BookAdditionDialog(
+            definedCategories
+          )
 
         "when the user enters the title of the new book" - {
           activateControl(
@@ -155,7 +165,9 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
     *
     * @return Dialog to add book to catalog
     */
-  private def BookAdditionDialog: Scene = {
+  private def BookAdditionDialog(
+    definedCategories: Set[String]
+  ): Scene = {
     // Create mock file choolser
     val coverImageChooser =
       mock[FileChooser]
@@ -174,7 +186,8 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
     // Create dialog to add book to catalog
     val bookEntryDialog =
       new BookEntryDialog(
-        coverImageChooser
+        coverImageChooser,
+        definedCategories
       )
     val bookEntryStage: javafx.stage.Stage =
       FxToolkit.setupStage(

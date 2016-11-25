@@ -9,7 +9,7 @@ So that I can know what books I own
 
 Scenario:
 Given the following defined categories:
-|category}
+|category|
 |sci-fi|
 |conspiracy|
 |fantasy|

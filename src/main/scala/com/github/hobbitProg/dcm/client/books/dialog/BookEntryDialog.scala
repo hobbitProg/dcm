@@ -3,8 +3,10 @@ package com.github.hobbitProg.dcm.client.books.dialog
 import java.io.FileInputStream
 
 import javafx.collections.FXCollections
-import javafx.scene.layout.{Border, BorderStroke, BorderStrokeStyle, CornerRadii}
+import javafx.scene.layout.{Border, BorderStroke, BorderStrokeStyle,
+CornerRadii}
 import javafx.scene.paint.Color
+import scala.collection.Set
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
@@ -23,7 +25,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
   */
 
 class BookEntryDialog(
-  private val coverImageChooser: FileChooser
+  private val coverImageChooser: FileChooser,
+  private val definedCategories: Set[String]
 )
   extends Scene(
     BookEntryDialog.dialogWidth,
