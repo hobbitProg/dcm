@@ -114,6 +114,9 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
                         activateControl(
                           CategorySelectionDialog.availableButtonId
                         )
+                        activateControl(
+                          CategorySelectionDialog.saveButtonId
+                        )
 
                         "when the user accepts the information on the new " +
                           "book" - {

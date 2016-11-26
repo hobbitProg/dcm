@@ -2,12 +2,14 @@ package com.github.hobbitProg.dcm.client.dialog
 
 import javafx.collections.FXCollections
 import javafx.scene.control.SelectionMode
+import scala.collection.Set
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, Label, ListView, MultipleSelectionModel}
 import scalafx.scene.layout.AnchorPane
+import scalafx.stage.Stage
 
 /**
   * Selects categories associated with entry
@@ -17,7 +19,10 @@ import scalafx.scene.layout.AnchorPane
 class CategorySelectionDialog(
   private val availableCategories: ObservableBuffer[String],
   private val selectedCategories: ObservableBuffer[String]
-) extends Scene {
+) extends Scene(
+  CategorySelectionDialog.dialogWidth,
+  CategorySelectionDialog.dialogHeight
+) {
   // Locally selected/available categories
   private val available: ObservableBuffer[String] =
     FXCollections.observableArrayList(
@@ -142,6 +147,48 @@ class CategorySelectionDialog(
     CategorySelectionDialog.disassociatedButtonLeftBorder
   )
 
+  // Create button to commit category associations
+  private val saveButton: Button =
+    new Button(
+      "Save"
+    )
+  saveButton.id =
+    CategorySelectionDialog.saveButtonId
+  saveButton.onAction =
+    (event: ActionEvent) => {
+      val newlySelectedCategories: Set[String] =
+        availableCategories.toSet[String] -- available.toSet[String]
+      val newlyDeselectedCategories: Set[String] =
+        available.toSet[String] -- availableCategories.toSet[String]
+      availableCategories --=
+        newlySelectedCategories
+      availableCategories ++=
+        newlyDeselectedCategories
+      availableCategories sort {
+        (categoryOne, categoryTwo) =>
+          (categoryOne compare categoryTwo) < 0
+      }
+      selectedCategories --=
+        newlyDeselectedCategories
+      selectedCategories ++=
+        newlySelectedCategories
+      selectedCategories sort {
+        (categoryOne, categoryTwo) =>
+          (categoryOne compare categoryTwo) < 0
+      }
+      val parentStage: Stage =
+        window.value.asInstanceOf[javafx.stage.Stage]
+      parentStage.close
+    }
+  AnchorPane.setTopAnchor(
+    saveButton,
+    CategorySelectionDialog.saveButtonTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    saveButton,
+    CategorySelectionDialog.saveButtonLeftBorder
+  )
+
   // Set pane for dialog
   content =
     new AnchorPane {
@@ -152,13 +199,15 @@ class CategorySelectionDialog(
           selectedLabel,
           selectedCategoriesControl,
           associateButton,
-          disassociateButton
+          disassociateButton,
+          saveButton
         )
     }
 }
 
 object CategorySelectionDialog {
   val availableButtonId: String = "AvailableButtonId"
+  val saveButtonId: String = "SaveButtonId"
 
   private val availableCategoriesLabelTopBorder: Double = 2.0
   private val availableCategoriesLabelLeftBorder: Double = 2.0
@@ -172,4 +221,9 @@ object CategorySelectionDialog {
   private val associateButtonLeftBorder: Double = 255.0
   private val disassociateButtonTopBorder: Double = 250.0
   private val disassociatedButtonLeftBorder: Double = 255.0
+  private val saveButtonTopBorder: Double = 432.0
+  private val saveButtonLeftBorder: Double = 390.0
+
+  private val dialogWidth: Double = 600.0
+  private val dialogHeight: Double = 475.0
 }
