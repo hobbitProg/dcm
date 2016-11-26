@@ -2,6 +2,8 @@ package com.github.hobbitProg.dcm.client.dialog
 
 import javafx.collections.FXCollections
 import javafx.scene.control.SelectionMode
+
+import scala.List
 import scala.collection.Set
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
@@ -104,10 +106,11 @@ class CategorySelectionDialog(
   }
   associateButton.onAction =
     (event: ActionEvent) => {
-      selected ++=
-        availableCategoriesControl.selectionModel.value.getSelectedItems.toList
-      available --=
-        availableCategoriesControl.selectionModel.value.getSelectedItems.toList
+      moveCategories(
+        availableCategoriesControl.selectionModel.value.getSelectedItems.toList,
+        available,
+        selected
+      )
     }
   AnchorPane.setTopAnchor(
     associateButton,
@@ -133,10 +136,11 @@ class CategorySelectionDialog(
   }
   disassociateButton.onAction =
     (event: ActionEvent) => {
-      selected --=
-        selectedCategoriesControl.selectionModel.value.getSelectedItems.toList
-      available ++=
-        selectedCategoriesControl.selectionModel.value.getSelectedItems.toList
+      moveCategories(
+        selectedCategoriesControl.selectionModel.value.getSelectedItems.toList,
+        selected,
+        available
+      )
     }
   AnchorPane.setTopAnchor(
     disassociateButton,
@@ -156,30 +160,10 @@ class CategorySelectionDialog(
     CategorySelectionDialog.saveButtonId
   saveButton.onAction =
     (event: ActionEvent) => {
-      val newlySelectedCategories: Set[String] =
-        availableCategories.toSet[String] -- available.toSet[String]
-      val newlyDeselectedCategories: Set[String] =
-        available.toSet[String] -- availableCategories.toSet[String]
-      availableCategories --=
-        newlySelectedCategories
-      availableCategories ++=
-        newlyDeselectedCategories
-      availableCategories sort {
-        (categoryOne, categoryTwo) =>
-          (categoryOne compare categoryTwo) < 0
-      }
-      selectedCategories --=
-        newlyDeselectedCategories
-      selectedCategories ++=
-        newlySelectedCategories
-      selectedCategories sort {
-        (categoryOne, categoryTwo) =>
-          (categoryOne compare categoryTwo) < 0
-      }
-      val parentStage: Stage =
-        window.value.asInstanceOf[javafx.stage.Stage]
-      parentStage.close
+      finalizeAssociation()
+      closeDialog()
     }
+
   AnchorPane.setTopAnchor(
     saveButton,
     CategorySelectionDialog.saveButtonTopBorder
@@ -187,6 +171,24 @@ class CategorySelectionDialog(
   AnchorPane.setLeftAnchor(
     saveButton,
     CategorySelectionDialog.saveButtonLeftBorder
+  )
+
+  // Create button to cancel associating categories
+  private val cancelButton: Button =
+    new Button(
+      "Cancel"
+    )
+  cancelButton.onAction =
+    (event: ActionEvent) => {
+      closeDialog()
+    }
+  AnchorPane.setTopAnchor(
+    cancelButton,
+    CategorySelectionDialog.cancelButtonTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    cancelButton,
+    CategorySelectionDialog.cancelButtonLeftBorder
   )
 
   // Set pane for dialog
@@ -200,9 +202,54 @@ class CategorySelectionDialog(
           selectedCategoriesControl,
           associateButton,
           disassociateButton,
-          saveButton
+          saveButton,
+          cancelButton
         )
     }
+
+  // Close dialog window
+  private def closeDialog() = {
+    val parentStage: Stage =
+      window.value.asInstanceOf[javafx.stage.Stage]
+    parentStage.close
+  }
+
+  // Move given categories from given collection to other collection
+  private def moveCategories(
+    categoriesToMove: List[String],
+    origin: ObservableBuffer[String],
+    destination: ObservableBuffer[String]
+  ) = {
+    origin --=
+      categoriesToMove
+    destination ++=
+      categoriesToMove
+  }
+
+  // Finalize category associations for item
+  private def finalizeAssociation() = {
+    val newlySelectedCategories: Set[String] =
+      availableCategories.toSet[String] -- available.toSet[String]
+    val newlyDeselectedCategories: Set[String] =
+      available.toSet[String] -- availableCategories.toSet[String]
+    availableCategories --=
+      newlySelectedCategories
+    availableCategories ++=
+      newlyDeselectedCategories
+    (newlySelectedCategories, newlyDeselectedCategories)
+    availableCategories sort {
+      (categoryOne, categoryTwo) =>
+        (categoryOne compare categoryTwo) < 0
+    }
+    selectedCategories --=
+      newlyDeselectedCategories
+    selectedCategories ++=
+      newlySelectedCategories
+    selectedCategories sort {
+      (categoryOne, categoryTwo) =>
+        (categoryOne compare categoryTwo) < 0
+    }
+  }
 }
 
 object CategorySelectionDialog {
@@ -223,6 +270,8 @@ object CategorySelectionDialog {
   private val disassociatedButtonLeftBorder: Double = 255.0
   private val saveButtonTopBorder: Double = 432.0
   private val saveButtonLeftBorder: Double = 390.0
+  private val cancelButtonTopBorder: Double = 432.0
+  private val cancelButtonLeftBorder: Double = 100.0
 
   private val dialogWidth: Double = 600.0
   private val dialogHeight: Double = 475.0
