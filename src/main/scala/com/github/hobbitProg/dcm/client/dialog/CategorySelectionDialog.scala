@@ -6,7 +6,7 @@ import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
 import scalafx.scene.Scene
-import scalafx.scene.control.{Button, Label, ListView}
+import scalafx.scene.control.{Button, Label, ListView, MultipleSelectionModel}
 import scalafx.scene.layout.AnchorPane
 
 /**
@@ -15,21 +15,21 @@ import scalafx.scene.layout.AnchorPane
   * @since 0.1
   */
 class CategorySelectionDialog(
-  val availableCategories: ObservableBuffer[String],
-  val selectedCategories: ObservableBuffer[String]
+  private val availableCategories: ObservableBuffer[String],
+  private val selectedCategories: ObservableBuffer[String]
 ) extends Scene {
   // Locally selected/available categories
-  val available: ObservableBuffer[String] =
+  private val available: ObservableBuffer[String] =
     FXCollections.observableArrayList(
       availableCategories.toList: _*
     )
-  val selected: ObservableBuffer[String] =
+  private val selected: ObservableBuffer[String] =
     FXCollections.observableArrayList(
       selectedCategories.toList: _*
     )
 
   // Create control for available categories
-  val availableLabel: Label =
+  private val availableLabel: Label =
     new Label(
       "Available categories:"
     )
@@ -41,7 +41,7 @@ class CategorySelectionDialog(
     availableLabel,
     CategorySelectionDialog.availableCategoriesLabelTopBorder
   )
-  val availableCategoriesControl: ListView[String] =
+  private val availableCategoriesControl: ListView[String] =
     new ListView[String](
       available
     )
@@ -57,7 +57,7 @@ class CategorySelectionDialog(
   )
 
   // Create control for associated categories
-  val selectedLabel: Label =
+  private val selectedLabel: Label =
     new Label(
       "Selected categories:"
     )
@@ -69,7 +69,7 @@ class CategorySelectionDialog(
     selectedLabel,
     CategorySelectionDialog.selectedCategoriesLabelTopBorder
   )
-  val selectedCategoriesControl: ListView[String] =
+  private val selectedCategoriesControl: ListView[String] =
     new ListView[String](
       selected
     )
@@ -82,16 +82,18 @@ class CategorySelectionDialog(
     CategorySelectionDialog.selectedCategoriesTopBorder
   )
 
-  // Create button to associate category with entry
-  val associateButton: Button =
+  // Create button to associate categories with entry
+  private val associateButton: Button =
     new Button(
       "->"
     )
   associateButton.disable =
-    false
+    true
   associateButton.id =
     CategorySelectionDialog.availableButtonId
-  availableCategoriesControl.selectionModel.onChange {
+  val availableCategoriesSelectionModel: MultipleSelectionModel[String] =
+    availableCategoriesControl.selectionModel.value
+  availableCategoriesSelectionModel.selectedItem.onChange {
     associateButton.disable =
       availableCategoriesControl.selectionModel.value.isEmpty
   }
@@ -111,6 +113,34 @@ class CategorySelectionDialog(
     CategorySelectionDialog.associateButtonLeftBorder
   )
 
+  // Create button to disassociate categories with entry
+  private val disassociateButton: Button =
+    new Button(
+      "<-"
+    )
+  disassociateButton.disable =
+    true
+  val selectedCategoriesSelectionModel: MultipleSelectionModel[String] =
+    selectedCategoriesControl.selectionModel.value
+  selectedCategoriesSelectionModel.selectedItem.onChange {
+    disassociateButton.disable =
+      selectedCategoriesControl.selectionModel.value.isEmpty
+  }
+  disassociateButton.onAction =
+    (event: ActionEvent) => {
+      selected --=
+        selectedCategoriesControl.selectionModel.value.getSelectedItems.toList
+      available ++=
+        selectedCategoriesControl.selectionModel.value.getSelectedItems.toList
+    }
+  AnchorPane.setTopAnchor(
+    disassociateButton,
+    CategorySelectionDialog.disassociateButtonTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    disassociateButton,
+    CategorySelectionDialog.disassociatedButtonLeftBorder
+  )
 
   // Set pane for dialog
   content =
@@ -121,7 +151,8 @@ class CategorySelectionDialog(
           availableCategoriesControl,
           selectedLabel,
           selectedCategoriesControl,
-          associateButton
+          associateButton,
+          disassociateButton
         )
     }
 }
@@ -139,4 +170,6 @@ object CategorySelectionDialog {
   private val selectedCategoriesLeftBorder: Double = 295.0
   private val associateButtonTopBorder: Double = 200.0
   private val associateButtonLeftBorder: Double = 255.0
+  private val disassociateButtonTopBorder: Double = 250.0
+  private val disassociatedButtonLeftBorder: Double = 255.0
 }
