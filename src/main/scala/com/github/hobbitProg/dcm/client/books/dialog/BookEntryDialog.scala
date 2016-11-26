@@ -14,10 +14,11 @@ import scalafx.scene.Scene
 import scalafx.scene.control.{Button, Label, ListView, TextArea, TextField}
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.{AnchorPane, VBox}
-import scalafx.stage.FileChooser
+import scalafx.stage.{FileChooser, Stage}
 
+import com.github.hobbitProg.dcm.client.control.DisableSelectionModel
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
-
+import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
 /**
   * Dialog for entering information on book for catalog
   * @author Kyle Cranmer
@@ -248,6 +249,8 @@ class BookEntryDialog(
     new ListView[String](
       associatedCategories
     )
+  categoryControl.selectionModel =
+    new DisableSelectionModel[String]
   AnchorPane.setTopAnchor(
     categoryControl,
     BookEntryDialog.categoryControlTopBorder
@@ -266,6 +269,19 @@ class BookEntryDialog(
     updateCategoriesButton.disable =
       unassociatedCategories.length == 0
   }
+  updateCategoriesButton.onAction =
+    (event: ActionEvent) => {
+      new Stage {
+        outer =>
+        title = "Associate categories with book"
+        scene =
+          new CategorySelectionDialog(
+            associatedCategories
+          )
+      }.showAndWait
+    }
+  updateCategoriesButton.id =
+    BookEntryDialog.categorySelectionButtonId
   AnchorPane.setTopAnchor(
     updateCategoriesButton,
     BookEntryDialog.categoryUpdateButtonTopBorder
@@ -303,6 +319,7 @@ object BookEntryDialog {
   val isbnControlId: String = "bookISBNControl"
   val descriptionControlId: String = "bookDescriptionControl"
   val bookCoverButtonId: String = "bookCoverButton"
+  val categorySelectionButtonId: String = "categorySelectionButton"
 
   private val titleTopBorder: Double = 2.0
   private val authorTopBorder: Double = 30.0

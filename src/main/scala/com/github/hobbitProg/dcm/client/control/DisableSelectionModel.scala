@@ -1,8 +1,6 @@
-package com.github.hobbitProg.dcm.client.books.control
+package com.github.hobbitProg.dcm.client.control
 
 import scalafx.scene.control.MultipleSelectionModel
-
-import com.github.hobbitProg.dcm.client.control.java.DisabledSelectionModel
 
 /**
   * Model that does not allow user to select any elements from control

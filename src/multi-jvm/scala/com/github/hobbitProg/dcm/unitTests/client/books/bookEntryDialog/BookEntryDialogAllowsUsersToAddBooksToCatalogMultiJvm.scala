@@ -95,6 +95,10 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
 
                   "and the user requests to associate categories with the new" +
                     " book" - {
+                    activateControl(
+                      BookEntryDialog.categorySelectionButtonId
+                    )
+
                     "and the user selects the first category with the new " +
                       "book" - {
                       "and the user selects the second category with the new " +
