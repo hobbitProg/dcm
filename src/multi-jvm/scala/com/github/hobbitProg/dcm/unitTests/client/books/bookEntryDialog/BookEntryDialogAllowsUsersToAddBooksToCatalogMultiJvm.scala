@@ -14,6 +14,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.FreeSpec
 
 import scala.collection.Set
+import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
@@ -101,8 +102,19 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
 
                     "and the user selects the first category with the new " +
                       "book" - {
+                      selectCategory(
+                        validNewBook.categories.head
+                      )
+
                       "and the user selects the second category with the new " +
                         "book" - {
+                        selectCategory(
+                          validNewBook.categories.last
+                        )
+                        activateControl(
+                          CategorySelectionDialog.availableButtonId
+                        )
+
                         "when the user accepts the information on the new " +
                           "book" - {
                           "then the dialog is closed" in
@@ -135,6 +147,25 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
     newBookRobot.clickOn(
       NodeQueryUtils hasId controlId,
       MouseButton.PRIMARY
+    )
+  }
+
+  /**
+    * Select given category
+    * @param category Category to select
+    */
+  private def selectCategory(
+    category: String
+  ) = {
+    newBookRobot.press(
+      KeyCode.CONTROL
+    )
+    newBookRobot.clickOn(
+      NodeQueryUtils hasText category,
+      MouseButton.PRIMARY
+    )
+    newBookRobot.release(
+      KeyCode.CONTROL
     )
   }
 
