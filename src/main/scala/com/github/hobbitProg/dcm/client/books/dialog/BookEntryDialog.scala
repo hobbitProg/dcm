@@ -276,6 +276,7 @@ class BookEntryDialog(
         title = "Associate categories with book"
         scene =
           new CategorySelectionDialog(
+            unassociatedCategories,
             associatedCategories
           )
       }.showAndWait
