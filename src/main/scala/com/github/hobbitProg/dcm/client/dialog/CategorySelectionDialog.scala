@@ -91,9 +91,9 @@ class CategorySelectionDialog(
     false
   associateButton.id =
     CategorySelectionDialog.availableButtonId
-  selectedCategoriesControl.selectionModel.onChange {
+  availableCategoriesControl.selectionModel.onChange {
     associateButton.disable =
-      selectedCategoriesControl.selectionModel.value.isEmpty
+      availableCategoriesControl.selectionModel.value.isEmpty
   }
   associateButton.onAction =
     (event: ActionEvent) => {
