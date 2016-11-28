@@ -11,7 +11,7 @@ import scalafx.stage.FileChooser
 import org.testfx.api.{FxRobot, FxRobotInterface, FxToolkit}
 import org.testfx.util.NodeQueryUtils
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.FreeSpec
+import org.scalatest.{FreeSpec, Matchers}
 
 import scala.collection.Set
 import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
@@ -24,7 +24,8 @@ import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
   */
 class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
   extends FreeSpec
-    with MockFactory {
+    with MockFactory
+    with Matchers {
   // Robot to automate entering in information
   val newBookRobot: FxRobotInterface =
     new FxRobot
@@ -43,7 +44,12 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
 
   "Given a book catalog" - {
     val catalog: Catalog =
-      stub[Catalog]
+      new TestCatalog
+    var addedBook: Book = null
+    catalog onAdd {
+      newBook =>
+        addedBook = newBook
+    }
 
     "and a collection of defined categories" - {
       val definedCategories: Set[String] =
@@ -124,13 +130,15 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
 
                         "when the user accepts the information on the new " +
                           "book" - {
+                          activateControl(
+                            BookEntryDialog.saveButtonId
+                          )
+
                           "then the dialog is closed" in
                             pending
-                          "and the book was added to the catalog" in
-                            pending
-                          "and the original contents of the catalog still " +
-                            "exist in the catalog" in
-                            pending
+                          "and the book was added to the catalog" in {
+                            addedBook shouldEqual validNewBook
+                          }
                         }
                       }
                     }
@@ -224,7 +232,7 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
   ): Scene = {
     // Create mock file choolser
     val coverImageChooser =
-      stub[FileChooser]
+      mock[FileChooser]
 
     // Create test application
     FxToolkit.registerPrimaryStage()
@@ -254,7 +262,7 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
       )
 
     // Create expectations for mock file chooser
-    (coverImageChooser.showOpenDialog _).when(
+    (coverImageChooser.showOpenDialog _).expects(
       jfxStage2sfx(
         bookEntryStage
       )

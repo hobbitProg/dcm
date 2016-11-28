@@ -38,8 +38,11 @@ class BookEntryDialog(
     BookEntryDialog.dialogHeight
   ) {
   // Book being edited
-  private val bookBeingEdited =
+  private val bookBeingEdited: Book =
     new Book
+
+  // Updated book catalog
+  var updatedCatalog: Catalog = _
 
   // Defined categories that are not associated with book
   val unassociatedCategories: ObservableBuffer[String] =
@@ -210,12 +213,16 @@ class BookEntryDialog(
     BookEntryDialog.bookCoverButtonId
   coverImageSelectionButton.onAction =
     (event: ActionEvent) => {
+      val coverImageFile =
+        coverImageChooser.showOpenDialog(
+          window.value
+        )
+      bookBeingEdited.coverImage =
+        coverImageFile.getName
       coverImageControl.image =
         new Image(
           new FileInputStream(
-            coverImageChooser.showOpenDialog(
-              window.value
-            )
+            coverImageFile
           ),
           BookEntryDialog.coverImageWidth,
           BookEntryDialog.coverImageHeight,
@@ -284,6 +291,8 @@ class BookEntryDialog(
             associatedCategories
           )
       }.showAndWait
+      bookBeingEdited.categories =
+        associatedCategories.toSet[String]
     }
   updateCategoriesButton.id =
     BookEntryDialog.categorySelectionButtonId
@@ -294,6 +303,27 @@ class BookEntryDialog(
   AnchorPane.setLeftAnchor(
     updateCategoriesButton,
     BookEntryDialog.categoryUpdateButtonLeftBorder
+  )
+
+  // Add button to save information
+  val saveButton =
+    new Button(
+      "Save"
+    )
+  saveButton.id =
+    BookEntryDialog.saveButtonId
+  saveButton.onAction =
+    (event: ActionEvent) => {
+      updatedCatalog =
+        catalog + bookBeingEdited
+    }
+  AnchorPane.setTopAnchor(
+    saveButton,
+    BookEntryDialog.saveButtonTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    saveButton,
+    BookEntryDialog.saveButtonLeftButton
   )
 
   // Set pane for dialog
@@ -313,7 +343,8 @@ class BookEntryDialog(
           coverImageSelectionButton,
           categoryLabel,
           categoryControl,
-          updateCategoriesButton
+          updateCategoriesButton,
+          saveButton
         )
     }
 }
@@ -325,6 +356,7 @@ object BookEntryDialog {
   val descriptionControlId: String = "bookDescriptionControl"
   val bookCoverButtonId: String = "bookCoverButton"
   val categorySelectionButtonId: String = "categorySelectionButton"
+  val saveButtonId = "saveButton"
 
   private val titleTopBorder: Double = 2.0
   private val authorTopBorder: Double = 30.0
@@ -344,9 +376,11 @@ object BookEntryDialog {
   private val categoryControlTopBorder: Double = 324.0
   private val categoryUpdateButtonLeftBorder: Double = 325.0
   private val categoryUpdateButtonTopBorder: Double = 725.0
+  private val saveButtonLeftButton: Double = 325.0
+  private val saveButtonTopBorder: Double = 800.0
 
   private val dialogWidth: Double = 650.0
-  private val dialogHeight: Double = 800.0
+  private val dialogHeight: Double = 1000.0
   private val coverImageWidth: Double = 300.0
   private val coverImageHeight: Double = 300.0
 }

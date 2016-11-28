@@ -1,7 +1,8 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog
 
 import java.sql.Connection
-import sodium.StreamSink
+import scala.collection.Set
+import sodium.{Listener, StreamSink}
 
 /**
   * Interface to book catalog
@@ -11,6 +12,8 @@ import sodium.StreamSink
 trait Catalog {
   protected val addStream: StreamSink[Book] =
     new StreamSink[Book]
+  private var actionListeners: Set[Listener] =
+    Set[Listener]()
 
   /**
     * Add book to catalog
@@ -33,9 +36,11 @@ trait Catalog {
   def onAdd(
     action: Book => Unit
   ): Unit = {
-    addStream.listen(
-      action
-    )
+    actionListeners =
+      actionListeners +
+      addStream.listen(
+        action
+      )
   }
 }
 
