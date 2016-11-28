@@ -17,16 +17,20 @@ import scalafx.scene.layout.{AnchorPane, VBox}
 import scalafx.stage.{FileChooser, Stage}
 
 import com.github.hobbitProg.dcm.client.control.DisableSelectionModel
-import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
+import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
 /**
   * Dialog for entering information on book for catalog
+  * @param coverImageChooser Creates dialog to select cover image for book
+  * @param catalog Catalog to update
+  * @param definedCategories Categories that can be associtated with book
   * @author Kyle Cranmer
   * @since 0.1
   */
 
 class BookEntryDialog(
   private val coverImageChooser: FileChooser,
+  private val catalog: Catalog,
   private val definedCategories: Set[String]
 )
   extends Scene(

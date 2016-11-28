@@ -15,7 +15,7 @@ import org.scalatest.FreeSpec
 
 import scala.collection.Set
 import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
-import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
+import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 
@@ -42,6 +42,9 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
       ))
 
   "Given a book catalog" - {
+    val catalog: Catalog =
+      stub[Catalog]
+
     "and a collection of defined categories" - {
       val definedCategories: Set[String] =
         Set[String](
@@ -53,7 +56,8 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
 
       "and dialog to fill with details of book to add to catalog" - {
         val bookAdditionDialog: Scene =
-          BookAdditionDialog(
+          createBookAdditionDialog(
+            catalog,
             definedCategories
           )
 
@@ -140,6 +144,18 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
     }
   }
 
+  // Test book catalog
+  private def bookCatalog: Catalog = {
+    val testCatalog =
+      mock[Catalog]
+    (testCatalog.+ _).expects(
+      validNewBook
+    ).returning(
+      testCatalog
+    )
+    testCatalog
+  }
+
   /**
     * Activate control to edit
     * @param controlId ID of control to activate
@@ -197,14 +213,18 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
   /**
     * Create dialog to add book to catalog
     *
+    * @param catalog Catalog to add to
+    * @param definedCategories Categories available to be associated with book
+    *
     * @return Dialog to add book to catalog
     */
-  private def BookAdditionDialog(
+  private def createBookAdditionDialog(
+    catalog: Catalog,
     definedCategories: Set[String]
   ): Scene = {
     // Create mock file choolser
     val coverImageChooser =
-      mock[FileChooser]
+      stub[FileChooser]
 
     // Create test application
     FxToolkit.registerPrimaryStage()
@@ -221,6 +241,7 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
     val bookEntryDialog =
       new BookEntryDialog(
         coverImageChooser,
+        catalog,
         definedCategories
       )
     val bookEntryStage: javafx.stage.Stage =
@@ -233,7 +254,7 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
       )
 
     // Create expectations for mock file chooser
-    (coverImageChooser.showOpenDialog _).expects(
+    (coverImageChooser.showOpenDialog _).when(
       jfxStage2sfx(
         bookEntryStage
       )
