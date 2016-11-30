@@ -1,5 +1,8 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog
 
+import com.github.hobbitProg.dcm.client.books.{Authors, Categories,
+CoverImageLocations, Descriptions, ISBNs, Titles}
+
 import scala.collection.Set
 
 /**
@@ -15,12 +18,12 @@ import scala.collection.Set
   * @param categories Categories associated with book
   */
 class Book(
-  var title: String = "",
-  var author: String = "",
-  var isbn: String = "",
-  var description: String = "",
-  var coverImage: String = "",
-  var categories: Set[String] = Set[String]()
+            var title: Titles = "",
+            var author: Authors = "",
+            var isbn: ISBNs = "",
+            var description: Descriptions = "",
+            var coverImage: CoverImageLocations = "",
+            var categories: Set[Categories] = Set[Categories]()
 ) {
   override def equals(
     obj: Any

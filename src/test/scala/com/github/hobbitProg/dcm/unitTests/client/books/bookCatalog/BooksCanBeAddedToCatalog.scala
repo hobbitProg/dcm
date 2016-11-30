@@ -1,14 +1,16 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog
 
-import acolyte.jdbc.{AcolyteDSL, Driver => AcolyteDriver, StatementHandler,
-UpdateExecution}
+import acolyte.jdbc.{AcolyteDSL, StatementHandler, UpdateExecution, Driver => AcolyteDriver}
 import acolyte.jdbc.Implicits._
 import java.sql.{Connection, DriverManager}
+
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
+
 import scala.collection.Set
 import scala.util.matching.Regex
-
+import com.github.hobbitProg.dcm.client.books.{Authors, Categories,
+CoverImageLocations, Descriptions, ISBNs, Titles}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
 
@@ -34,13 +36,13 @@ class BooksCanBeAddedToCatalog
   ("INSERT INTO catetegoryMapping [(]ISBN,Category[)]VALUES[(]'([^']+)','" +
       "([^']+)'[)]").r
 
-  private var addedTitle: String = ""
-  private var addedAuthor: String = ""
-  private var addedISBN: String = ""
-  private var addedDescription: String = ""
-  private var addedCover: String = ""
-  private var addedCategoryAssociations: Set[(String, String)] =
-    Set[(String, String)]()
+  private var addedTitle: Titles = ""
+  private var addedAuthor: Authors = ""
+  private var addedISBN: ISBNs = ""
+  private var addedDescription: Descriptions = ""
+  private var addedCover: CoverImageLocations = ""
+  private var addedCategoryAssociations: Set[(ISBNs, Categories)] =
+    Set[(ISBNs, Categories)]()
 
   "Given a book catalog" - {
     addedTitle = ""
@@ -107,7 +109,7 @@ class BooksCanBeAddedToCatalog
             (addedCategoryAssociations map {
               categoryAssociation =>
                 categoryAssociation._1
-            }) shouldEqual Set[String](newBook.isbn)
+            }) shouldEqual Set[ISBNs](newBook.isbn)
           }
 
           "and the book is given to the listener" in {
