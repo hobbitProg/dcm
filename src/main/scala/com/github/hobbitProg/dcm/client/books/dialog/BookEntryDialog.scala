@@ -316,6 +316,9 @@ class BookEntryDialog(
     (event: ActionEvent) => {
       updatedCatalog =
         catalog + bookBeingEdited
+      val parentStage: Stage =
+        window.value.asInstanceOf[javafx.stage.Stage]
+      parentStage.close
     }
   AnchorPane.setTopAnchor(
     saveButton,

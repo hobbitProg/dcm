@@ -134,8 +134,9 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
                             BookEntryDialog.saveButtonId
                           )
 
-                          "then the dialog is closed" in
-                            pending
+                          "then the dialog is closed" in {
+                            bookAdditionDialog.window.value.showing.value shouldBe false
+                          }
                           "and the book was added to the catalog" in {
                             addedBook shouldEqual validNewBook
                           }
