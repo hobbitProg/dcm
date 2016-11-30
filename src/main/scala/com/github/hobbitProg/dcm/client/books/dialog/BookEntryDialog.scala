@@ -175,6 +175,18 @@ class BookEntryDialog(
   )
 
   // Create control to display cover image
+  val coverImageLabel: Label =
+    new Label(
+      "Cover Image:"
+    )
+  AnchorPane.setLeftAnchor(
+    coverImageLabel,
+    BookEntryDialog.coverImageLabelLeftBorder
+  )
+  AnchorPane.setTopAnchor(
+    coverImageLabel,
+    BookEntryDialog.coverImageLabelTopBorder
+  )
   val coverImageControl: ImageView =
     new ImageView
   val coverImagePane: VBox =
@@ -342,6 +354,7 @@ class BookEntryDialog(
           isbnControl,
           descriptionLabel,
           descriptionControl,
+          coverImageLabel,
           coverImagePane,
           coverImageSelectionButton,
           categoryLabel,
@@ -369,10 +382,12 @@ object BookEntryDialog {
   private val descrptionControlTopBorder: Double = 114.0
   private val labelLeftBorder: Double = 2.0
   private val textFieldLeftBorder: Double = 90.0
+  private val coverImageLabelLeftBorder: Double = 2.0
+  private val coverImageLabelTopBorder: Double = 296.0
   private val coverImageLeftBorder: Double = 2.0
-  private val coverImageTopBorder: Double = 296.0
+  private val coverImageTopBorder: Double = 324.0
   private val coverImageSelectionLeftBorder: Double = 75.0
-  private val coverImageSelectionTopBorder: Double = 598.0
+  private val coverImageSelectionTopBorder: Double = 725.0
   private val categoryLabelLeftBorder: Double = 310.0
   private val categoryLabelTopBorder: Double = 296.0
   private val categoryControlLeftBorder: Double = 310.0
