@@ -14,36 +14,37 @@ private class DatabaseCatalog(
 ) extends Catalog {
 
   // Register action to add book to database
-  addStream.listen(
-    bookToAdd => {
-      // Add main book information
-      val bookStatement: Statement =
-        databaseConnection.createStatement
-      bookStatement.executeUpdate(
-        "INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES('" +
-          bookToAdd.title +
-          "','" +
-          bookToAdd.author +
-          "','" +
-          bookToAdd.isbn +
-          "','" +
-          bookToAdd.description +
-          "','" +
-          bookToAdd.coverImage +
-          "')"
-      )
+  private val databaseAdditionListener: Catalog.Subscriptions =
+    addStream.listen(
+      bookToAdd => {
+        // Add main book information
+        val bookStatement: Statement =
+          databaseConnection.createStatement
+        bookStatement.executeUpdate(
+          "INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES('" +
+            bookToAdd.title +
+            "','" +
+            bookToAdd.author +
+            "','" +
+            bookToAdd.isbn +
+            "','" +
+            bookToAdd.description +
+            "','" +
+            bookToAdd.coverImage +
+            "')"
+        )
 
-      // Add all categories associated with book
-      bookToAdd.categories.foreach(
-        category =>
-          bookStatement.executeUpdate(
-            "INSERT INTO catetegoryMapping (ISBN,Category)VALUES('" +
-              bookToAdd.isbn +
-              "','" +
-              category +
-              "')"
-          )
-      )
-    }
-  )
+        // Add all categories associated with book
+        bookToAdd.categories.foreach(
+          category =>
+            bookStatement.executeUpdate(
+              "INSERT INTO catetegoryMapping (ISBN,Category)VALUES('" +
+                bookToAdd.isbn +
+                "','" +
+                category +
+                "')"
+            )
+        )
+      }
+    )
 }

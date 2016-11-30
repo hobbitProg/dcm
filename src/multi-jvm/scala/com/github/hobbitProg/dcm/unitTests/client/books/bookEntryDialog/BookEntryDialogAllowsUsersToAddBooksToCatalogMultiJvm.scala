@@ -46,10 +46,11 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
     val catalog: Catalog =
       new TestCatalog
     var addedBook: Book = null
-    catalog onAdd {
-      newBook =>
-        addedBook = newBook
-    }
+    val addSubscription: Catalog.Subscriptions =
+      catalog onAdd {
+        newBook =>
+          addedBook = newBook
+      }
 
     "and a collection of defined categories" - {
       val definedCategories: Set[String] =

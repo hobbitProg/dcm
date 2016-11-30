@@ -10,10 +10,9 @@ import sodium.{Listener, StreamSink}
   * @since 0.1
   */
 trait Catalog {
+  // Stream containing addition books
   protected val addStream: StreamSink[Book] =
     new StreamSink[Book]
-  private var actionListeners: Set[Listener] =
-    Set[Listener]()
 
   /**
     * Add book to catalog
@@ -35,16 +34,19 @@ trait Catalog {
     */
   def onAdd(
     action: Book => Unit
-  ): Unit = {
-    actionListeners =
-      actionListeners +
-      addStream.listen(
-        action
-      )
+  ): Catalog.Subscriptions = {
+    addStream.listen(
+      action
+    )
   }
 }
 
 object Catalog {
+  /**
+    * Subscriptions to book catalog events
+    */
+  type Subscriptions = Listener
+
   /**
     * Create database implementation of book catalog
     * @param databaseConnection Connection to book catalog database

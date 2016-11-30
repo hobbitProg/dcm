@@ -52,7 +52,7 @@ class BooksCanBeAddedToCatalog
     addedDescription = ""
     addedCover = ""
     addedCategoryAssociations =
-      Set[(String, String)]()
+      Set[(ISBNs, Categories)]()
     AcolyteDriver.register(
       databaseId,
       BookCatalogHandler
@@ -69,10 +69,11 @@ class BooksCanBeAddedToCatalog
     "and a listener for book addition events" - {
       var bookThatWasBroadcast: Book =
         null
-      originalBookCatalog onAdd {
-        addedBook =>
-          bookThatWasBroadcast = addedBook
-      }
+      val additionListener: Catalog.Subscriptions =
+        originalBookCatalog onAdd {
+          addedBook =>
+            bookThatWasBroadcast = addedBook
+        }
 
       "and a book to add to the catalog" - {
         val newBook: Book =
