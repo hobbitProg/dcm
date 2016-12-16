@@ -1,11 +1,10 @@
 package com.github.hobbitProg.dcm.client.books.dialog
 
 import java.io.FileInputStream
-
 import javafx.collections.FXCollections
-import javafx.scene.layout.{Border, BorderStroke, BorderStrokeStyle,
-CornerRadii}
+import javafx.scene.layout.{Border, BorderStroke, BorderStrokeStyle, CornerRadii}
 import javafx.scene.paint.Color
+
 import scala.collection.Set
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
@@ -15,9 +14,8 @@ import scalafx.scene.control.{Button, Label, ListView, TextArea, TextField}
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.{AnchorPane, VBox}
 import scalafx.stage.{FileChooser, Stage}
-
-import com.github.hobbitProg.dcm.client.control.DisableSelectionModel
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
+import com.github.hobbitProg.dcm.client.control.model.DisableSelectionModel
 import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
 /**
   * Dialog for entering information on book for catalog

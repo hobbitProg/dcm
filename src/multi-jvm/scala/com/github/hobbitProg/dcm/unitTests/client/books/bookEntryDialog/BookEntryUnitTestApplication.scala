@@ -12,9 +12,11 @@ class BookEntryUnitTestApplication
   extends Application {
 
   /**
-    * Create application to add book to catalog
+    * Start application to add book to catalog
     * @param primaryStage Primary stage of application
     */
-  override def start(primaryStage: Stage): Unit = {
+  override def start(
+    primaryStage: Stage
+    ): Unit = {
   }
 }

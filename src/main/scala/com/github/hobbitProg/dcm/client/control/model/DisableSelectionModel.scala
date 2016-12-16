@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.client.control
+package com.github.hobbitProg.dcm.client.control.model
 
 import scalafx.scene.control.MultipleSelectionModel
 

@@ -25,7 +25,8 @@
           "org.eu.acolyte" % "jdbc-scala_2.11" % "1.0.42-j7p",
           "org.scalamock" % "scalamock-scalatest-support_2.11" % "3.3.0",
           "org.testfx" % "testfx-junit" % "4.0.4-alpha",
-          "org.scalafx" % "scalafx_2.11" % "8.0.102-R11"),
+          "org.scalafx" % "scalafx_2.11" % "8.0.102-R11",
+          "com.novocode" % "junit-interface" % "0.11"),
         // make sure that MultiJvm test are compiled by the default test compilation
         compile in MultiJvm <<= (compile in MultiJvm) triggeredBy (compile in Test),
         // disable parallel tests

@@ -21,7 +21,7 @@ And the following books that are already in the catalog:
 And the following book to add to the catalog:
 |title|author|isbn|description|cover image|categories|
 |Ground Zero|Kevin J. Anderson|006105223X|Description for Ground Zero|GrouondZero.jpg|sci-fi,conspiracy|
-When I enter this books into the book catalog
+When I enter this book into the book catalog
 Then the book is in the book catalogs
 And the book is displayed on the window displaying the book catalog
 And the books that were originally on the window displaying the book catalog are still on that window

@@ -1,7 +1,7 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog
 
 import java.sql.Connection
-import scala.collection.Set
+import scala.collection.Seq
 import sodium.{Listener, StreamSink}
 
 /**
@@ -39,6 +39,14 @@ trait Catalog {
       action
     )
   }
+
+  /**
+    * Apply operation to each book in catalog
+    * @param op Operation to apply
+    */
+  def foreach(
+    op: (Book) => Unit
+  ): Unit
 }
 
 object Catalog {
