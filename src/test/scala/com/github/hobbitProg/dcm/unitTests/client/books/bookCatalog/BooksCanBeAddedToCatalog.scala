@@ -2,6 +2,7 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog
 
 import acolyte.jdbc.{AcolyteDSL, StatementHandler, UpdateExecution, Driver => AcolyteDriver}
 import acolyte.jdbc.Implicits._
+import java.net.URI
 import java.sql.{Connection, DriverManager}
 
 import org.scalatest.FreeSpec
@@ -40,7 +41,7 @@ class BooksCanBeAddedToCatalog
   private var addedAuthor: Authors = ""
   private var addedISBN: ISBNs = ""
   private var addedDescription: Descriptions = ""
-  private var addedCover: CoverImageLocations = ""
+  private var addedCover: CoverImageLocations = None
   private var addedCategoryAssociations: Set[(ISBNs, Categories)] =
     Set[(ISBNs, Categories)]()
 
@@ -50,7 +51,7 @@ class BooksCanBeAddedToCatalog
     addedISBN = ""
     addedDescription = ""
     addedDescription = ""
-    addedCover = ""
+    addedCover = None
     addedCategoryAssociations =
       Set[(ISBNs, Categories)]()
     AcolyteDriver.register(
@@ -82,7 +83,11 @@ class BooksCanBeAddedToCatalog
             "Kevin J. Anderson",
             "006105223X",
             "Description for Ground Zero",
-            "GrouondZero.jpg",
+            Some[URI](
+              getClass.getResource(
+                "/GroundZero.jpg"
+              ).toURI
+            ),
             Set[String](
               "sci-fi",
               "conspiracy"
@@ -136,7 +141,12 @@ class BooksCanBeAddedToCatalog
             addedAuthor = newAuthor
             addedISBN = newISBN
             addedDescription = newDescription
-            addedCover = newCover
+            addedCover =
+              Some[URI](
+                new URI(
+                  newCover
+                )
+              )
           case categoryAddSQL(
           newISBN,
           newCategory

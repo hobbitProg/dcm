@@ -1,9 +1,11 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog
 
+import java.net.URI
 import java.sql.{Connection, ResultSet, Statement}
 import scala.collection.Set
 
-import com.github.hobbitProg.dcm.client.books.Categories
+import com.github.hobbitProg.dcm.client.books.{Authors, Titles, Categories,
+Descriptions, CoverImageLocations, ISBNs}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
 
 /**
@@ -31,6 +33,11 @@ private class DatabaseCatalog(
         // Add main book information
         val bookStatement: Statement =
           databaseConnection.createStatement
+        val imageValue =
+          bookToAdd.coverImage match {
+            case Some(imageLocation) => imageLocation
+            case None => "NULL"
+          }
         bookStatement.executeUpdate(
           "INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES('" +
             bookToAdd.title +
@@ -41,7 +48,7 @@ private class DatabaseCatalog(
             "','" +
             bookToAdd.description +
             "','" +
-            bookToAdd.coverImage +
+            imageValue +
             "')"
         )
 
@@ -97,7 +104,15 @@ private class DatabaseCatalog(
           coreBookInfo getString authorLocation,
           coreBookInfo getString isbnLocation,
           coreBookInfo getString descriptionLocation,
-          coreBookInfo getString coverLocation,
+          if ((coreBookInfo getString coverLocation) == "NULL") {
+            None
+          } else {
+            Some[URI](
+              new URI(
+                coreBookInfo getString coverLocation
+              )
+            )
+          },
           categorySet
         )
       gatheredBooks =

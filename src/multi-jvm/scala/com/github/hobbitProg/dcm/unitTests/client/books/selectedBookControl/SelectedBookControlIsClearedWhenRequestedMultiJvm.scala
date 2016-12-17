@@ -1,5 +1,6 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.selectedBookControl
 
+import java.net.URI
 import java.util.function.{Consumer, Supplier}
 import javafx.application.Application
 import javafx.stage.Stage
@@ -29,7 +30,11 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
           "Kevin J. Anderson",
           "0061052477",
           "Description for Ruins",
-          "Ruins.jpg",
+          Some[URI](
+            getClass.getResource(
+              "/Ruins.jpg"
+            ).toURI
+          ),
           Set[Categories](
             "sci-fi",
             "conspiracy"

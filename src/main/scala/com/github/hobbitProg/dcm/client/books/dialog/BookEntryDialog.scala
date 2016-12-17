@@ -1,6 +1,7 @@
 package com.github.hobbitProg.dcm.client.books.dialog
 
 import java.io.FileInputStream
+import java.net.URI
 import javafx.collections.FXCollections
 import javafx.scene.layout.{Border, BorderStroke, BorderStrokeStyle, CornerRadii}
 import javafx.scene.paint.Color
@@ -228,7 +229,9 @@ class BookEntryDialog(
           window.value
         )
       bookBeingEdited.coverImage =
-        coverImageFile.getName
+        Some[URI](
+          coverImageFile.toURI
+        )
       coverImageControl.image =
         new Image(
           new FileInputStream(

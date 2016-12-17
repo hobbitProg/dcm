@@ -9,6 +9,6 @@ import scalafx.scene.control.MultipleSelectionModel
   */
 class DisableSelectionModel[ListControlType]
 extends MultipleSelectionModel[ListControlType](
-  new com.github.hobbitProg.dcm.client.control.java.DisabledSelectionModel[ListControlType]()
+  new com.github.hobbitProg.dcm.client.control.javaRepresentation.DisabledSelectionModel[ListControlType]()
 ) {
 }

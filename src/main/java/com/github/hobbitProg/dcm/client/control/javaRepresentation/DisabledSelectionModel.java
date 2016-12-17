@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.client.control.java;
+package com.github.hobbitProg.dcm.client.control.javaRepresentation;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

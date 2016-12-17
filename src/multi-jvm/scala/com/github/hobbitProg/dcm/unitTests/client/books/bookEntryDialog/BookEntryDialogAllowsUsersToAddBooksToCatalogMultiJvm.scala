@@ -1,6 +1,7 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookEntryDialog
 
 import java.io.File
+import java.net.URI
 import java.util.function.{Consumer, Supplier}
 import javafx.application.Application
 import javafx.scene.input.{KeyCode, MouseButton}
@@ -31,12 +32,18 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
     new FxRobot
 
   // Valid new book to add
+  val bookImageLocation: URI =
+    getClass.getResource(
+      "/GroundZero.jpg"
+    ).toURI
   private val validNewBook: Book =
     ("Ground Zero",
       "Kevin J. Anderson",
       "006105223X",
       "Description for Ground Zero",
-      "GroundZero.jpg",
+      Some[URI](
+        bookImageLocation
+      ),
       Set[String](
         "sci-fi",
         "conspiracy"
@@ -270,10 +277,7 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
       )
     ).returning(
       new File(
-        getClass.getResource(
-          "/" +
-          validNewBook.coverImage
-        ).toURI
+        bookImageLocation
       )
     )
 

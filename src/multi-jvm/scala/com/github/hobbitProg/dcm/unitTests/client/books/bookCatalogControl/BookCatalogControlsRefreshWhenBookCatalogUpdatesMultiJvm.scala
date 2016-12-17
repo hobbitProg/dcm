@@ -1,5 +1,6 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogControl
 
+import java.net.URI
 import java.util.function.{Consumer, Supplier}
 import javafx.application.Application
 import javafx.stage.Stage
@@ -35,7 +36,11 @@ class BookCatalogControlsRefreshWhenBookCatalogUpdatesMultiJvm
             "Kevin J. Anderson",
             "006105223X",
             "Description for Ground Zero",
-            "GrouondZero.jpg",
+            Some[URI](
+              getClass.getResource(
+                "/GroundZero.jpg"
+              ).toURI
+            ),
             Set(
               "sci-fi",
               "conspiracy"

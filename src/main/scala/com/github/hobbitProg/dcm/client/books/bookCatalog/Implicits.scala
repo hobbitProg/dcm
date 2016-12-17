@@ -1,5 +1,7 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog
 
+import com.github.hobbitProg.dcm.client.books._
+
 import scala.collection.Set
 import scala.language.implicitConversions
 
@@ -14,7 +16,8 @@ object Implicits {
     * @return Book containing book data
     */
   implicit def tupleToBook(
-    bookData: (String, String, String, String, String, Set[String])
+    bookData: (Titles, Authors, ISBNs, Descriptions, CoverImageLocations,
+      Set[Categories])
   ): Book = {
     new Book(
       bookData._1,

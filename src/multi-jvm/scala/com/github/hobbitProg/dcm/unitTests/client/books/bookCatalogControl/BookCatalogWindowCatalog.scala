@@ -1,5 +1,6 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogControl
 
+import java.net.URI
 import scala.collection.Set
 
 import com.github.hobbitProg.dcm.client.books.Categories
@@ -20,7 +21,11 @@ class BookCatalogWindowCatalog
         "Kevin J. Anderson",
         "0061052477",
         "Description for Ruins",
-        "Ruins.jpg",
+        Some[URI](
+          getClass.getResource(
+            "/Ruins.jpg"
+          ).toURI
+        ),
         Set[Categories](
           "sci-fi",
           "conspiracy"
@@ -31,7 +36,11 @@ class BookCatalogWindowCatalog
         "Charles Grant",
         "0061054143",
         "Description for Goblins",
-        "Goblins.jpg",
+        Some[URI](
+          getClass.getResource(
+            "/Goblins.jpg"
+          ).toURI
+        ),
         Set[Categories](
           "sci-fi",
           "conspiracy"

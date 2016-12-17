@@ -22,7 +22,7 @@ class Book(
             var author: Authors = "",
             var isbn: ISBNs = "",
             var description: Descriptions = "",
-            var coverImage: CoverImageLocations = "",
+            var coverImage: CoverImageLocations = None,
             var categories: Set[Categories] = Set[Categories]()
 ) {
   override def equals(

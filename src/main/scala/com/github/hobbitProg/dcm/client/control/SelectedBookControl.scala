@@ -1,9 +1,15 @@
 package com.github.hobbitProg.dcm.client.control
 
-import scalafx.scene.control.{Label, TextArea, TextField, TextInputControl}
-import scalafx.scene.layout.AnchorPane
-import scalafx.scene.Group
+import java.io.{File, FileInputStream}
+import java.net.URI
+import javafx.scene.layout.{Border, BorderStroke, BorderStrokeStyle, CornerRadii}
+import javafx.scene.paint.Color
 
+import scalafx.Includes._
+import scalafx.scene.control.{Label, TextArea, TextField, TextInputControl}
+import scalafx.scene.image.{Image, ImageView}
+import scalafx.scene.layout.{AnchorPane, VBox}
+import scalafx.scene.Group
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
 
 /**
@@ -117,6 +123,48 @@ class SelectedBookControl
     SelectedBookControl.descriptionControlLeftBorder
   )
 
+  // Create control to display cover image
+  val coverImageLabel: Label =
+    new Label(
+      "Cover Image:"
+    )
+  AnchorPane.setLeftAnchor(
+    coverImageLabel,
+    SelectedBookControl.coverImageLabelLeftBorder
+  )
+  AnchorPane.setTopAnchor(
+    coverImageLabel,
+    SelectedBookControl.coverImageLabelTopBorder
+  )
+  val coverImageControl: ImageView =
+    new ImageView
+  val coverImagePane: VBox =
+    new VBox {
+      border =
+        new Border(
+          new BorderStroke(
+            Color.BLACK,
+            BorderStrokeStyle.SOLID,
+            CornerRadii.EMPTY,
+            BorderStroke.THIN
+          )
+        )
+      children =
+        List(
+          coverImageControl
+        )
+      minHeight = SelectedBookControl.coverImageHeight
+      minWidth = SelectedBookControl.coverImageWidth
+    }
+  AnchorPane.setLeftAnchor(
+    coverImagePane,
+    SelectedBookControl.coverImageLeftBorder
+  )
+  AnchorPane.setTopAnchor(
+    coverImagePane,
+    SelectedBookControl.coverImageTopBorder
+  )
+
   // Set pane for dialog
   children =
     new AnchorPane {
@@ -129,7 +177,9 @@ class SelectedBookControl
           isbnLabel,
           isbnValue,
           descriptionLabel,
-          descriptionValue
+          descriptionValue,
+          coverImageLabel,
+          coverImagePane
         )
     }
 
@@ -156,6 +206,22 @@ class SelectedBookControl
       descriptionValue,
       selectedBook.description
     )
+    selectedBook.coverImage match {
+      case Some(imageLocation: URI) =>
+        coverImageControl.image =
+          new Image(
+            new FileInputStream(
+              new File(
+                imageLocation
+              )
+            ),
+            SelectedBookControl.coverImageWidth,
+            SelectedBookControl.coverImageHeight,
+            true,
+            true
+          )
+      case None =>
+    }
   }
 
   /**
@@ -178,9 +244,16 @@ object  SelectedBookControl {
   private val titleTopBorder: Double = 2.0
   private val authorTopBorder: Double = 30.0
   private val labelLeftBorder: Double = 2.0
+  private val textFieldLeftBorder: Double = 90.0
+  private val isbnTopBorder: Double = 58.0
   private val descriptionLabelTopBorder: Double = 86.0
   private val descriptionControlLeftBorder: Double = 2.0
   private val descrptionControlTopBorder: Double = 114.0
-  private val textFieldLeftBorder: Double = 90.0
-  private val isbnTopBorder: Double = 58.0
+  private val coverImageLabelLeftBorder: Double = 2.0
+  private val coverImageLabelTopBorder: Double = 296.0
+  private val coverImageLeftBorder: Double = 2.0
+  private val coverImageTopBorder: Double = 324.0
+
+  private val coverImageWidth: Double = 300.0
+  private val coverImageHeight: Double = 300.0
 }
