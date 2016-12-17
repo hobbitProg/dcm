@@ -64,6 +64,31 @@ class SelectedBookControl
     SelectedBookControl.textFieldLeftBorder
   )
 
+  // Create control to display ISBN of book
+  private val isbnLabel: Label =
+    new Label(
+      "ISBN"
+    )
+  AnchorPane.setTopAnchor(
+    isbnLabel,
+    SelectedBookControl.isbnTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    isbnLabel,
+    SelectedBookControl.labelLeftBorder
+  )
+
+  private val isbnValue: TextField =
+    new TextField
+  AnchorPane.setTopAnchor(
+    isbnValue,
+    SelectedBookControl.isbnTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    isbnValue,
+    SelectedBookControl.textFieldLeftBorder
+  )
+
   // Set pane for dialog
   children =
     new AnchorPane {
@@ -72,7 +97,9 @@ class SelectedBookControl
           titleLabel,
           titleValue,
           authorLabel,
-          authorValue
+          authorValue,
+          isbnLabel,
+          isbnValue
         )
     }
 
@@ -90,6 +117,10 @@ class SelectedBookControl
     updateValue(
       authorValue,
       selectedBook.author
+    )
+    updateValue(
+      isbnValue,
+      selectedBook.isbn
     )
   }
 
@@ -114,4 +145,5 @@ object  SelectedBookControl {
   private val authorTopBorder: Double = 30.0
   private val labelLeftBorder: Double = 2.0
   private val textFieldLeftBorder: Double = 90.0
+  private val isbnTopBorder: Double = 58.0
 }
