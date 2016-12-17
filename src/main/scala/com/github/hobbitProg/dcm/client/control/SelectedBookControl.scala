@@ -2,15 +2,20 @@ package com.github.hobbitProg.dcm.client.control
 
 import java.io.{File, FileInputStream}
 import java.net.URI
+import javafx.collections.FXCollections
 import javafx.scene.layout.{Border, BorderStroke, BorderStrokeStyle, CornerRadii}
 import javafx.scene.paint.Color
 
+import scalafx.collections.ObservableBuffer
 import scalafx.Includes._
-import scalafx.scene.control.{Label, TextArea, TextField, TextInputControl}
+import scalafx.scene.control.{Label, ListView, TextArea, TextField,
+TextInputControl}
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.{AnchorPane, VBox}
 import scalafx.scene.Group
+
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
+import com.github.hobbitProg.dcm.client.control.model.DisableSelectionModel
 
 /**
   * Control that displays information on currently selected book
@@ -165,6 +170,38 @@ class SelectedBookControl
     SelectedBookControl.coverImageTopBorder
   )
 
+  // Create control to display categories associated with selected book
+  private val categoryLabel: Label =
+    new Label(
+      "Associated Categories:"
+    )
+  AnchorPane.setTopAnchor(
+    categoryLabel,
+    SelectedBookControl.categoryLabelTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    categoryLabel,
+    SelectedBookControl.categoryControlLeftBorder
+  )
+  private val associatedCategories: ObservableBuffer[String] =
+    new ObservableBuffer[String](
+      FXCollections.observableArrayList()
+    )
+  private val categoryControl: ListView[String] =
+    new ListView[String](
+      associatedCategories
+    )
+  categoryControl.selectionModel =
+    new DisableSelectionModel[String]
+  AnchorPane.setTopAnchor(
+    categoryControl,
+    SelectedBookControl.categoryControlTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    categoryControl,
+    SelectedBookControl.categoryControlLeftBorder
+  )
+
   // Set pane for dialog
   children =
     new AnchorPane {
@@ -179,7 +216,9 @@ class SelectedBookControl
           descriptionLabel,
           descriptionValue,
           coverImageLabel,
-          coverImagePane
+          coverImagePane,
+          categoryLabel,
+          categoryControl
         )
     }
 
@@ -222,6 +261,9 @@ class SelectedBookControl
           )
       case None =>
     }
+    associatedCategories.addAll(
+      selectedBook.categories.toList.sorted :_*
+    )
   }
 
   /**
@@ -253,6 +295,10 @@ object  SelectedBookControl {
   private val coverImageLabelTopBorder: Double = 296.0
   private val coverImageLeftBorder: Double = 2.0
   private val coverImageTopBorder: Double = 324.0
+  private val categoryLabelLeftBorder: Double = 310.0
+  private val categoryLabelTopBorder: Double = 296.0
+  private val categoryControlLeftBorder: Double = 310.0
+  private val categoryControlTopBorder: Double = 324.0
 
   private val coverImageWidth: Double = 300.0
   private val coverImageHeight: Double = 300.0
