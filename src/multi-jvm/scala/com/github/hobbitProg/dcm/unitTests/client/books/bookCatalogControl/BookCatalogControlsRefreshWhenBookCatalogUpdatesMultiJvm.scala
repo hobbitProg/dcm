@@ -1,10 +1,9 @@
-package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogWindow
+package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogControl
 
 import java.util.function.{Consumer, Supplier}
 import javafx.application.Application
 import javafx.stage.Stage
 import org.scalatest.{FreeSpec, Matchers}
-import org.scalatest.enablers.Containing
 import org.testfx.api.FxToolkit
 import scala.collection.Set
 import scalafx.Includes._
@@ -16,7 +15,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
   * Verifies window that contains book catalog data is updated when
   * associated book catalog is updated
   */
-class BookCatalogWindowsRefreshWhenBookCatalogUpdatesMultiJvm
+class BookCatalogControlsRefreshWhenBookCatalogUpdatesMultiJvm
   extends FreeSpec
     with Matchers {
   "Given a populated book catalog" - {

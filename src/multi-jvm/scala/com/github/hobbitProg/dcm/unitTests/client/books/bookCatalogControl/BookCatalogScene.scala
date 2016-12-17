@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogWindow
+package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogControl
 
 import scalafx.scene.Scene
 import scalafx.scene.layout.GridPane

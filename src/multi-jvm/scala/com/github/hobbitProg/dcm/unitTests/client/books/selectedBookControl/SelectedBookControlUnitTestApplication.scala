@@ -1,12 +1,12 @@
-package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogWindow
+package com.github.hobbitProg.dcm.unitTests.client.books.selectedBookControl
 
 import javafx.application.Application
 import javafx.stage.Stage
 
 /**
-  * Application for book catalog control unit tests
+  * Application for unit tests for selected book control
   */
-class BookCatalogControlUnitTestApplication
+class SelectedBookControlUnitTestApplication
   extends Application {
   /**
     * Start application for book catalog control unit tests
