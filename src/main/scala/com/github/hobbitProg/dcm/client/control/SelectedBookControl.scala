@@ -39,13 +39,40 @@ class SelectedBookControl
     SelectedBookControl.textFieldLeftBorder
   )
 
+  // Create control to display author of book
+  private val authorLabel: Label =
+    new Label(
+      "Author"
+    )
+  AnchorPane.setTopAnchor(
+    authorLabel,
+    SelectedBookControl.authorTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    authorLabel,
+    SelectedBookControl.labelLeftBorder
+  )
+
+  private val authorValue: TextField =
+    new TextField
+  AnchorPane.setTopAnchor(
+    authorValue,
+    SelectedBookControl.authorTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    authorValue,
+    SelectedBookControl.textFieldLeftBorder
+  )
+
   // Set pane for dialog
   children =
     new AnchorPane {
       children =
         List(
           titleLabel,
-          titleValue
+          titleValue,
+          authorLabel,
+          authorValue
         )
     }
 
@@ -59,6 +86,10 @@ class SelectedBookControl
     updateValue(
       titleValue,
       selectedBook.title
+    )
+    updateValue(
+      authorValue,
+      selectedBook.author
     )
   }
 
@@ -79,9 +110,8 @@ class SelectedBookControl
 }
 
 object  SelectedBookControl {
-  val titleControlId: String = "selectedBookTitleId"
-
   private val titleTopBorder: Double = 2.0
+  private val authorTopBorder: Double = 30.0
   private val labelLeftBorder: Double = 2.0
   private val textFieldLeftBorder: Double = 90.0
 }
