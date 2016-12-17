@@ -1,6 +1,6 @@
 package com.github.hobbitProg.dcm.client.control
 
-import scalafx.scene.control.{Label, TextField}
+import scalafx.scene.control.{Label, TextArea, TextField, TextInputControl}
 import scalafx.scene.layout.AnchorPane
 import scalafx.scene.Group
 
@@ -55,6 +55,7 @@ class SelectedBookControl
 
   private val authorValue: TextField =
     new TextField
+  authorValue.editable = false
   AnchorPane.setTopAnchor(
     authorValue,
     SelectedBookControl.authorTopBorder
@@ -80,6 +81,7 @@ class SelectedBookControl
 
   private val isbnValue: TextField =
     new TextField
+  isbnValue.editable = false
   AnchorPane.setTopAnchor(
     isbnValue,
     SelectedBookControl.isbnTopBorder
@@ -87,6 +89,32 @@ class SelectedBookControl
   AnchorPane.setLeftAnchor(
     isbnValue,
     SelectedBookControl.textFieldLeftBorder
+  )
+
+  // Create control for display book description
+  val descriptionLabel: Label =
+    new Label(
+      "Description:"
+    )
+  AnchorPane.setTopAnchor(
+    descriptionLabel,
+    SelectedBookControl.descriptionLabelTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    descriptionLabel,
+    SelectedBookControl.labelLeftBorder
+  )
+
+  val descriptionValue: TextArea =
+    new TextArea
+  descriptionValue.editable = false
+  AnchorPane.setTopAnchor(
+    descriptionValue,
+    SelectedBookControl.descrptionControlTopBorder
+  )
+  AnchorPane.setLeftAnchor(
+    descriptionValue,
+    SelectedBookControl.descriptionControlLeftBorder
   )
 
   // Set pane for dialog
@@ -99,7 +127,9 @@ class SelectedBookControl
           authorLabel,
           authorValue,
           isbnLabel,
-          isbnValue
+          isbnValue,
+          descriptionLabel,
+          descriptionValue
         )
     }
 
@@ -122,6 +152,10 @@ class SelectedBookControl
       isbnValue,
       selectedBook.isbn
     )
+    updateValue(
+      descriptionValue,
+      selectedBook.description
+    )
   }
 
   /**
@@ -130,7 +164,7 @@ class SelectedBookControl
     * @param newValue Value to place intofield
     */
   private def updateValue(
-    valueField: TextField,
+    valueField: TextInputControl,
     newValue: String
   ) = {
     valueField.editable = true
@@ -144,6 +178,9 @@ object  SelectedBookControl {
   private val titleTopBorder: Double = 2.0
   private val authorTopBorder: Double = 30.0
   private val labelLeftBorder: Double = 2.0
+  private val descriptionLabelTopBorder: Double = 86.0
+  private val descriptionControlLeftBorder: Double = 2.0
+  private val descrptionControlTopBorder: Double = 114.0
   private val textFieldLeftBorder: Double = 90.0
   private val isbnTopBorder: Double = 58.0
 }

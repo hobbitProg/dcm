@@ -9,7 +9,10 @@ import com.github.hobbitProg.dcm.client.control.SelectedBookControl
   * Scene to use to test control containing currently selected book
   */
 class SelectedBookScene
-  extends Scene {
+  extends Scene(
+    SelectedBookScene.sceneWidth,
+    SelectedBookScene.sceneHeight
+  ) {
   // Create control that displays books within catalog
   val bookControl: SelectedBookControl =
     new SelectedBookControl
@@ -29,4 +32,10 @@ class SelectedBookScene
           bookControl
         )
     }
+}
+
+object SelectedBookScene {
+  private val sceneWidth: Double = 650.0
+  private val sceneHeight: Double = 1000.0
+
 }
