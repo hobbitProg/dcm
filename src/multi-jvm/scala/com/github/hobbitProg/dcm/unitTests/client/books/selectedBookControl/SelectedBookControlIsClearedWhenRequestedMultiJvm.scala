@@ -13,6 +13,7 @@ import org.scalatest.{Matchers, FreeSpec}
 import scala.collection.Set
 import scala.reflect.runtime.universe._
 
+import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.control.TextInputControl
 import scalafx.Includes._
 
@@ -55,35 +56,38 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
         selectedBookScene.bookControl.clear()
 
         "then there is no title for the selected book" in {
-          getTextFieldValue(
+          getTextControlValue(
             selectedBookScene.bookControl,
             "titleValue"
           ) shouldBe ""
         }
 
         "and there is no author for the selected book" in {
-          getTextFieldValue(
+          getTextControlValue(
             selectedBookScene.bookControl,
             "authorValue"
           ) shouldBe ""
         }
 
         "and there is no ISBN for the selected book" in {
-          getTextFieldValue(
+          getTextControlValue(
             selectedBookScene.bookControl,
             "isbnValue"
           ) shouldBe ""
         }
 
         "and there is no description for the selected book" in {
-          getTextFieldValue(
+          getTextControlValue(
             selectedBookScene.bookControl,
             "descriptionValue"
           ) shouldBe ""
         }
 
-        "and there is no cover image for the selected book" in
-          pending
+        "and there is no cover image for the selected book" in {
+          getDisplayedImage(
+            selectedBookScene.bookControl
+          ) shouldBe null
+        }
 
         "and the selected book has no associated categories" in
           pending
@@ -126,12 +130,12 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
   }
 
   /**
-    * Get value of text field control
+    * Get value of text control
     * @param bookControl Selected book control used in test
-    * @param controlFieldName Name of field containing text field to extract
-    * @return
+    * @param controlFieldName Name of field containing text control to extract
+    * @return Value from text control
     */
-  def getTextFieldValue(
+  def getTextControlValue(
     bookControl: SelectedBookControl,
     controlFieldName: String
   ): String = {
@@ -156,5 +160,37 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
         }
       ).apply().asInstanceOf[TextInputControl]
     titleControl.text.value
+  }
+
+  /**
+    * Get displayed cover image
+    * @param bookControl Selected book control used in test
+    * @return Displayed cover image
+    */
+  def getDisplayedImage(
+    bookControl: SelectedBookControl
+  ): Image = {
+    val mirror =
+      scala.reflect.runtime.currentMirror
+    val titleField =
+      mirror.classSymbol(
+        bookControl.getClass
+      ).toType.members.find {
+        member => {
+          member.name.toString == "coverImageControl"
+        }
+      }
+    val instanceMirror =
+      mirror.reflect(
+        bookControl
+      )
+    val titleControl: ImageView =
+      instanceMirror.reflectMethod(
+        titleField match {
+          case Some(fieldValue) => fieldValue.asMethod
+        }
+      ).apply().asInstanceOf[ImageView]
+    titleControl.image.value
+
   }
 }

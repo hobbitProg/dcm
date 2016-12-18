@@ -103,7 +103,7 @@ class SelectedBookControl
   )
 
   // Create control for display book description
-  val descriptionLabel: Label =
+  private val descriptionLabel: Label =
     new Label(
       "Description:"
     )
@@ -116,7 +116,7 @@ class SelectedBookControl
     SelectedBookControl.labelLeftBorder
   )
 
-  val descriptionValue: TextArea =
+  private val descriptionValue: TextArea =
     new TextArea
   descriptionValue.editable = false
   AnchorPane.setTopAnchor(
@@ -129,7 +129,7 @@ class SelectedBookControl
   )
 
   // Create control to display cover image
-  val coverImageLabel: Label =
+  private val coverImageLabel: Label =
     new Label(
       "Cover Image:"
     )
@@ -141,9 +141,9 @@ class SelectedBookControl
     coverImageLabel,
     SelectedBookControl.coverImageLabelTopBorder
   )
-  val coverImageControl: ImageView =
+  private val coverImageControl: ImageView =
     new ImageView
-  val coverImagePane: VBox =
+  private val coverImagePane: VBox =
     new VBox {
       border =
         new Border(
@@ -286,6 +286,7 @@ class SelectedBookControl
       descriptionValue,
       ""
     )
+    coverImageControl.image = null
   }
 
   /**
