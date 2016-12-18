@@ -1,13 +1,12 @@
-package com.github.hobbitProg.dcm.client.control
+package com.github.hobbitProg.dcm.client.books.control
+
+import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 
 import scala.math.Ordering.StringOrdering
+import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.collections.ObservableBuffer
-import scalafx.Includes._
 import scalafx.scene.control.{ListCell, ListView}
-
-import com.github.hobbitProg.dcm.Conversions._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 
 /**
   * Control to display books in catalog

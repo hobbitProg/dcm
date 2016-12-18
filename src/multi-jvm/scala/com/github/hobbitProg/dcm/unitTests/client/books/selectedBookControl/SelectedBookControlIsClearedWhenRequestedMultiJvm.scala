@@ -2,13 +2,11 @@ package com.github.hobbitProg.dcm.unitTests.client.books.selectedBookControl
 
 import java.net.URI
 import java.util.function.{Consumer, Supplier}
-
 import javafx.application.Application
 import javafx.stage.Stage
 
 import org.testfx.api.FxToolkit
-
-import org.scalatest.{Matchers, FreeSpec}
+import org.scalatest.{FreeSpec, Matchers}
 
 import scala.collection.Set
 import scala.reflect.runtime.universe._
@@ -18,9 +16,10 @@ import scalafx.scene.control.{ListView, TextInputControl}
 import scalafx.Includes._
 
 import com.github.hobbitProg.dcm.client.books.Categories
-import com.github.hobbitProg.dcm.client.control.SelectedBookControl
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
+import com.github.hobbitProg.dcm.client.books.control.SelectedBookControl
+import com.github.hobbitProg.dcm.client.books.control.image.CoverImage
 
 /**
   * Verifies window containing information on currently selected book is
@@ -193,12 +192,12 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
       mirror.reflect(
         bookControl
       )
-    val coverControl: ImageView =
+    val coverControl: CoverImage =
       instanceMirror.reflectMethod(
         titleField match {
           case Some(fieldValue) => fieldValue.asMethod
         }
-      ).apply().asInstanceOf[ImageView]
+      ).apply().asInstanceOf[CoverImage]
     coverControl.image.value
   }
 

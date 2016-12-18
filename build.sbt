@@ -31,8 +31,8 @@
         compile in MultiJvm <<= (compile in MultiJvm) triggeredBy (compile in Test),
         // disable parallel tests
         parallelExecution in Test := false,
-        // Generate html test results
-        testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-h",
+        // Generate xml test results
+        testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-u",
           "target/test-reports"),
         // make sure that MultiJvm tests are executed by the default test target,
         // and combine the results from ordinary test and multi-jvm tests

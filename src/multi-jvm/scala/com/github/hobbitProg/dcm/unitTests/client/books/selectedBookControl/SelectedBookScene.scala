@@ -1,9 +1,9 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.selectedBookControl
 
+import com.github.hobbitProg.dcm.client.books.control.SelectedBookControl
+
 import scalafx.scene.Scene
 import scalafx.scene.layout.GridPane
-
-import com.github.hobbitProg.dcm.client.control.SelectedBookControl
 
 /**
   * Scene to use to test control containing currently selected book

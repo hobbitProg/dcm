@@ -2,9 +2,8 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogControl
 
 import scalafx.scene.Scene
 import scalafx.scene.layout.GridPane
-
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Catalog
-import com.github.hobbitProg.dcm.client.control.BookCatalogControl
+import com.github.hobbitProg.dcm.client.books.control.BookCatalogControl
 
 /**
   * Scene to use to test control that displays book catalog

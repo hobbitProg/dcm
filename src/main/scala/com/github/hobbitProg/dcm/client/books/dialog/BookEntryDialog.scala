@@ -1,23 +1,24 @@
 package com.github.hobbitProg.dcm.client.books.dialog
 
-import java.io.FileInputStream
 import java.net.URI
 import javafx.collections.FXCollections
-import javafx.scene.layout.{Border, BorderStroke, BorderStrokeStyle, CornerRadii}
-import javafx.scene.paint.Color
 
 import scala.collection.Set
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
 import scalafx.scene.Scene
-import scalafx.scene.control.{Button, Label, ListView, TextArea, TextField}
-import scalafx.scene.image.{Image, ImageView}
-import scalafx.scene.layout.{AnchorPane, VBox}
+import scalafx.scene.control.Button
+import scalafx.scene.layout.AnchorPane
 import scalafx.stage.{FileChooser, Stage}
+
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
-import com.github.hobbitProg.dcm.client.control.model.DisableSelectionModel
+import com.github.hobbitProg.dcm.client.books.control.image._
+import com.github.hobbitProg.dcm.client.books.control.label._
+import com.github.hobbitProg.dcm.client.books.control.listView._
+import com.github.hobbitProg.dcm.client.books.control.text._
 import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
+
 /**
   * Dialog for entering information on book for catalog
   * @param coverImageChooser Creates dialog to select cover image for book
@@ -58,162 +59,50 @@ class BookEntryDialog(
 
   // Create control for entering in title of book
   private val titleLabel =
-    new Label(
-      "Title:"
-    )
-  AnchorPane.setTopAnchor(
-    titleLabel,
-    BookEntryDialog.titleTopBorder
-  )
-  AnchorPane.setLeftAnchor(
-    titleLabel,
-    BookEntryDialog.labelLeftBorder
-  )
-
-  private val titleControl: TextField =
-    new TextField
+    new TitleLabel
+  private val titleControl: TitleValue =
+    new TitleValue
   titleControl.id = BookEntryDialog.titleControlId
   titleControl.text.onChange {
     bookBeingEdited.title = titleControl.text.value
   }
-  AnchorPane.setTopAnchor(
-    titleControl,
-    BookEntryDialog.titleTopBorder
-  )
-  AnchorPane.setLeftAnchor(
-    titleControl,
-    BookEntryDialog.textFieldLeftBorder
-  )
 
   // Create control for entering in author of book
-  private val authorLabel: Label =
-    new Label(
-      "Label:"
-    )
-  AnchorPane.setTopAnchor(
-    authorLabel,
-    BookEntryDialog.authorTopBorder
-  )
-  AnchorPane.setLeftAnchor(
-    authorLabel,
-    BookEntryDialog.labelLeftBorder
-  )
-
-  private val authorControl: TextField =
-    new TextField
+  private val authorLabel: AuthorLabel =
+    new AuthorLabel
+  private val authorControl: AuthorValue =
+    new AuthorValue
   authorControl.id = BookEntryDialog.authorControlId
   authorControl.text.onChange{
     bookBeingEdited.author = authorControl.text.value
   }
-  AnchorPane.setTopAnchor(
-    authorControl,
-    BookEntryDialog.authorTopBorder
-  )
-  AnchorPane.setLeftAnchor(
-    authorControl,
-    BookEntryDialog.textFieldLeftBorder
-  )
 
   // Create control for entering ISBN for book
-  private val isbnLabel: Label =
-    new Label(
-      "ISBN:"
-    )
-  AnchorPane.setTopAnchor(
-    isbnLabel,
-    BookEntryDialog.isbnTopBorder
-  )
-  AnchorPane.setLeftAnchor(
-    isbnLabel,
-    BookEntryDialog.labelLeftBorder
-  )
-
-  val isbnControl: TextField =
-    new TextField
+  private val isbnLabel: ISBNLabel =
+    new ISBNLabel
+  private val isbnControl: ISBNValue =
+    new ISBNValue
   isbnControl.text.onChange(
     bookBeingEdited.isbn = isbnControl.text.value
   )
   isbnControl.id = BookEntryDialog.isbnControlId
-  AnchorPane.setTopAnchor(
-    isbnControl,
-    BookEntryDialog.isbnTopBorder
-  )
-  AnchorPane.setLeftAnchor(
-    isbnControl,
-    BookEntryDialog.textFieldLeftBorder
-  )
 
   // Create control for entering book description
-  val descriptionLabel: Label =
-    new Label(
-      "Description:"
-    )
-  AnchorPane.setTopAnchor(
-    descriptionLabel,
-    BookEntryDialog.descriptionLabelTopBorder
-  )
-  AnchorPane.setLeftAnchor(
-    descriptionLabel,
-    BookEntryDialog.labelLeftBorder
-  )
-
-  val descriptionControl: TextArea =
-    new TextArea
+  val descriptionLabel: DescriptionLabel =
+    new DescriptionLabel
+  val descriptionControl: DescriptionValue =
+    new DescriptionValue
   descriptionControl.id =
     BookEntryDialog.descriptionControlId
   descriptionControl.text.onChange {
     bookBeingEdited.description = descriptionControl.text.value
   }
-  AnchorPane.setTopAnchor(
-    descriptionControl,
-    BookEntryDialog.descrptionControlTopBorder
-  )
-  AnchorPane.setLeftAnchor(
-    descriptionControl,
-    BookEntryDialog.descriptionControlLeftBorder
-  )
 
   // Create control to display cover image
-  val coverImageLabel: Label =
-    new Label(
-      "Cover Image:"
-    )
-  AnchorPane.setLeftAnchor(
-    coverImageLabel,
-    BookEntryDialog.coverImageLabelLeftBorder
-  )
-  AnchorPane.setTopAnchor(
-    coverImageLabel,
-    BookEntryDialog.coverImageLabelTopBorder
-  )
-  val coverImageControl: ImageView =
-    new ImageView
-  val coverImagePane: VBox =
-    new VBox {
-      border =
-        new Border(
-          new BorderStroke(
-            Color.BLACK,
-            BorderStrokeStyle.SOLID,
-            CornerRadii.EMPTY,
-            BorderStroke.THIN
-          )
-        )
-      children =
-        List(
-          coverImageControl
-        )
-      minHeight = BookEntryDialog.coverImageHeight
-      minWidth = BookEntryDialog.coverImageWidth
-    }
-  AnchorPane.setLeftAnchor(
-    coverImagePane,
-    BookEntryDialog.coverImageLeftBorder
-  )
-  AnchorPane.setTopAnchor(
-    coverImagePane,
-    BookEntryDialog.coverImageTopBorder
-  )
+  val coverImageLabel: CoverImageLabel =
+    new CoverImageLabel
+  val coverImageControl: CoverImage =
+    new CoverImage
 
   // Create button to change cover image
   val coverImageSelectionButton: Button =
@@ -233,15 +122,7 @@ class BookEntryDialog(
           coverImageFile.toURI
         )
       coverImageControl.image =
-        new Image(
-          new FileInputStream(
-            coverImageFile
-          ),
-          BookEntryDialog.coverImageWidth,
-          BookEntryDialog.coverImageHeight,
-          true,
-          true
-        )
+        coverImageFile.toURI
   }
   AnchorPane.setLeftAnchor(
     coverImageSelectionButton,
@@ -253,36 +134,10 @@ class BookEntryDialog(
   )
 
   // Create control to display categories associated with book
-  private val categoryLabel: Label =
-    new Label(
-      "Associated Categories:"
-    )
-  AnchorPane.setTopAnchor(
-    categoryLabel,
-    BookEntryDialog.categoryLabelTopBorder
-  )
-  AnchorPane.setLeftAnchor(
-    categoryLabel,
-    BookEntryDialog.categoryControlLeftBorder
-  )
-  private val associatedCategories: ObservableBuffer[String] =
-    new ObservableBuffer[String](
-      FXCollections.observableArrayList()
-    )
-  private val categoryControl: ListView[String] =
-    new ListView[String](
-      associatedCategories
-    )
-  categoryControl.selectionModel =
-    new DisableSelectionModel[String]
-  AnchorPane.setTopAnchor(
-    categoryControl,
-    BookEntryDialog.categoryControlTopBorder
-  )
-  AnchorPane.setLeftAnchor(
-    categoryControl,
-    BookEntryDialog.categoryControlLeftBorder
-  )
+  private val categoryLabel: CategoryLabel =
+    new CategoryLabel
+  private val categoryControl: BookCategories =
+    new BookCategories
 
   // Create button to update what categories are associated with book
   private val updateCategoriesButton =
@@ -301,11 +156,11 @@ class BookEntryDialog(
         scene =
           new CategorySelectionDialog(
             unassociatedCategories,
-            associatedCategories
+            categoryControl.categories
           )
       }.showAndWait
       bookBeingEdited.categories =
-        associatedCategories.toSet[String]
+        categoryControl.categories.toSet[String]
     }
   updateCategoriesButton.id =
     BookEntryDialog.categorySelectionButtonId
@@ -356,7 +211,7 @@ class BookEntryDialog(
           descriptionLabel,
           descriptionControl,
           coverImageLabel,
-          coverImagePane,
+          coverImageControl,
           coverImageSelectionButton,
           categoryLabel,
           categoryControl,
@@ -375,24 +230,8 @@ object BookEntryDialog {
   val categorySelectionButtonId: String = "categorySelectionButton"
   val saveButtonId = "saveButton"
 
-  private val titleTopBorder: Double = 2.0
-  private val authorTopBorder: Double = 30.0
-  private val isbnTopBorder: Double = 58.0
-  private val descriptionLabelTopBorder: Double = 86.0
-  private val descriptionControlLeftBorder: Double = 2.0
-  private val descrptionControlTopBorder: Double = 114.0
-  private val labelLeftBorder: Double = 2.0
-  private val textFieldLeftBorder: Double = 90.0
-  private val coverImageLabelLeftBorder: Double = 2.0
-  private val coverImageLabelTopBorder: Double = 296.0
-  private val coverImageLeftBorder: Double = 2.0
-  private val coverImageTopBorder: Double = 324.0
   private val coverImageSelectionLeftBorder: Double = 75.0
   private val coverImageSelectionTopBorder: Double = 725.0
-  private val categoryLabelLeftBorder: Double = 310.0
-  private val categoryLabelTopBorder: Double = 296.0
-  private val categoryControlLeftBorder: Double = 310.0
-  private val categoryControlTopBorder: Double = 324.0
   private val categoryUpdateButtonLeftBorder: Double = 325.0
   private val categoryUpdateButtonTopBorder: Double = 725.0
   private val saveButtonLeftButton: Double = 325.0
@@ -400,6 +239,4 @@ object BookEntryDialog {
 
   private val dialogWidth: Double = 650.0
   private val dialogHeight: Double = 1000.0
-  private val coverImageWidth: Double = 300.0
-  private val coverImageHeight: Double = 300.0
 }
