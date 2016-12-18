@@ -17,6 +17,7 @@ import scalafx.scene.control.TextField
 import scalafx.Includes._
 
 import com.github.hobbitProg.dcm.client.books.Categories
+import com.github.hobbitProg.dcm.client.control.SelectedBookControl
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
 
@@ -54,31 +55,18 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
         selectedBookScene.bookControl.clear()
 
         "then there is no title for the selected book" in {
-          val mirror =
-            scala.reflect.runtime.currentMirror
-          val titleField =
-            mirror.classSymbol(
-              selectedBookScene.bookControl.getClass
-            ).toType.members.find {
-              member => {
-                member.name.toString == "titleValue"
-              }
-            }
-          val instanceMirror =
-            mirror.reflect(
-              selectedBookScene.bookControl
-            )
-          val titleControl: TextField =
-            instanceMirror.reflectMethod(
-              titleField match {
-                case Some(fieldValue) => fieldValue.asMethod
-             }
-            ).apply().asInstanceOf[TextField]
-          titleControl.text.value shouldBe ""
+          getTextFieldValue(
+            selectedBookScene.bookControl,
+            "titleValue"
+          ) shouldBe ""
         }
 
-        "and there is no author for the selected book" in
-          pending
+        "and there is no author for the selected book" in {
+          getTextFieldValue(
+            selectedBookScene.bookControl,
+            "authorValue"
+          ) shouldBe ""
+        }
 
         "and there is no ISBN for the selected book" in
           pending
@@ -129,4 +117,36 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
     bookScene
   }
 
+  /**
+    * Get value of text field control
+    * @param bookControl Selected book control used in test
+    * @param controlFieldName Name of field containing text field to extract
+    * @return
+    */
+  def getTextFieldValue(
+    bookControl: SelectedBookControl,
+    controlFieldName: String
+  ): String = {
+    val mirror =
+      scala.reflect.runtime.currentMirror
+    val titleField =
+      mirror.classSymbol(
+        bookControl.getClass
+      ).toType.members.find {
+        member => {
+          member.name.toString == controlFieldName
+        }
+      }
+    val instanceMirror =
+      mirror.reflect(
+        bookControl
+      )
+    val titleControl: TextField =
+      instanceMirror.reflectMethod(
+        titleField match {
+          case Some(fieldValue) => fieldValue.asMethod
+        }
+      ).apply().asInstanceOf[TextField]
+    titleControl.text.value
+  }
 }

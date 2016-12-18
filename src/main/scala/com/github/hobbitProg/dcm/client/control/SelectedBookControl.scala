@@ -274,6 +274,10 @@ class SelectedBookControl
       titleValue,
       ""
     )
+    updateValue(
+      authorValue,
+      ""
+    )
   }
 
   /**
