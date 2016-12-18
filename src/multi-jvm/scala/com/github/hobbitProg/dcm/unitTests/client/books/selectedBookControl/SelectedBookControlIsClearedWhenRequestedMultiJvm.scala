@@ -68,8 +68,12 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
           ) shouldBe ""
         }
 
-        "and there is no ISBN for the selected book" in
-          pending
+        "and there is no ISBN for the selected book" in {
+          getTextFieldValue(
+            selectedBookScene.bookControl,
+            "isbnValue"
+          ) shouldBe ""
+        }
 
         "and there is no description for the selected book" in
           pending

@@ -278,6 +278,10 @@ class SelectedBookControl
       authorValue,
       ""
     )
+    updateValue(
+      isbnValue,
+      ""
+    )
   }
 
   /**
