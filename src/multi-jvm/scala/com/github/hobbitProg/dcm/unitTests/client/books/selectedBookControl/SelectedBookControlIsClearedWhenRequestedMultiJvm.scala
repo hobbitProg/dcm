@@ -2,11 +2,18 @@ package com.github.hobbitProg.dcm.unitTests.client.books.selectedBookControl
 
 import java.net.URI
 import java.util.function.{Consumer, Supplier}
+
 import javafx.application.Application
 import javafx.stage.Stage
+
 import org.testfx.api.FxToolkit
-import org.scalatest.FreeSpec
+
+import org.scalatest.{Matchers, FreeSpec}
+
 import scala.collection.Set
+import scala.reflect.runtime.universe._
+
+import scalafx.scene.control.TextField
 import scalafx.Includes._
 
 import com.github.hobbitProg.dcm.client.books.Categories
@@ -18,7 +25,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
   * cleared when requested
   */
 class SelectedBookControlIsClearedWhenRequestedMultiJvm
-  extends FreeSpec {
+  extends FreeSpec
+    with Matchers {
   "Given a selected book control" - {
     val selectedBookScene =
       createSelectedBookControlScene
@@ -43,8 +51,31 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
       selectedBookScene.bookControl display selectedBook
 
       "when the selected book is cleared" - {
-        "then there is no title for the selected book" in
-          pending
+        selectedBookScene.bookControl.clear()
+
+        "then there is no title for the selected book" in {
+          val mirror =
+            scala.reflect.runtime.currentMirror
+          val titleField =
+            mirror.classSymbol(
+              selectedBookScene.bookControl.getClass
+            ).toType.members.find {
+              member => {
+                member.name.toString == "titleValue"
+              }
+            }
+          val instanceMirror =
+            mirror.reflect(
+              selectedBookScene.bookControl
+            )
+          val titleControl: TextField =
+            instanceMirror.reflectMethod(
+              titleField match {
+                case Some(fieldValue) => fieldValue.asMethod
+             }
+            ).apply().asInstanceOf[TextField]
+          titleControl.text.value shouldBe ""
+        }
 
         "and there is no author for the selected book" in
           pending

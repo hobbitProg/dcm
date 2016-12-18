@@ -267,6 +267,16 @@ class SelectedBookControl
   }
 
   /**
+    * Clear information on selected information
+    */
+  def clear(): Unit = {
+    updateValue(
+      titleValue,
+      ""
+    )
+  }
+
+  /**
     * Update value displayed in field
     * @param valueField Field to update
     * @param newValue Value to place intofield
