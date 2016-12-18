@@ -13,7 +13,7 @@ import org.scalatest.{Matchers, FreeSpec}
 import scala.collection.Set
 import scala.reflect.runtime.universe._
 
-import scalafx.scene.control.TextField
+import scalafx.scene.control.TextInputControl
 import scalafx.Includes._
 
 import com.github.hobbitProg.dcm.client.books.Categories
@@ -75,8 +75,12 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
           ) shouldBe ""
         }
 
-        "and there is no description for the selected book" in
-          pending
+        "and there is no description for the selected book" in {
+          getTextFieldValue(
+            selectedBookScene.bookControl,
+            "descriptionValue"
+          ) shouldBe ""
+        }
 
         "and there is no cover image for the selected book" in
           pending
@@ -145,12 +149,12 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
       mirror.reflect(
         bookControl
       )
-    val titleControl: TextField =
+    val titleControl: TextInputControl =
       instanceMirror.reflectMethod(
         titleField match {
           case Some(fieldValue) => fieldValue.asMethod
         }
-      ).apply().asInstanceOf[TextField]
+      ).apply().asInstanceOf[TextInputControl]
     titleControl.text.value
   }
 }

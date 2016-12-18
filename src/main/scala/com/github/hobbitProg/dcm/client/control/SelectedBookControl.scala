@@ -282,6 +282,10 @@ class SelectedBookControl
       isbnValue,
       ""
     )
+    updateValue(
+      descriptionValue,
+      ""
+    )
   }
 
   /**
