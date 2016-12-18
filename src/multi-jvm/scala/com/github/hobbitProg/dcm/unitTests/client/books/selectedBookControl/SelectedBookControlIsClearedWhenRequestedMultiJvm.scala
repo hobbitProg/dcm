@@ -14,7 +14,7 @@ import scala.collection.Set
 import scala.reflect.runtime.universe._
 
 import scalafx.scene.image.{Image, ImageView}
-import scalafx.scene.control.TextInputControl
+import scalafx.scene.control.{ListView, TextInputControl}
 import scalafx.Includes._
 
 import com.github.hobbitProg.dcm.client.books.Categories
@@ -58,28 +58,32 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
         "then there is no title for the selected book" in {
           getTextControlValue(
             selectedBookScene.bookControl,
-            "titleValue"
+            SelectedBookControlIsClearedWhenRequestedMultiJvm.
+              titleControlFieldName
           ) shouldBe ""
         }
 
         "and there is no author for the selected book" in {
           getTextControlValue(
             selectedBookScene.bookControl,
-            "authorValue"
+            SelectedBookControlIsClearedWhenRequestedMultiJvm.
+              authorControlFieldName
           ) shouldBe ""
         }
 
         "and there is no ISBN for the selected book" in {
           getTextControlValue(
             selectedBookScene.bookControl,
-            "isbnValue"
+            SelectedBookControlIsClearedWhenRequestedMultiJvm.
+              isbnControlFieldName
           ) shouldBe ""
         }
 
         "and there is no description for the selected book" in {
           getTextControlValue(
             selectedBookScene.bookControl,
-            "descriptionValue"
+            SelectedBookControlIsClearedWhenRequestedMultiJvm.
+              descriptionControlFieldName
           ) shouldBe ""
         }
 
@@ -89,8 +93,11 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
           ) shouldBe null
         }
 
-        "and the selected book has no associated categories" in
-          pending
+        "and the selected book has no associated categories" in {
+          getDisplayedCategories(
+            selectedBookScene.bookControl
+          ) shouldBe Set[Categories]()
+        }
       }
     }
   }
@@ -153,13 +160,13 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
       mirror.reflect(
         bookControl
       )
-    val titleControl: TextInputControl =
+    val textControl: TextInputControl =
       instanceMirror.reflectMethod(
         titleField match {
           case Some(fieldValue) => fieldValue.asMethod
         }
       ).apply().asInstanceOf[TextInputControl]
-    titleControl.text.value
+    textControl.text.value
   }
 
   /**
@@ -177,20 +184,63 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
         bookControl.getClass
       ).toType.members.find {
         member => {
-          member.name.toString == "coverImageControl"
+          member.name.toString ==
+            SelectedBookControlIsClearedWhenRequestedMultiJvm.
+              coverImageControlFieldName
         }
       }
     val instanceMirror =
       mirror.reflect(
         bookControl
       )
-    val titleControl: ImageView =
+    val coverControl: ImageView =
       instanceMirror.reflectMethod(
         titleField match {
           case Some(fieldValue) => fieldValue.asMethod
         }
       ).apply().asInstanceOf[ImageView]
-    titleControl.image.value
-
+    coverControl.image.value
   }
+
+  /**
+    * Get displayed categories associated with book
+    * @param bookControl Selected book control used in test
+    * @return Displayed categories associated with book
+    */
+  private def getDisplayedCategories(
+    bookControl: SelectedBookControl
+  ): Set[Categories] = {
+    val mirror =
+      scala.reflect.runtime.currentMirror
+    val titleField =
+      mirror.classSymbol(
+        bookControl.getClass
+      ).toType.members.find {
+        member => {
+          member.name.toString ==
+            SelectedBookControlIsClearedWhenRequestedMultiJvm.
+              categoryControlFieldName
+        }
+      }
+    val instanceMirror =
+      mirror.reflect(
+        bookControl
+      )
+    val categoryControl: ListView[Categories] =
+      instanceMirror.reflectMethod(
+        titleField match {
+          case Some(fieldValue) => fieldValue.asMethod
+        }
+      ).apply().asInstanceOf[ListView[Categories]]
+    categoryControl.items.value.toSet
+  }
+}
+
+object SelectedBookControlIsClearedWhenRequestedMultiJvm {
+  private val titleControlFieldName: String = "titleValue"
+  private val authorControlFieldName: String = "authorValue"
+  private val isbnControlFieldName: String = "isbnValue"
+  private val descriptionControlFieldName: String = "descriptionValue"
+  private val coverImageControlFieldName: String = "coverImageControl"
+  private val categoryControlFieldName: String = "categoryControl"
 }

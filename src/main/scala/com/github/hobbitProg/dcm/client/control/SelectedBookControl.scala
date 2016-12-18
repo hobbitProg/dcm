@@ -3,7 +3,8 @@ package com.github.hobbitProg.dcm.client.control
 import java.io.{File, FileInputStream}
 import java.net.URI
 import javafx.collections.FXCollections
-import javafx.scene.layout.{Border, BorderStroke, BorderStrokeStyle, CornerRadii}
+import javafx.scene.layout.{Border, BorderStroke, BorderStrokeStyle,
+CornerRadii}
 import javafx.scene.paint.Color
 
 import scalafx.collections.ObservableBuffer
@@ -287,6 +288,7 @@ class SelectedBookControl
       ""
     )
     coverImageControl.image = null
+    associatedCategories.clear()
   }
 
   /**
