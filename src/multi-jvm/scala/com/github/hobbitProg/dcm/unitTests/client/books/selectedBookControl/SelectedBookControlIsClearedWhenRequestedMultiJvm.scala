@@ -38,7 +38,7 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
           "Ruins",
           "Kevin J. Anderson",
           "0061052477",
-          "Description for Ruins",
+          Some("Description for Ruins"),
           Some[URI](
             getClass.getResource(
               "/Ruins.jpg"
@@ -163,6 +163,7 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
       instanceMirror.reflectMethod(
         titleField match {
           case Some(fieldValue) => fieldValue.asMethod
+          case None => null
         }
       ).apply().asInstanceOf[TextInputControl]
     textControl.text.value
@@ -196,6 +197,7 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
       instanceMirror.reflectMethod(
         titleField match {
           case Some(fieldValue) => fieldValue.asMethod
+          case None => null
         }
       ).apply().asInstanceOf[CoverImage]
     coverControl.image.value
@@ -229,6 +231,7 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
       instanceMirror.reflectMethod(
         titleField match {
           case Some(fieldValue) => fieldValue.asMethod
+          case None => null
         }
       ).apply().asInstanceOf[ListView[Categories]]
     categoryControl.items.value.toSet

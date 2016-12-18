@@ -40,7 +40,7 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
     ("Ground Zero",
       "Kevin J. Anderson",
       "006105223X",
-      "Description for Ground Zero",
+      Some("Description for Ground Zero"),
       Some[URI](
         bookImageLocation
       ),
@@ -104,7 +104,10 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
                   BookEntryDialog.descriptionControlId
                 )
                 enterDataIntoControl(
-                  validNewBook.description
+                  validNewBook.description match {
+                    case Some(existingDescription) => existingDescription
+                    case None => ""
+                  }
                 )
 
                 "and the user selects the cover image for the new book" - {

@@ -2,6 +2,7 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog
 
 import acolyte.jdbc.{AcolyteDSL, StatementHandler, UpdateExecution, Driver => AcolyteDriver}
 import acolyte.jdbc.Implicits._
+
 import java.net.URI
 import java.sql.{Connection, DriverManager}
 
@@ -10,8 +11,10 @@ import org.scalatest.Matchers._
 
 import scala.collection.Set
 import scala.util.matching.Regex
+
 import com.github.hobbitProg.dcm.client.books.{Authors, Categories,
 CoverImageLocations, Descriptions, ISBNs, Titles}
+import com.github.hobbitProg.dcm.client.books.Conversions._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
 
@@ -82,7 +85,7 @@ class BooksCanBeAddedToCatalog
             "Ground Zero",
             "Kevin J. Anderson",
             "006105223X",
-            "Description for Ground Zero",
+            Some("Description for Ground Zero"),
             Some[URI](
               getClass.getResource(
                 "/GroundZero.jpg"
@@ -92,7 +95,7 @@ class BooksCanBeAddedToCatalog
               "sci-fi",
               "conspiracy"
             )
-            )
+          )
 
         "when the book is added to the catalog" - {
           val updatedBookCatalog =

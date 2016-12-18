@@ -24,7 +24,7 @@ package object books {
   /**
     * Type for descriptions of book
     */
-  type Descriptions = String
+  type Descriptions = Option[String]
 
   /**
     * Type for location where cover image is located

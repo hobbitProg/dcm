@@ -12,6 +12,7 @@ import scalafx.scene.control.Button
 import scalafx.scene.layout.AnchorPane
 import scalafx.stage.{FileChooser, Stage}
 
+import com.github.hobbitProg.dcm.client.books.Conversions._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 import com.github.hobbitProg.dcm.client.books.control.image._
 import com.github.hobbitProg.dcm.client.books.control.label._

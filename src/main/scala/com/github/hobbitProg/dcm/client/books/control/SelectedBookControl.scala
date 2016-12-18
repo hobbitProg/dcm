@@ -8,6 +8,7 @@ import scalafx.scene.Group
 import scalafx.scene.control._
 import scalafx.scene.layout.AnchorPane
 
+import com.github.hobbitProg.dcm.client.books.Conversions._
 import com.github.hobbitProg.dcm.client.books.control.image._
 import com.github.hobbitProg.dcm.client.books.control.label._
 import com.github.hobbitProg.dcm.client.books.control.listView._

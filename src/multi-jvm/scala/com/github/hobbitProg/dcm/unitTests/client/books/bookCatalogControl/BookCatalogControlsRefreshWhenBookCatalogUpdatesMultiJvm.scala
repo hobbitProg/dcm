@@ -35,7 +35,7 @@ class BookCatalogControlsRefreshWhenBookCatalogUpdatesMultiJvm
             "Ground Zero",
             "Kevin J. Anderson",
             "006105223X",
-            "Description for Ground Zero",
+            Some("Description for Ground Zero"),
             Some[URI](
               getClass.getResource(
                 "/GroundZero.jpg"

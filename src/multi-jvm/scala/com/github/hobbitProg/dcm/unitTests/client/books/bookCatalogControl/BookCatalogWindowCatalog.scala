@@ -20,7 +20,7 @@ class BookCatalogWindowCatalog
         "Ruins",
         "Kevin J. Anderson",
         "0061052477",
-        "Description for Ruins",
+        Some("Description for Ruins"),
         Some[URI](
           getClass.getResource(
             "/Ruins.jpg"
@@ -35,7 +35,7 @@ class BookCatalogWindowCatalog
         "Goblins",
         "Charles Grant",
         "0061054143",
-        "Description for Goblins",
+        Some("Description for Goblins"),
         Some[URI](
           getClass.getResource(
             "/Goblins.jpg"

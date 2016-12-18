@@ -21,7 +21,7 @@ class Book(
             var title: Titles = "",
             var author: Authors = "",
             var isbn: ISBNs = "",
-            var description: Descriptions = "",
+            var description: Descriptions = None,
             var coverImage: CoverImageLocations = None,
             var categories: Set[Categories] = Set[Categories]()
 ) {

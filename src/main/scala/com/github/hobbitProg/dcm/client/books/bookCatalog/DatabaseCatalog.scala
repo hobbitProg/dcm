@@ -2,6 +2,8 @@ package com.github.hobbitProg.dcm.client.books.bookCatalog
 
 import java.net.URI
 import java.sql.{Connection, ResultSet, Statement}
+
+import scala.language.implicitConversions
 import scala.collection.Set
 
 import com.github.hobbitProg.dcm.client.books.{Authors, Titles, Categories,
@@ -18,13 +20,49 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
 private class DatabaseCatalog(
   private val databaseConnection: Connection
 ) extends Catalog {
-
   private val titleLocation: Int = 1
   private val authorLocation: Int = 2
   private val isbnLocation: Int = 3
   private val descriptionLocation: Int = 4
   private val coverLocation: Int = 5
   private val categoryLocation: Int = 1
+
+  // Convert image location from database to internal representation
+  private implicit def databaseToCoverImageLocation(
+    locationFromDatabase: String
+  ) : CoverImageLocations =
+    locationFromDatabase match {
+      case "NULL" => None
+      case existingLocation => Some[URI](new URI(locationFromDatabase))
+    }
+
+  // Convert internal representation of internal location to database
+  // representation
+  private implicit def coverImageLocationToDatabase(
+    locationToDatabase: CoverImageLocations
+  ) : String = {
+    locationToDatabase match {
+      case Some(imageLocation) => imageLocation.toString
+      case None => "NULL"
+    }
+  }
+
+  // Convert description from database to internal format
+  private implicit def databaseToDescription(
+    databaseDescription: String
+  ): Descriptions =
+    databaseDescription match {
+      case "NULL" => None
+      case existingDescription => Some(existingDescription)
+    }
+
+  private implicit def descriptionToDatabase(
+    descriptionToConvert: Descriptions
+  ): String =
+    descriptionToConvert match {
+      case None => "NULL"
+      case Some(realDescription) => realDescription
+    }
 
   // Register action to add book to database
   private val databaseAdditionListener: Catalog.Subscriptions =
@@ -33,11 +71,6 @@ private class DatabaseCatalog(
         // Add main book information
         val bookStatement: Statement =
           databaseConnection.createStatement
-        val imageValue =
-          bookToAdd.coverImage match {
-            case Some(imageLocation) => imageLocation
-            case None => "NULL"
-          }
         bookStatement.executeUpdate(
           "INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES('" +
             bookToAdd.title +
@@ -48,7 +81,7 @@ private class DatabaseCatalog(
             "','" +
             bookToAdd.description +
             "','" +
-            imageValue +
+            bookToAdd.coverImage +
             "')"
         )
 
@@ -98,21 +131,17 @@ private class DatabaseCatalog(
         categorySet =
           categorySet + (associatedCategories getString categoryLocation)
       }
+      val location: CoverImageLocations =
+        coreBookInfo getString coverLocation
+      val description: Descriptions =
+        coreBookInfo getString descriptionLocation
       val newBook: Book =
         (
           coreBookInfo getString titleLocation,
           coreBookInfo getString authorLocation,
           coreBookInfo getString isbnLocation,
-          coreBookInfo getString descriptionLocation,
-          if ((coreBookInfo getString coverLocation) == "NULL") {
-            None
-          } else {
-            Some[URI](
-              new URI(
-                coreBookInfo getString coverLocation
-              )
-            )
-          },
+          description,
+          location,
           categorySet
         )
       gatheredBooks =
