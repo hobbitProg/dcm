@@ -71,6 +71,10 @@ private class DatabaseCatalog(
         // Add main book information
         val bookStatement: Statement =
           databaseConnection.createStatement
+        val databaseDescription: String =
+          bookToAdd.description
+        val databaseCover: String =
+          bookToAdd.coverImage
         bookStatement.executeUpdate(
           "INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES('" +
             bookToAdd.title +
@@ -79,9 +83,9 @@ private class DatabaseCatalog(
             "','" +
             bookToAdd.isbn +
             "','" +
-            bookToAdd.description +
+            databaseDescription +
             "','" +
-            bookToAdd.coverImage +
+            databaseCover +
             "')"
         )
 
