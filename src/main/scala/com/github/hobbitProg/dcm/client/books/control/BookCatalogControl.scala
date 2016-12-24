@@ -55,6 +55,7 @@ class BookCatalogControl(
       )
   }
 
+  //noinspection ScalaUnusedSymbol
   // Display all books that are added to catalog
   private val additionSubscription =
     source onAdd {

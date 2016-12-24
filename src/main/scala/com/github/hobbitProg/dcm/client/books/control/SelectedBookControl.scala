@@ -142,7 +142,7 @@ class SelectedBookControl
   /**
     * Update value displayed in field
     * @param valueField Field to update
-    * @param newValue Value to place intofield
+    * @param newValue Value to place into field
     */
   private def updateValue(
     valueField: TextInputControl,

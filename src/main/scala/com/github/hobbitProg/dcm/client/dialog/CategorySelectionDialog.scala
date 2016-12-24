@@ -104,6 +104,7 @@ class CategorySelectionDialog(
     associateButton.disable =
       availableCategoriesControl.selectionModel.value.isEmpty
   }
+  //noinspection ScalaUnusedSymbol
   associateButton.onAction =
     (event: ActionEvent) => {
       moveCategories(
@@ -134,6 +135,7 @@ class CategorySelectionDialog(
     disassociateButton.disable =
       selectedCategoriesControl.selectionModel.value.isEmpty
   }
+  //noinspection ScalaUnusedSymbol
   disassociateButton.onAction =
     (event: ActionEvent) => {
       moveCategories(
@@ -158,6 +160,7 @@ class CategorySelectionDialog(
     )
   saveButton.id =
     CategorySelectionDialog.saveButtonId
+  //noinspection ScalaUnusedSymbol
   saveButton.onAction =
     (event: ActionEvent) => {
       finalizeAssociation()
@@ -178,6 +181,7 @@ class CategorySelectionDialog(
     new Button(
       "Cancel"
     )
+  //noinspection ScalaUnusedSymbol
   cancelButton.onAction =
     (event: ActionEvent) => {
       closeDialog()
@@ -236,7 +240,6 @@ class CategorySelectionDialog(
       newlySelectedCategories
     availableCategories ++=
       newlyDeselectedCategories
-    (newlySelectedCategories, newlyDeselectedCategories)
     availableCategories sort {
       (categoryOne, categoryTwo) =>
         (categoryOne compare categoryTwo) < 0

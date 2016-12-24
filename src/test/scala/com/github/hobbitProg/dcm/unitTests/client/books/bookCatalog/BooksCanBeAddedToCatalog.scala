@@ -37,7 +37,7 @@ class BooksCanBeAddedToCatalog
 
   // Regular expression to match SQL statement to associate category with book
   private val categoryAddSQL: Regex =
-  ("INSERT INTO catetegoryMapping [(]ISBN,Category[)]VALUES[(]'([^']+)','" +
+  ("INSERT INTO categoryMapping [(]ISBN,Category[)]VALUES[(]'([^']+)','" +
       "([^']+)'[)]").r
 
   private var addedTitle: Titles = ""
@@ -73,6 +73,7 @@ class BooksCanBeAddedToCatalog
     "and a listener for book addition events" - {
       var bookThatWasBroadcast: Book =
         null
+      //noinspection ScalaUnusedSymbol
       val additionListener: Catalog.Subscriptions =
         originalBookCatalog onAdd {
           addedBook =>
@@ -98,6 +99,7 @@ class BooksCanBeAddedToCatalog
           )
 
         "when the book is added to the catalog" - {
+          //noinspection ScalaUnusedSymbol
           val updatedBookCatalog =
             originalBookCatalog + newBook
 

@@ -1,6 +1,5 @@
 package com.github.hobbitProg.dcm
 
-import java.lang.Runnable
 import scala.language.implicitConversions
 
 /**
@@ -8,10 +7,10 @@ import scala.language.implicitConversions
   */
 object Conversions {
   implicit def functionToRunnable(
-    op: Unit
+    op: () => Unit
    ): Runnable = {
     new Runnable {
-      override def run(): Unit = op
+      override def run(): Unit = op()
     }
   }
 }

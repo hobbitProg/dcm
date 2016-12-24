@@ -15,7 +15,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
   * @author Kyle Cranmer
   * @since 0.1
   * @constructor Create database implementation of book catalog
-  * @param databaseConnection Connection to database implmentation
+  * @param databaseConnection Connection to database implementation
   */
 private class DatabaseCatalog(
   private val databaseConnection: Connection
@@ -27,6 +27,7 @@ private class DatabaseCatalog(
   private val coverLocation: Int = 5
   private val categoryLocation: Int = 1
 
+  //noinspection ScalaUnusedSymbol
   // Convert image location from database to internal representation
   private implicit def databaseToCoverImageLocation(
     locationFromDatabase: String
@@ -64,6 +65,7 @@ private class DatabaseCatalog(
       case Some(realDescription) => realDescription
     }
 
+  //noinspection ScalaUnusedSymbol
   // Register action to add book to database
   private val databaseAdditionListener: Catalog.Subscriptions =
     addStream.listen(
@@ -93,7 +95,7 @@ private class DatabaseCatalog(
         bookToAdd.categories.foreach(
           category =>
             bookStatement.executeUpdate(
-              "INSERT INTO catetegoryMapping (ISBN,Category)VALUES('" +
+              "INSERT INTO categoryMapping (ISBN,Category)VALUES('" +
                 bookToAdd.isbn +
                 "','" +
                 category +

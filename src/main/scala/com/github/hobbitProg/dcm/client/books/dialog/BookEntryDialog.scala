@@ -24,7 +24,7 @@ import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
   * Dialog for entering information on book for catalog
   * @param coverImageChooser Creates dialog to select cover image for book
   * @param catalog Catalog to update
-  * @param definedCategories Categories that can be associtated with book
+  * @param definedCategories Categories that can be associated with book
   * @author Kyle Cranmer
   * @since 0.1
   */
@@ -112,6 +112,7 @@ class BookEntryDialog(
     )
   coverImageSelectionButton.id =
     BookEntryDialog.bookCoverButtonId
+  //noinspection ScalaUnusedSymbol
   coverImageSelectionButton.onAction =
     (event: ActionEvent) => {
       val coverImageFile =
@@ -149,6 +150,7 @@ class BookEntryDialog(
     updateCategoriesButton.disable =
       unassociatedCategories.length == 0
   }
+  //noinspection ScalaUnusedSymbol
   updateCategoriesButton.onAction =
     (event: ActionEvent) => {
       new Stage {
@@ -181,6 +183,7 @@ class BookEntryDialog(
     )
   saveButton.id =
     BookEntryDialog.saveButtonId
+  //noinspection ScalaUnusedSymbol
   saveButton.onAction =
     (event: ActionEvent) => {
       updatedCatalog =
