@@ -1,5 +1,6 @@
 import java.io.File
 import java.sql._
+import java.net.URI
 import java.util.function.{Consumer, Supplier}
 
 import javafx.scene.Parent
@@ -12,10 +13,12 @@ import org.testfx.api.{FxRobot, FxRobotInterface, FxToolkit}
 import org.testfx.util.{NodeQueryUtils, WaitForAsyncUtils}
 
 import scala.collection.Set
+import scala.collection.mutable.Map
 import scala.collection.JavaConversions._
+import scala.language.implicitConversions
 
 import com.github.hobbitProg.dcm.client.books.Categories
-import com.github.hobbitProg.dcm.client.books.bookCatalog.Catalog
+import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
 
@@ -31,6 +34,44 @@ class BookCatalogClientSteps {
   // Robot to perform steps
   private val bookClientRobot: FxRobotInterface =
     new FxRobot
+
+  // Book to place into catalog
+  private var bookToEnter: Book = _
+
+  // Convert row from storty to book
+  private implicit def row2Book(
+    bookRow: scala.collection.mutable.Map[String, String]
+  ): Book = {
+    new Book(
+      bookRow.get("title") match {
+        case Some(title) => title
+        case None => ""
+      },
+      bookRow.get("author") match {
+        case Some(author) => author
+        case None => ""
+      },
+      bookRow.get("isbn") match {
+        case Some(isbn) => isbn
+        case None => ""
+      },
+      bookRow.get("description") match {
+        case Some(description) =>
+          if (description == "") None else Some(description)
+        case None => None
+      },
+      bookRow.get("cover image") match {
+        case Some(cover) =>
+          if (cover == "") None else Some(new URI(cover))
+        case None => None
+      },
+      bookRow.get("categories") match {
+        case Some(categories) =>
+          Set(categories.split(","): _*)
+        case None => Set()
+      }
+    )
+  }
 
   @org.jbehave.core.annotations.BeforeStory
   def defineSchemas(): Unit = {
@@ -171,6 +212,11 @@ class BookCatalogClientSteps {
     def bookToAdd(
     newBook: ExamplesTable
   ): Unit = {
+    bookToEnter = mapAsScalaMap(newBook getRow 0)
+  }
+
+  @org.jbehave.core.annotations.When("I enter this book into the book catalog")
+  def addBooksToCatalog(): Unit = {
     // Display dialog to enter in new book
     bookClientRobot.clickOn(
       NodeQueryUtils hasId BookTab.addButtonId,
@@ -183,13 +229,26 @@ class BookCatalogClientSteps {
       MouseButton.PRIMARY
     )
     enterDataIntoControl(
-      newBook.getRow(0).get("title")
+      bookToEnter.title
     )
-  }
 
-  @org.jbehave.core.annotations.When("I enter this books into the book catalog")
-  @org.jbehave.core.annotations.Pending
-  def addBooksToCatalog(): Unit = {
+    // Enter in author of new book
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId BookEntryDialog.authorControlId,
+      MouseButton.PRIMARY
+    )
+    enterDataIntoControl(
+      bookToEnter.author
+    )
+
+    // Enter in ISBN of new book
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId BookEntryDialog.isbnControlId,
+      MouseButton.PRIMARY
+    )
+    enterDataIntoControl(
+      bookToEnter.isbn
+    )
   }
 
   @org.jbehave.core.annotations.Then("the book is in the book catalogs")
