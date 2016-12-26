@@ -1,6 +1,6 @@
+import java.io.File
 import java.sql._
 
-import org.jbehave.core.annotations._
 import org.jbehave.core.model.ExamplesTable
 
 import scala.collection.JavaConversions._
@@ -14,7 +14,7 @@ class BookCatalogClientSteps {
   // Connection to book catalog
   private var bookConnection: Connection = _
 
-  @BeforeStory
+  @org.jbehave.core.annotations.BeforeStory
   def defineSchemas(): Unit = {
     // Get connection to database
     Class.forName(
@@ -32,7 +32,22 @@ class BookCatalogClientSteps {
       schemaStatement execute
         "CREATE TABLE " + BookCatalogClientSteps.definedCategoriesTable + " (" +
           "categoryID integer PRIMARY KEY," +
-          BookCatalogClientSteps.categoryColumn + " CHAR(25)" +
+          BookCatalogClientSteps.categoryColumn + " TINYTEXT" +
+          ");"
+      schemaStatement execute
+        "CREATE TABLE " + BookCatalogClientSteps.bookCatalogTable + " (" +
+          "bookID integer PRIMARY KEY," +
+          BookCatalogClientSteps.titleColumn + " MEDIUMTEXT," +
+          BookCatalogClientSteps.authorColumn + " MEDIUMTEXT," +
+          BookCatalogClientSteps.isbnColumn + " MEDIUMTEXT," +
+          BookCatalogClientSteps.descriptionColumn + " MEDIUMTEXT," +
+          BookCatalogClientSteps.coverColumn + " MEDIUMTEXT" +
+          ");"
+      schemaStatement execute
+        "CREATE TABLE " + BookCatalogClientSteps.categoryMappingTable + " (" +
+          "mappingID integer PRIMARY KEY," +
+          BookCatalogClientSteps.isbnColumn + " MEDIUMTEXT," +
+          BookCatalogClientSteps.categoryColumn + " TINYTEXT" +
           ");"
     }
     catch {
@@ -40,19 +55,22 @@ class BookCatalogClientSteps {
     }
   }
 
-  @AfterStory
-  @Pending
+  @org.jbehave.core.annotations.AfterStory
   def removeTestCatalog(): Unit = {
+    val dbFile =
+      new File(
+        BookCatalogClientSteps.databaseFile
+      )
+    dbFile.delete()
   }
 
-  @AfterStory
-  @Pending
+  @org.jbehave.core.annotations.AfterStory
+  @org.jbehave.core.annotations.Pending
   def releaseTestResources(): Unit = {
   }
 
-  @Given("the following defined categories: <existingCategories>")
+  @org.jbehave.core.annotations.Given("the following defined categories: $existingCategories")
   def definedCategories(
-    @Named("existingCategories")
     existingCategories: ExamplesTable
   ): Unit = {
     val insertStatement =
@@ -63,67 +81,106 @@ class BookCatalogClientSteps {
         BookCatalogClientSteps.definedCategoriesTable +
         " (" +
         BookCatalogClientSteps.categoryColumn +
-        ") VALUES (" +
+        ") VALUES ('" +
         definedCategory.get("category") +
-        ")"
+        "')"
     }
   }
 
-  @Given("the following books that are already in the catalog: <preExistingBooks>")
-  @Pending
+  @org.jbehave.core.annotations.Given("the following books that are already in the catalog: $preExistingBooks")
   def catalogContents(
-    @Named("preExistingBooks")
     preExistingBooks: ExamplesTable
   ): Unit = {
+    val insertStatement =
+      bookConnection.createStatement()
+    for (existingBook <- preExistingBooks.getRows) {
+      insertStatement executeUpdate
+        "INSERT INTO " + BookCatalogClientSteps.bookCatalogTable + "(" +
+          BookCatalogClientSteps.titleColumn + "," +
+          BookCatalogClientSteps.authorColumn + ","  +
+          BookCatalogClientSteps.isbnColumn + "," +
+          BookCatalogClientSteps.descriptionColumn + "," +
+          BookCatalogClientSteps.coverColumn + ")VALUES('" +
+          existingBook.get("title") + "','" +
+          existingBook.get("author") + "','" +
+          existingBook.get("isbn") + "','" +
+          existingBook.get("description") + "','" +
+          existingBook.get("cover") + "')"
+
+      for (associatedCategory <- existingBook.get("categories").split(",")) {
+        insertStatement executeUpdate
+          "INSERT INTO " + BookCatalogClientSteps.categoryMappingTable + "(" +
+            BookCatalogClientSteps.isbnColumn + "," +
+            BookCatalogClientSteps.categoryColumn + ")VALUES('" +
+            existingBook.get("isbn") + "','" +
+            associatedCategory + "')"
+      }
+    }
   }
 
-  @Given("the following book to add to the catalog: <newBook>")
-  @Pending
+  @org.jbehave.core.annotations.Given("the following book to add to the catalog: $newBook")
+  @org.jbehave.core.annotations.Pending
   def bookToAdd(
-    @Named("newBook")
     newBook: ExamplesTable
   ): Unit = {
   }
 
-  @When("I enter this books into the book catalog")
-  @Pending
+  @org.jbehave.core.annotations.When("I enter this books into the book catalog")
+  @org.jbehave.core.annotations.Pending
   def addBooksToCatalog(): Unit = {
   }
 
-  @Then("the book is in the book catalogs")
-  @Pending
+  @org.jbehave.core.annotations.Then("the book is in the book catalogs")
+  @org.jbehave.core.annotations.Pending
   def bookExistsInCatalog(): Unit = {
   }
 
-  @Then("the book is displayed on the window displaying the book catalog")
-  @Pending
+  @org.jbehave.core.annotations.Then("the book is displayed on the window displaying the book catalog")
+  @org.jbehave.core.annotations.Pending
   def newBookIsDisplayedWithinBookCatalog(): Unit = {
   }
 
-  @Then("the books that were originally on the window displaying the book catalog are still on that window")
-  @Pending
+  @org.jbehave.core.annotations.Then("the books that were originally on the window displaying the book catalog are still on that window")
+  @org.jbehave.core.annotations.Pending
   def originalBooksAreStillDisplayed(): Unit = {
   }
 
-  @Then("no books are selected on the window displaying the book catalog")
-  @Pending
+  @org.jbehave.core.annotations.Then("no books are selected on the window displaying the book catalog")
+  @org.jbehave.core.annotations.Pending
   def noBooksAreSelectedInBookCatalogWindow(): Unit = {
   }
 
-  @Then("the window displaying the information on the selected book is empty")
-  @Pending
+  @org.jbehave.core.annotations.Then("the window displaying the information on the selected book is empty")
+  @org.jbehave.core.annotations.Pending
   def noSelectedBookIsDisplayed(): Unit = {
   }
 }
 
 object BookCatalogClientSteps {
+  private val databaseFile: String =
+    "bookCatalogClient.db"
   private val databaseClass: String =
     "org.sqlite.JDBC"
   private val databaseURL: String =
-    "jdbc:sqlite:bookCatalogClient.db"
+    "jdbc:sqlite:" + databaseFile
 
   private val definedCategoriesTable: String =
     "definedCategories"
+  private val bookCatalogTable: String =
+    "bookCatalog"
+  private val categoryMappingTable: String =
+    "categoryMapping"
+
   private val categoryColumn: String =
-    "category"
+    "Category"
+  private val titleColumn: String =
+    "Title"
+  private val authorColumn: String =
+    "Author"
+  private val isbnColumn: String =
+    "ISBN"
+  private val descriptionColumn: String =
+    "Description"
+  private val coverColumn: String =
+    "Cover"
 }

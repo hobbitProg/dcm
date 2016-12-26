@@ -15,7 +15,7 @@ Given the following defined categories:
 |fantasy|
 |thriller|
 And the following books that are already in the catalog:
-|title|author|isbn|description|cover image}categories|
+|title|author|isbn|description|cover image|categories|
 |Ruins|Kevin J. Anderson|0061052477|Description for Ruins|Ruins.jpg|sci-fi,conspiracy|
 |Goblins|Charles Grant|0061054143|Description for Goblins|Goblins.jpg|sci-fi,conspiracy|
 And the following book to add to the catalog:
