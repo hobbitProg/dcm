@@ -249,6 +249,19 @@ class BookCatalogClientSteps {
     enterDataIntoControl(
       bookToEnter.isbn
     )
+
+    // Enter in description of new book
+    bookToEnter.description match {
+      case Some(description) =>
+        bookClientRobot.clickOn(
+          NodeQueryUtils hasId BookEntryDialog.descriptionControlId,
+          MouseButton.PRIMARY
+        )
+        enterDataIntoControl(
+          description
+        )
+      case None =>
+    }
   }
 
   @org.jbehave.core.annotations.Then("the book is in the book catalogs")
