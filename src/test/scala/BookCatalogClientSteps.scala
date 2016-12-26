@@ -1,21 +1,22 @@
 import java.io.File
 import java.sql._
 import java.util.function.{Consumer, Supplier}
+
 import javafx.scene.Parent
-import javafx.scene.input.MouseButton
+import javafx.scene.input.{KeyCode, MouseButton}
 import javafx.stage.Stage
 
 import org.jbehave.core.model.ExamplesTable
+
 import org.testfx.api.{FxRobot, FxRobotInterface, FxToolkit}
 import org.testfx.util.{NodeQueryUtils, WaitForAsyncUtils}
 
-import scalafx.Includes._
-import scalafx.scene.Scene
 import scala.collection.Set
 import scala.collection.JavaConversions._
 
 import com.github.hobbitProg.dcm.client.books.Categories
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Catalog
+import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
 
 /**
@@ -77,7 +78,7 @@ class BookCatalogClientSteps {
     FxToolkit.registerPrimaryStage()
     FxToolkit.setupSceneRoot(
       new Supplier[Parent] {
-        override def get(): () = {
+        override def get(): Parent = {
           new DCMDesktop(
             Catalog(
               bookConnection
@@ -95,7 +96,7 @@ class BookCatalogClientSteps {
     WaitForAsyncUtils.waitForFxEvents()
     FxToolkit.setupStage(
       new Consumer[Stage] {
-        override def accept(t: Stage): () = {
+        override def accept(t: Stage): Unit = {
           t.show()
         }
       }
@@ -175,6 +176,15 @@ class BookCatalogClientSteps {
       NodeQueryUtils hasId BookTab.addButtonId,
       MouseButton.PRIMARY
     )
+
+    // Enter in title of new book
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId BookEntryDialog.titleControlId,
+      MouseButton.PRIMARY
+    )
+    enterDataIntoControl(
+      newBook.getRow(0).get("title")
+    )
   }
 
   @org.jbehave.core.annotations.When("I enter this books into the book catalog")
@@ -205,6 +215,29 @@ class BookCatalogClientSteps {
   @org.jbehave.core.annotations.Then("the window displaying the information on the selected book is empty")
   @org.jbehave.core.annotations.Pending
   def noSelectedBookIsDisplayed(): Unit = {
+  }
+
+  /**
+    * Enter data into currently active control
+    * @param dataToEnter Data to place into control
+    */
+  private def enterDataIntoControl(
+    dataToEnter: String
+  ) = {
+    //noinspection ScalaUnusedSymbol,ScalaUnusedSymbol
+    dataToEnter.toCharArray foreach {
+      case current@upperCase if current.isLetter && current.isUpper =>
+        bookClientRobot push(
+          KeyCode.SHIFT,
+          KeyCode getKeyCode upperCase.toString
+        )
+      case current@space if current == ' ' =>
+        bookClientRobot push KeyCode.SPACE
+      case current@period if current == '.' =>
+        bookClientRobot push KeyCode.PERIOD
+      case current =>
+        bookClientRobot push (KeyCode getKeyCode current.toUpper.toString)
+    }
   }
 }
 
