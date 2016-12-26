@@ -16,7 +16,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
   * Verifies window that contains book catalog data is updated when
   * associated book catalog is updated
   */
-class BookCatalogControlsRefreshWhenBookCatalogUpdatesMultiJvm
+class BookCatalogControlsRefreshWhenBookCatalogUpdates
   extends FreeSpec
     with Matchers {
   "Given a populated book catalog" - {

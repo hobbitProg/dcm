@@ -23,7 +23,7 @@ import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 /**
   * Verifies dialog that allows books to be edited can add books to catalog
   */
-class BookEntryDialogAllowsUsersToAddBooksToCatalogMultiJvm
+class BookEntryDialogAllowsUsersToAddBooksToCatalog
   extends FreeSpec
     with MockFactory
     with Matchers {

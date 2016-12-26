@@ -1,9 +1,22 @@
 import java.io.File
 import java.sql._
+import java.util.function.{Consumer, Supplier}
+import javafx.scene.Parent
+import javafx.scene.input.MouseButton
+import javafx.stage.Stage
 
 import org.jbehave.core.model.ExamplesTable
+import org.testfx.api.{FxRobot, FxRobotInterface, FxToolkit}
+import org.testfx.util.{NodeQueryUtils, WaitForAsyncUtils}
 
+import scalafx.Includes._
+import scalafx.scene.Scene
+import scala.collection.Set
 import scala.collection.JavaConversions._
+
+import com.github.hobbitProg.dcm.client.books.Categories
+import com.github.hobbitProg.dcm.client.books.bookCatalog.Catalog
+import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
 
 /**
   * Performs steps in stories related to book catalog client
@@ -13,6 +26,10 @@ import scala.collection.JavaConversions._
 class BookCatalogClientSteps {
   // Connection to book catalog
   private var bookConnection: Connection = _
+
+  // Robot to perform steps
+  private val bookClientRobot: FxRobotInterface =
+    new FxRobot
 
   @org.jbehave.core.annotations.BeforeStory
   def defineSchemas(): Unit = {
@@ -53,6 +70,37 @@ class BookCatalogClientSteps {
     catch {
       case sqlProblem: SQLException => System.out.println(sqlProblem.getMessage)
     }
+  }
+
+  @org.jbehave.core.annotations.BeforeStory
+  def showMainApplication(): Unit = {
+    FxToolkit.registerPrimaryStage()
+    FxToolkit.setupSceneRoot(
+      new Supplier[Parent] {
+        override def get(): () = {
+          new DCMDesktop(
+            Catalog(
+              bookConnection
+            ),
+            Set[Categories](
+              "sci-fi",
+              "conspiracy",
+              "fantasy",
+              "thriller"
+            )
+          )
+        }
+      }
+    )
+    WaitForAsyncUtils.waitForFxEvents()
+    FxToolkit.setupStage(
+      new Consumer[Stage] {
+        override def accept(t: Stage): () = {
+          t.show()
+        }
+      }
+    )
+    WaitForAsyncUtils.waitForFxEvents()
   }
 
   @org.jbehave.core.annotations.AfterStory
@@ -119,10 +167,14 @@ class BookCatalogClientSteps {
   }
 
   @org.jbehave.core.annotations.Given("the following book to add to the catalog: $newBook")
-  @org.jbehave.core.annotations.Pending
-  def bookToAdd(
+    def bookToAdd(
     newBook: ExamplesTable
   ): Unit = {
+    // Display dialog to enter in new book
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId BookTab.addButtonId,
+      MouseButton.PRIMARY
+    )
   }
 
   @org.jbehave.core.annotations.When("I enter this books into the book catalog")
