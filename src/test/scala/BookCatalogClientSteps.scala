@@ -42,7 +42,7 @@ class BookCatalogClientSteps
   private var bookToEnter: Book = _
 
   // Chooses cover of book
-  private var coverChooser =
+  private val coverChooser =
     mock[FileChooser]
 
   // Convert row from storty to book
@@ -283,43 +283,33 @@ class BookCatalogClientSteps
     }
 
     // Select cover of new book
-//    bookToEnter.coverImage match {
-//      case Some(coverName) =>
-//        for (testWindow <- bookClientRobot.listWindows()) {
-//          testWindow match {
-//            case dialog: javafx.stage.Stage =>
-//              Console println dialog.getTitle
-//            case _ =>
-//          }
-//        }
-//        val dialogStage =
-//          bookClientRobot.listWindows().find {
-//            currentWindow =>
-//              currentWindow match {
-//                case possibleDialog: javafx.stage.Stage =>
-//                  possibleDialog.getTitle == BookTab.addBookTitle
-//                case _ => false
-//              }
-//          }
-//        dialogStage match {
-//          case Some(actualStage) =>
-//            val adaptedStage: scalafx.stage.Window =
-//              actualStage
-//            (coverChooser.showOpenDialog _).expects(
-//              adaptedStage
-//            ).returning(
-//              new File(
-//                coverName
-//              )
-//            )
-//          case None =>
-//        }
-//        bookClientRobot.clickOn(
-//          NodeQueryUtils hasId BookEntryDialog.bookCoverButtonId,
-//          MouseButton.PRIMARY
-//        )
-//      case None =>
-//    }
+    bookToEnter.coverImage match {
+      case Some(coverName) =>
+        val dialogStage =
+          bookClientRobot.listWindows().find {
+            case possibleDialog: javafx.stage.Stage =>
+              possibleDialog.getTitle == BookTab.addBookTitle
+            case _ => false
+          }
+        dialogStage match {
+          case Some(actualStage) =>
+            val adaptedStage: scalafx.stage.Window =
+              actualStage
+            (coverChooser.showOpenDialog _).expects(
+              adaptedStage
+            ).returning(
+              new File(
+                coverName
+              )
+            )
+          case None =>
+        }
+        bookClientRobot.clickOn(
+          NodeQueryUtils hasId BookEntryDialog.bookCoverButtonId,
+          MouseButton.PRIMARY
+        )
+      case None =>
+    }
 
     // Select categories for new book
 

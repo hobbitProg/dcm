@@ -18,10 +18,15 @@ class DescriptionValue
     this,
     DescriptionValue.topBorder
   )
+
+  prefHeight = DescriptionValue.height
+  prefWidth = DescriptionValue.width
 }
 
 object DescriptionValue {
   private val leftBorder: Double = 2.0
-  private val topBorder: Double = 114.0
+  private val topBorder: Double = 104.0
 
+  private val height: Double = 75.0
+  private val width: Double = 415.0
 }

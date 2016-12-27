@@ -234,13 +234,14 @@ object BookEntryDialog {
   val categorySelectionButtonId: String = "categorySelectionButton"
   val saveButtonId = "saveButton"
 
-  private val coverImageSelectionLeftBorder: Double = 75.0
-  private val coverImageSelectionTopBorder: Double = 725.0
-  private val categoryUpdateButtonLeftBorder: Double = 325.0
-  private val categoryUpdateButtonTopBorder: Double = 725.0
-  private val saveButtonLeftButton: Double = 325.0
-  private val saveButtonTopBorder: Double = 800.0
+  private val coverImageSelectionLeftBorder: Double = 4.0
+  private val coverImageSelectionTopBorder: Double = 370.0
+  private val categoryUpdateButtonLeftBorder: Double = 185.0
+  private val categoryUpdateButtonTopBorder: Double = 370.0
+  private val saveButtonLeftButton: Double = 50.0
+  private val saveButtonTopBorder: Double = 425.0
 
-  private val dialogWidth: Double = 650.0
-  private val dialogHeight: Double = 1000.0
+//  private val dialogWidth: Double = 650.0
+  private val dialogWidth: Double = 450.0
+  private val dialogHeight: Double = 460.0
 }

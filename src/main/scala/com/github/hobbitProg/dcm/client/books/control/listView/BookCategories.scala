@@ -35,12 +35,15 @@ class BookCategories
     this,
     BookCategories.leftBorder
   )
+
+  prefHeight = BookCategories.height
 }
 
 object BookCategories {
-  private val leftBorder: Double = 310.0
-  private val topBorder: Double = 324.0
+  private val leftBorder: Double = 170.0
+  private val topBorder: Double = 204.0
 
+  private val height: Double = 160.0
 }
 
 

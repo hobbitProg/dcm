@@ -24,6 +24,5 @@ class CoverImageLabel
 
 object CoverImageLabel {
   private val leftBorder: Double = 2.0
-  private val topBorder: Double = 296.0
-
+  private val topBorder: Double = 186.0
 }

@@ -79,8 +79,8 @@ class CoverImage
 
 object CoverImage {
   private val leftBorder: Double = 2.0
-  private val topBorder: Double = 324.0
+  private val topBorder: Double = 204.0
 
-  private val imageWidth: Double = 300.0
-  private val imageHeight: Double = 300.0
+  private val imageWidth: Double = 160.0
+  private val imageHeight: Double = 160.0
 }

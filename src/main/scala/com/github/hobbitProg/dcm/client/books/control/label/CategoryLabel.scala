@@ -20,11 +20,9 @@ class CategoryLabel
     this,
     CategoryLabel.leftBorder
   )
-
 }
 
 object CategoryLabel {
-  private val leftBorder: Double = 310.0
-  private val topBorder: Double = 296.0
-
+  private val leftBorder: Double = 170.0
+  private val topBorder: Double = 186.0
 }

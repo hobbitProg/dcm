@@ -31,6 +31,7 @@ class BookTab(
     )
   addButton.id =
     BookTab.addButtonId
+  //noinspection ScalaUnusedSymbol
   addButton.onAction =
     (event: ActionEvent) => {
       val dialogStage: Stage =
