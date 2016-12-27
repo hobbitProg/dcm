@@ -4,6 +4,7 @@ import scala.collection.Set
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
+import scalafx.stage.FileChooser
 import com.github.hobbitProg.dcm.client.books.Categories
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Catalog
 import com.sun.org.apache.xml.internal.resolver.CatalogManager
@@ -21,6 +22,7 @@ class DCMApp(
   stage = new PrimaryStage {
     scene = new Scene {
       root = new DCMDesktop(
+        new FileChooser(),
         bookCatalog,
         definedBookCategories
       )

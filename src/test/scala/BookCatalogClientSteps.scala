@@ -2,32 +2,35 @@ import java.io.File
 import java.sql._
 import java.net.URI
 import java.util.function.{Consumer, Supplier}
-
 import javafx.scene.Parent
 import javafx.scene.input.{KeyCode, MouseButton}
-import javafx.stage.Stage
+import javafx.stage.{Stage, Window}
 
 import org.jbehave.core.model.ExamplesTable
-
 import org.testfx.api.{FxRobot, FxRobotInterface, FxToolkit}
 import org.testfx.util.{NodeQueryUtils, WaitForAsyncUtils}
 
-import scala.collection.Set
-import scala.collection.mutable.Map
+import scala.collection.{Set, mutable}
+import scala.collection.mutable.{Buffer, Map}
 import scala.collection.JavaConversions._
 import scala.language.implicitConversions
-
+import scalafx.Includes._
+import scalafx.scene.Scene
+import scalafx.stage.FileChooser
+import org.scalamock.scalatest.MockFactory
 import com.github.hobbitProg.dcm.client.books.Categories
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
+import org.scalamock.matchers.MockParameter
 
 /**
   * Performs steps in stories related to book catalog client
   * @author Kyle Cranmer
   * @since 0.1
   */
-class BookCatalogClientSteps {
+class BookCatalogClientSteps
+  extends MockFactory {
   // Connection to book catalog
   private var bookConnection: Connection = _
 
@@ -37,6 +40,10 @@ class BookCatalogClientSteps {
 
   // Book to place into catalog
   private var bookToEnter: Book = _
+
+  // Chooses cover of book
+  private var coverChooser =
+    mock[FileChooser]
 
   // Convert row from storty to book
   private implicit def row2Book(
@@ -62,7 +69,16 @@ class BookCatalogClientSteps {
       },
       bookRow.get("cover image") match {
         case Some(cover) =>
-          if (cover == "") None else Some(new URI(cover))
+          if (cover == "") {
+            None
+          }
+          else {
+            val coverLocation =
+              getClass.getResource(
+                cover
+              ).toURI
+            Some(coverLocation)
+          }
         case None => None
       },
       bookRow.get("categories") match {
@@ -73,7 +89,7 @@ class BookCatalogClientSteps {
     )
   }
 
-  @org.jbehave.core.annotations.BeforeStory
+  @org.jbehave.core.annotations.BeforeStories
   def defineSchemas(): Unit = {
     // Get connection to database
     Class.forName(
@@ -114,13 +130,14 @@ class BookCatalogClientSteps {
     }
   }
 
-  @org.jbehave.core.annotations.BeforeStory
+  @org.jbehave.core.annotations.BeforeStories
   def showMainApplication(): Unit = {
     FxToolkit.registerPrimaryStage()
     FxToolkit.setupSceneRoot(
       new Supplier[Parent] {
         override def get(): Parent = {
           new DCMDesktop(
+            coverChooser,
             Catalog(
               bookConnection
             ),
@@ -138,14 +155,16 @@ class BookCatalogClientSteps {
     FxToolkit.setupStage(
       new Consumer[Stage] {
         override def accept(t: Stage): Unit = {
-          t.show()
+          if (!t.showingProperty().value) {
+            t.show()
+          }
         }
       }
     )
     WaitForAsyncUtils.waitForFxEvents()
   }
 
-  @org.jbehave.core.annotations.AfterStory
+  @org.jbehave.core.annotations.AfterStories
   def removeTestCatalog(): Unit = {
     val dbFile =
       new File(
@@ -154,7 +173,7 @@ class BookCatalogClientSteps {
     dbFile.delete()
   }
 
-  @org.jbehave.core.annotations.AfterStory
+  @org.jbehave.core.annotations.AfterStories
   @org.jbehave.core.annotations.Pending
   def releaseTestResources(): Unit = {
   }
@@ -262,6 +281,45 @@ class BookCatalogClientSteps {
         )
       case None =>
     }
+
+    // Select cover of new book
+//    bookToEnter.coverImage match {
+//      case Some(coverName) =>
+//        for (testWindow <- bookClientRobot.listWindows()) {
+//          testWindow match {
+//            case dialog: javafx.stage.Stage =>
+//              Console println dialog.getTitle
+//            case _ =>
+//          }
+//        }
+//        val dialogStage =
+//          bookClientRobot.listWindows().find {
+//            currentWindow =>
+//              currentWindow match {
+//                case possibleDialog: javafx.stage.Stage =>
+//                  possibleDialog.getTitle == BookTab.addBookTitle
+//                case _ => false
+//              }
+//          }
+//        dialogStage match {
+//          case Some(actualStage) =>
+//            val adaptedStage: scalafx.stage.Window =
+//              actualStage
+//            (coverChooser.showOpenDialog _).expects(
+//              adaptedStage
+//            ).returning(
+//              new File(
+//                coverName
+//              )
+//            )
+//          case None =>
+//        }
+//        bookClientRobot.clickOn(
+//          NodeQueryUtils hasId BookEntryDialog.bookCoverButtonId,
+//          MouseButton.PRIMARY
+//        )
+//      case None =>
+//    }
   }
 
   @org.jbehave.core.annotations.Then("the book is in the book catalogs")

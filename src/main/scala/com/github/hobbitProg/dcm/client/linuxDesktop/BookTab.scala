@@ -17,6 +17,7 @@ import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
   * @since 0.1
   */
 class BookTab(
+  private val coverChooser: FileChooser,
   private val catalog: Catalog,
   private val definedCategories: Set[Categories]
 ) extends Tab {
@@ -34,9 +35,11 @@ class BookTab(
     (event: ActionEvent) => {
       val dialogStage: Stage =
         new Stage
+      dialogStage.title =
+        BookTab.addBookTitle
       dialogStage.scene =
         new BookEntryDialog(
-          new FileChooser(),
+          coverChooser,
           catalog,
           definedCategories
         )
@@ -62,6 +65,8 @@ class BookTab(
 
 object BookTab {
   val addButtonId = "AddBookButton"
+
+  val addBookTitle = "Add Book To Catalog"
 
   private val addButtonTop: Double = 50.0
   private val addButtonLeft: Double = 50.0

@@ -30,7 +30,7 @@ import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
   */
 
 class BookEntryDialog(
-  private val coverImageChooser: FileChooser,
+  private var coverImageChooser: FileChooser,
   private val catalog: Catalog,
   private val definedCategories: Set[String]
 )
