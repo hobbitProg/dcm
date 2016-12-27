@@ -320,6 +320,14 @@ class BookCatalogClientSteps
 //        )
 //      case None =>
 //    }
+
+    // Select categories for new book
+
+    // Accept information on new book
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId BookEntryDialog.saveButtonId,
+      MouseButton.PRIMARY
+    )
   }
 
   @org.jbehave.core.annotations.Then("the book is in the book catalogs")
