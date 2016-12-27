@@ -10,19 +10,18 @@ import org.jbehave.core.model.ExamplesTable
 import org.testfx.api.{FxRobot, FxRobotInterface, FxToolkit}
 import org.testfx.util.{NodeQueryUtils, WaitForAsyncUtils}
 
-import scala.collection.{Set, mutable}
-import scala.collection.mutable.{Buffer, Map}
+import scala.collection.Set
 import scala.collection.JavaConversions._
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.scene.Scene
 import scalafx.stage.FileChooser
 import org.scalamock.scalatest.MockFactory
+
+import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
 import com.github.hobbitProg.dcm.client.books.Categories
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
-import org.scalamock.matchers.MockParameter
 
 /**
   * Performs steps in stories related to book catalog client
@@ -312,6 +311,23 @@ class BookCatalogClientSteps
     }
 
     // Select categories for new book
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId BookEntryDialog.categorySelectionButtonId,
+      MouseButton.PRIMARY
+    )
+    for (bookCategory <- bookToEnter.categories) {
+      selectCategory(
+        bookCategory
+      )
+    }
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId CategorySelectionDialog.availableButtonId,
+      MouseButton.PRIMARY
+    )
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId CategorySelectionDialog.saveButtonId,
+      MouseButton.PRIMARY
+    )
 
     // Accept information on new book
     bookClientRobot.clickOn(
@@ -366,6 +382,25 @@ class BookCatalogClientSteps
       case current =>
         bookClientRobot push (KeyCode getKeyCode current.toUpper.toString)
     }
+  }
+
+  /**
+    * Select given category
+    * @param category Category to select
+    */
+  private def selectCategory(
+    category: Categories
+  ) = {
+    bookClientRobot.press(
+      KeyCode.CONTROL
+    )
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasText category,
+      MouseButton.PRIMARY
+    )
+    bookClientRobot.release(
+      KeyCode.CONTROL
+    )
   }
 }
 
