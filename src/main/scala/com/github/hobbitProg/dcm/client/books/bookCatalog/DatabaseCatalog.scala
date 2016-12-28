@@ -1,7 +1,7 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog
 
 import java.net.URI
-import java.sql.{Connection, ResultSet, Statement}
+import java.sql.{Connection, ResultSet, PreparedStatement, Statement}
 
 import scala.language.implicitConversions
 import scala.collection.Set
@@ -116,26 +116,28 @@ private class DatabaseCatalog(
     // Gather core book information
     var gatheredBooks: Set[Book] =
       Set[Book]()
-    val bookStatement: Statement =
-      databaseConnection.createStatement
+    val bookStatement: PreparedStatement =
+      databaseConnection prepareStatement
+        "SELECT Title,Author,ISBN,Description,Cover FROM bookCatalog;"
+
     val coreBookInfo: ResultSet =
-      bookStatement executeQuery
-       "SELECT (Title,Author,ISBN,Description,Cover) FROM bookCatalog"
+      bookStatement.executeQuery()
 
     // Add categories to books
-    coreBookInfo.first()
     while (!coreBookInfo.isAfterLast) {
-      val associatedCategories: ResultSet =
-        bookStatement executeQuery
+      val categoriesStatement: PreparedStatement =
+        databaseConnection prepareStatement
           "SELECT Category FROM categoryMapping WHERE ISBN='" +
             (coreBookInfo getString isbnLocation) +
-            "'"
+            "';"
+      val associatedCategories: ResultSet =
+        categoriesStatement.executeQuery()
       var categorySet: Set[Categories] =
         Set[Categories]()
-      associatedCategories.first()
       while (!associatedCategories.isAfterLast) {
         categorySet =
           categorySet + (associatedCategories getString categoryLocation)
+        associatedCategories.next()
       }
       val location: CoverImageLocations =
         coreBookInfo getString coverLocation
@@ -152,6 +154,7 @@ private class DatabaseCatalog(
         )
       gatheredBooks =
         gatheredBooks + newBook
+      coreBookInfo.next()
     }
 
     // Perform operation on books

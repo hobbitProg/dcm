@@ -15,10 +15,12 @@ import org.testfx.api.{FxRobot, FxRobotInterface, FxToolkit}
 import org.testfx.util.{NodeQueryUtils, WaitForAsyncUtils}
 
 import scala.collection.Set
-import scala.collection.JavaConversions._
+import scala.collection.convert.wrapAll._
 import scala.language.implicitConversions
 
 import scalafx.Includes._
+import scalafx.scene.control.ListView
+import scalafx.scene.layout.AnchorPane
 import scalafx.stage.FileChooser
 
 import org.scalamock.scalatest.MockFactory
@@ -26,6 +28,7 @@ import org.scalamock.scalatest.MockFactory
 import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
 import com.github.hobbitProg.dcm.client.books.{Categories, Descriptions}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
+import com.github.hobbitProg.dcm.client.books.control.BookCatalogControl
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
 
@@ -37,7 +40,13 @@ import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
 class BookCatalogClientSteps
   extends MockFactory {
   // Connection to book catalog
-  private var bookConnection: Connection = _
+  Class.forName(
+    BookCatalogClientSteps.databaseClass
+  )
+  private val bookConnection =
+    DriverManager.getConnection(
+      BookCatalogClientSteps.databaseURL
+    )
 
   // Robot to perform steps
   private val bookClientRobot: FxRobotInterface =
@@ -49,6 +58,9 @@ class BookCatalogClientSteps
   // Chooses cover of book
   private val coverChooser =
     mock[FileChooser]
+
+  // Desktop for distributed catalog manager
+  private var desktop: DCMDesktop = _
 
   // Convert row from story to book
   private implicit def row2Book(
@@ -142,15 +154,6 @@ class BookCatalogClientSteps
 
   @org.jbehave.core.annotations.BeforeStories
   def defineSchemas(): Unit = {
-    // Get connection to database
-    Class.forName(
-      BookCatalogClientSteps.databaseClass
-    )
-    bookConnection =
-      DriverManager.getConnection(
-        BookCatalogClientSteps.databaseURL
-      )
-
     // Create schema for categories defined for book
     val schemaStatement: Statement =
       bookConnection.createStatement()
@@ -179,40 +182,6 @@ class BookCatalogClientSteps
     catch {
       case sqlProblem: SQLException => System.out.println(sqlProblem.getMessage)
     }
-  }
-
-  @org.jbehave.core.annotations.BeforeStories
-  def showMainApplication(): Unit = {
-    FxToolkit.registerPrimaryStage()
-    FxToolkit.setupSceneRoot(
-      new Supplier[Parent] {
-        override def get(): Parent = {
-          new DCMDesktop(
-            coverChooser,
-            Catalog(
-              bookConnection
-            ),
-            Set[Categories](
-              "sci-fi",
-              "conspiracy",
-              "fantasy",
-              "thriller"
-            )
-          )
-        }
-      }
-    )
-    WaitForAsyncUtils.waitForFxEvents()
-    FxToolkit.setupStage(
-      new Consumer[Stage] {
-        override def accept(t: Stage): Unit = {
-          if (!t.showingProperty().value) {
-            t.show()
-          }
-        }
-      }
-    )
-    WaitForAsyncUtils.waitForFxEvents()
   }
 
   @org.jbehave.core.annotations.AfterStories
@@ -276,10 +245,12 @@ class BookCatalogClientSteps
             associatedCategory + "')"
       }
     }
+
+    showMainApplication()
   }
 
   @org.jbehave.core.annotations.Given("the following book to add to the catalog: $newBook")
-    def bookToAdd(
+  def bookToAdd(
     newBook: ExamplesTable
   ): Unit = {
     bookToEnter = mapAsScalaMap(newBook getRow 0)
@@ -403,7 +374,6 @@ class BookCatalogClientSteps
           bookToEnter.isbn + "';"
     val newBooksInCatalog: ResultSet =
       queryStatement.executeQuery()
-//    newBooksInCatalog.first()
     val newBook: Book =
       newBooksInCatalog
     Assert.assertEquals(
@@ -414,8 +384,43 @@ class BookCatalogClientSteps
   }
 
   @org.jbehave.core.annotations.Then("the book is displayed on the window displaying the book catalog")
-  @org.jbehave.core.annotations.Pending
   def newBookIsDisplayedWithinBookCatalog(): Unit = {
+    // Get tab containing book information
+    val existingTabs =
+      desktop.tabs.toList
+    val possibleBookTab =
+      existingTabs.find {
+        currentTab =>
+          currentTab.getText == "Books"
+      }
+
+    // Get control containing book catalog information
+    val possibleBookCatalogControl =
+      possibleBookTab match {
+        case Some(bookTab) =>
+          val adaptedTab: scalafx.scene.control.Tab =
+            bookTab
+          val bookTabPane: AnchorPane =
+            adaptedTab.content.value.asInstanceOf[javafx.scene.layout.AnchorPane]
+          bookTabPane.children.find {
+            case contentsControl:  javafx.scene.control.ListView[Book] => true
+            case _ => false
+          }
+        case None => None
+      }
+
+    // Verify new book is displayed in control
+    possibleBookCatalogControl match {
+      case Some(bookCatalogControl) =>
+        val catalogControl: ListView[Book] =
+          bookCatalogControl.asInstanceOf[javafx.scene.control.ListView[Book]]
+        Assert.assertTrue(
+          "New book is not displayed",
+          catalogControl.items.value.toSet contains bookToEnter
+        )
+      case None => Assert fail "Could not " +
+        "rerieve book catalog control"
+    }
   }
 
   @org.jbehave.core.annotations.Then("the books that were originally on the window displaying the book catalog are still on that window")
@@ -431,6 +436,41 @@ class BookCatalogClientSteps
   @org.jbehave.core.annotations.Then("the window displaying the information on the selected book is empty")
   @org.jbehave.core.annotations.Pending
   def noSelectedBookIsDisplayed(): Unit = {
+  }
+
+  private def showMainApplication(): Unit = {
+    FxToolkit.registerPrimaryStage()
+    desktop =
+      new DCMDesktop(
+        coverChooser,
+        Catalog(
+          bookConnection
+        ),
+        Set[Categories](
+          "sci-fi",
+          "conspiracy",
+          "fantasy",
+          "thriller"
+        )
+      )
+    FxToolkit.setupSceneRoot(
+      new Supplier[Parent] {
+        override def get(): Parent = {
+          desktop
+        }
+      }
+    )
+    WaitForAsyncUtils.waitForFxEvents()
+    FxToolkit.setupStage(
+      new Consumer[Stage] {
+        override def accept(t: Stage): Unit = {
+          if (!t.showingProperty().value) {
+            t.show()
+          }
+        }
+      }
+    )
+    WaitForAsyncUtils.waitForFxEvents()
   }
 
   /**

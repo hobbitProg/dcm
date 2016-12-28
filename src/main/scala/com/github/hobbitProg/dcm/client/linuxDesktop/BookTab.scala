@@ -1,6 +1,7 @@
 package com.github.hobbitProg.dcm.client.linuxDesktop
 
 import scala.collection.Set
+
 import scalafx.Includes._
 import scalafx.event.ActionEvent
 import scalafx.scene.control.{Button, Tab}
@@ -9,6 +10,7 @@ import scalafx.stage.{FileChooser ,Stage}
 
 import com.github.hobbitProg.dcm.client.books.Categories
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Catalog
+import com.github.hobbitProg.dcm.client.books.control._
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 
 /**
@@ -21,8 +23,24 @@ class BookTab(
   private val catalog: Catalog,
   private val definedCategories: Set[Categories]
 ) extends Tab {
+  text = "Books"
+
   // Do not allow tab to control
   closable = false
+
+  // Add control to display books within catalog
+  val catalogDisplay: BookCatalogControl =
+    new BookCatalogControl(
+      catalog
+    )
+  AnchorPane.setTopAnchor(
+    catalogDisplay,
+    BookTab.catalogDisplayTop
+  )
+  AnchorPane.setLeftAnchor(
+    catalogDisplay,
+    BookTab.catalogDisplayLeft
+  )
 
   // Add button to add book to catalog
   val addButton: Button =
@@ -59,6 +77,7 @@ class BookTab(
     new AnchorPane {
       children =
         List(
+          catalogDisplay,
           addButton
         )
     }
@@ -69,6 +88,8 @@ object BookTab {
 
   val addBookTitle = "Add Book To Catalog"
 
-  private val addButtonTop: Double = 50.0
-  private val addButtonLeft: Double = 50.0
+  private val catalogDisplayTop: Double = 4.0
+  private val catalogDisplayLeft: Double = 4.0
+  private val addButtonTop: Double = 175.0
+  private val addButtonLeft: Double = 255.0
 }
