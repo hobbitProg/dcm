@@ -425,8 +425,12 @@ class BookCatalogClientSteps
   }
 
   @org.jbehave.core.annotations.Then("no books are selected on the window displaying the book catalog")
-  @org.jbehave.core.annotations.Pending
   def noBooksAreSelectedInBookCatalogWindow(): Unit = {
+    bookCatalogControlVerification(
+      "Book is still selected",
+      catalogControl =>
+        catalogControl.selectionModel.value.isEmpty
+    )
   }
 
   @org.jbehave.core.annotations.Then("the window displaying the information on the selected book is empty")
