@@ -50,8 +50,21 @@ class BookTab(
   addButton.id =
     BookTab.addButtonId
   //noinspection ScalaUnusedSymbol
+  AnchorPane.setTopAnchor(
+    addButton,
+    BookTab.addButtonTop
+  )
+  AnchorPane.setLeftAnchor(
+    addButton,
+    BookTab.addButtonLeft
+  )
+
+  // Add control to display currently added book
+  val selectedBookControl: SelectedBookControl =
+    new SelectedBookControl
   addButton.onAction =
     (event: ActionEvent) => {
+      selectedBookControl.clear()
       val dialogStage: Stage =
         new Stage
       dialogStage.title =
@@ -65,12 +78,12 @@ class BookTab(
       dialogStage.showAndWait()
     }
   AnchorPane.setTopAnchor(
-    addButton,
-    BookTab.addButtonTop
+    selectedBookControl,
+    BookTab.selectedBookTop
   )
   AnchorPane.setLeftAnchor(
-    addButton,
-    BookTab.addButtonLeft
+    selectedBookControl,
+    BookTab.selectedBookLeft
   )
 
   content =
@@ -78,7 +91,8 @@ class BookTab(
       children =
         List(
           catalogDisplay,
-          addButton
+          addButton,
+          selectedBookControl
         )
     }
 }
@@ -92,4 +106,6 @@ object BookTab {
   private val catalogDisplayLeft: Double = 4.0
   private val addButtonTop: Double = 175.0
   private val addButtonLeft: Double = 255.0
+  private val selectedBookTop: Double = 4.0
+  private val selectedBookLeft: Double = 310.0
 }

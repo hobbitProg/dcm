@@ -16,3 +16,6 @@
 # JIRA plugin
 # Crashlytics plugin (for Android Studio and IntelliJ)
 target/
+
+.directory
+.idea/uiDesigner.xml

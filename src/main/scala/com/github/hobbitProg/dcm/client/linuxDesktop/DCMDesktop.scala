@@ -19,10 +19,19 @@ class DCMDesktop(
   private val bookCategories: Set[Categories]
 )
   extends TabPane {
+
+  prefWidth = DCMDesktop.width
+  prefHeight = DCMDesktop.height
+
   // Add tab that contains book information
   this += new BookTab(
     coverChooser,
     bookCatalog,
     bookCategories
   )
+}
+
+object DCMDesktop {
+  private val width = 740.0
+  private val height = 445.0
 }

@@ -241,7 +241,6 @@ object BookEntryDialog {
   private val saveButtonLeftButton: Double = 50.0
   private val saveButtonTopBorder: Double = 425.0
 
-//  private val dialogWidth: Double = 650.0
-  private val dialogWidth: Double = 450.0
-  private val dialogHeight: Double = 460.0
+  private val dialogWidth: Double = 430.0
+  private val dialogHeight: Double = 455.0
 }

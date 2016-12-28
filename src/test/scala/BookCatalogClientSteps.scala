@@ -515,10 +515,7 @@ class BookCatalogClientSteps
     )
   }
 
-  private def bookCatalogControlVerification(
-    message: String,
-    assertionPredicate: ListView[Book] => Boolean
-  ) = {
+  private def findControl[ControlType <: javafx.scene.Node]: Option[javafx.scene.Node] = {
     // Get tab containing book information
     val existingTabs =
       desktop.tabs.toList
@@ -529,21 +526,28 @@ class BookCatalogClientSteps
       }
 
     // Get control containing book catalog information
-    val possibleBookCatalogControl =
-      possibleBookTab match {
-        case Some(bookTab) =>
-          val adaptedTab: scalafx.scene.control.Tab =
-            bookTab
-          val bookTabPane: AnchorPane =
-            adaptedTab.content.value.asInstanceOf[javafx.scene.layout.AnchorPane]
-          bookTabPane.children.find {
-            case contentsControl:  javafx.scene.control.ListView[Book] => true
-            case _ => false
-          }
-        case None => None
+    possibleBookTab match {
+      case Some(bookTab) =>
+        val adaptedTab: scalafx.scene.control.Tab =
+          bookTab
+        val bookTabPane: AnchorPane =
+          adaptedTab.content.value.asInstanceOf[javafx.scene.layout.AnchorPane]
+        bookTabPane.children.find {
+          case contentsControl:  ControlType => true
+          case _ => false
+        }
+      case None => None
       }
 
+  }
+
+  private def bookCatalogControlVerification(
+    message: String,
+    assertionPredicate: ListView[Book] => Boolean
+  ) = {
     // Verify new book is displayed in control
+    val possibleBookCatalogControl =
+      findControl[javafx.scene.control.ListView[Book]]
     possibleBookCatalogControl match {
       case Some(bookCatalogControl) =>
         val catalogControl: ListView[Book] =
