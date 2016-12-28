@@ -62,6 +62,10 @@ class BookCatalogClientSteps
   // Desktop for distributed catalog manager
   private var desktop: DCMDesktop = _
 
+  // Books already in books
+  private var existingBooks: Set[Book] =
+    Set[Book]()
+
   // Convert row from story to book
   private implicit def row2Book(
     bookRow: scala.collection.mutable.Map[String, String]
@@ -234,7 +238,7 @@ class BookCatalogClientSteps
           existingBook.get("author") + "','" +
           existingBook.get("isbn") + "','" +
           existingBook.get("description") + "','" +
-          existingBook.get("cover") + "')"
+          existingBook.get("cover image") + "')"
 
       for (associatedCategory <- existingBook.get("categories").split(",")) {
         insertStatement executeUpdate
@@ -244,6 +248,25 @@ class BookCatalogClientSteps
             existingBook.get("isbn") + "','" +
             associatedCategory + "')"
       }
+
+      existingBooks =
+        existingBooks +
+        new Book(
+          existingBook.get("title"),
+          existingBook.get("author"),
+          existingBook.get("isbn"),
+          Some(
+            existingBook.get("description")
+          ),
+          Some(
+            new URI(
+              existingBook.get("cover image")
+            )
+          ),
+          Set[Categories](
+            existingBook.get("categories").split(","): _*
+          )
+        )
     }
 
     showMainApplication()
@@ -385,47 +408,20 @@ class BookCatalogClientSteps
 
   @org.jbehave.core.annotations.Then("the book is displayed on the window displaying the book catalog")
   def newBookIsDisplayedWithinBookCatalog(): Unit = {
-    // Get tab containing book information
-    val existingTabs =
-      desktop.tabs.toList
-    val possibleBookTab =
-      existingTabs.find {
-        currentTab =>
-          currentTab.getText == "Books"
-      }
-
-    // Get control containing book catalog information
-    val possibleBookCatalogControl =
-      possibleBookTab match {
-        case Some(bookTab) =>
-          val adaptedTab: scalafx.scene.control.Tab =
-            bookTab
-          val bookTabPane: AnchorPane =
-            adaptedTab.content.value.asInstanceOf[javafx.scene.layout.AnchorPane]
-          bookTabPane.children.find {
-            case contentsControl:  javafx.scene.control.ListView[Book] => true
-            case _ => false
-          }
-        case None => None
-      }
-
-    // Verify new book is displayed in control
-    possibleBookCatalogControl match {
-      case Some(bookCatalogControl) =>
-        val catalogControl: ListView[Book] =
-          bookCatalogControl.asInstanceOf[javafx.scene.control.ListView[Book]]
-        Assert.assertTrue(
-          "New book is not displayed",
-          catalogControl.items.value.toSet contains bookToEnter
-        )
-      case None => Assert fail "Could not " +
-        "rerieve book catalog control"
-    }
+    bookCatalogControlVerification(
+      "New book is not displayed",
+      catalogControl =>
+        catalogControl.items.value.toSet contains bookToEnter
+    )
   }
 
   @org.jbehave.core.annotations.Then("the books that were originally on the window displaying the book catalog are still on that window")
-  @org.jbehave.core.annotations.Pending
   def originalBooksAreStillDisplayed(): Unit = {
+    bookCatalogControlVerification(
+      "Existing books are not displayed in control",
+      catalogControl =>
+        existingBooks subsetOf catalogControl.items.value.toSet
+    )
   }
 
   @org.jbehave.core.annotations.Then("no books are selected on the window displaying the book catalog")
@@ -513,6 +509,50 @@ class BookCatalogClientSteps
     bookClientRobot.release(
       KeyCode.CONTROL
     )
+  }
+
+  private def bookCatalogControlVerification(
+    message: String,
+    assertionPredicate: ListView[Book] => Boolean
+  ) = {
+    // Get tab containing book information
+    val existingTabs =
+      desktop.tabs.toList
+    val possibleBookTab =
+      existingTabs.find {
+        currentTab =>
+          currentTab.getText == "Books"
+      }
+
+    // Get control containing book catalog information
+    val possibleBookCatalogControl =
+      possibleBookTab match {
+        case Some(bookTab) =>
+          val adaptedTab: scalafx.scene.control.Tab =
+            bookTab
+          val bookTabPane: AnchorPane =
+            adaptedTab.content.value.asInstanceOf[javafx.scene.layout.AnchorPane]
+          bookTabPane.children.find {
+            case contentsControl:  javafx.scene.control.ListView[Book] => true
+            case _ => false
+          }
+        case None => None
+      }
+
+    // Verify new book is displayed in control
+    possibleBookCatalogControl match {
+      case Some(bookCatalogControl) =>
+        val catalogControl: ListView[Book] =
+          bookCatalogControl.asInstanceOf[javafx.scene.control.ListView[Book]]
+        Assert.assertTrue(
+          message,
+          assertionPredicate(
+            catalogControl
+          )
+        )
+      case None => Assert fail "Could not " +
+        "rerieve book catalog control"
+    }
   }
 }
 
