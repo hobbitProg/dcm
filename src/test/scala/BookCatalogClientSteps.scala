@@ -1,24 +1,30 @@
 import java.io.File
-import java.sql._
 import java.net.URI
+import java.sql._
 import java.util.function.{Consumer, Supplier}
+
 import javafx.scene.Parent
 import javafx.scene.input.{KeyCode, MouseButton}
 import javafx.stage.{Stage, Window}
 
 import org.jbehave.core.model.ExamplesTable
+
+import org.junit.Assert
+
 import org.testfx.api.{FxRobot, FxRobotInterface, FxToolkit}
 import org.testfx.util.{NodeQueryUtils, WaitForAsyncUtils}
 
 import scala.collection.Set
 import scala.collection.JavaConversions._
 import scala.language.implicitConversions
+
 import scalafx.Includes._
 import scalafx.stage.FileChooser
+
 import org.scalamock.scalatest.MockFactory
 
 import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
-import com.github.hobbitProg.dcm.client.books.Categories
+import com.github.hobbitProg.dcm.client.books.{Categories, Descriptions}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
@@ -44,7 +50,7 @@ class BookCatalogClientSteps
   private val coverChooser =
     mock[FileChooser]
 
-  // Convert row from storty to book
+  // Convert row from story to book
   private implicit def row2Book(
     bookRow: scala.collection.mutable.Map[String, String]
   ): Book = {
@@ -88,6 +94,52 @@ class BookCatalogClientSteps
     )
   }
 
+  private implicit def sqlRow2Book(
+    bookRow: ResultSet
+  ) : Book = {
+    var descriptionValue: Descriptions =
+      Some(bookRow getString 4)
+    if (bookRow.wasNull()) {
+      descriptionValue = None
+    }
+    val coverLocationString =
+      bookRow getString 5
+    val coverLocation =
+      if (bookRow.wasNull()) {
+        None
+      } else {
+        Some(
+          new URI(
+            coverLocationString
+          )
+        )
+      }
+    val categoriesStatement: PreparedStatement =
+      bookConnection prepareStatement
+        "SELECT " + BookCatalogClientSteps.categoryColumn +
+          " FROM " + BookCatalogClientSteps.categoryMappingTable +
+          " WHERE " + BookCatalogClientSteps.isbnColumn +
+          " = '" + (bookRow getString 3) + "';"
+    val associatedCategoriesInDatabase: ResultSet =
+      categoriesStatement.executeQuery()
+    var associatedCategories: Set[Categories] =
+      Set[Categories]()
+    while (!associatedCategoriesInDatabase.isAfterLast) {
+      associatedCategories =
+        associatedCategories +
+          (associatedCategoriesInDatabase getString 1)
+      associatedCategoriesInDatabase.next()
+    }
+    new Book(
+      bookRow getString 1,
+      bookRow getString 2,
+      bookRow getString 3,
+      descriptionValue,
+      coverLocation,
+      associatedCategories
+    )
+  }
+
   @org.jbehave.core.annotations.BeforeStories
   def defineSchemas(): Unit = {
     // Get connection to database
@@ -111,9 +163,9 @@ class BookCatalogClientSteps
       schemaStatement execute
         "CREATE TABLE " + BookCatalogClientSteps.bookCatalogTable + " (" +
           "bookID integer PRIMARY KEY," +
-          BookCatalogClientSteps.titleColumn + " MEDIUMTEXT," +
-          BookCatalogClientSteps.authorColumn + " MEDIUMTEXT," +
-          BookCatalogClientSteps.isbnColumn + " MEDIUMTEXT," +
+          BookCatalogClientSteps.titleColumn + " MEDIUMTEXT NOT NULL," +
+          BookCatalogClientSteps.authorColumn + " MEDIUMTEXT NOT NULL," +
+          BookCatalogClientSteps.isbnColumn + " MEDIUMTEXT NOT NULL," +
           BookCatalogClientSteps.descriptionColumn + " MEDIUMTEXT," +
           BookCatalogClientSteps.coverColumn + " MEDIUMTEXT" +
           ");"
@@ -337,8 +389,28 @@ class BookCatalogClientSteps
   }
 
   @org.jbehave.core.annotations.Then("the book is in the book catalogs")
-  @org.jbehave.core.annotations.Pending
   def bookExistsInCatalog(): Unit = {
+    val queryStatement: PreparedStatement =
+      bookConnection prepareStatement
+        "SELECT " +
+          BookCatalogClientSteps.titleColumn + "," +
+          BookCatalogClientSteps.authorColumn + "," +
+          BookCatalogClientSteps.isbnColumn + "," +
+          BookCatalogClientSteps.descriptionColumn + "," +
+          BookCatalogClientSteps.coverColumn +
+          " FROM " + BookCatalogClientSteps.bookCatalogTable +
+          " WHERE " + BookCatalogClientSteps.isbnColumn + " = '" +
+          bookToEnter.isbn + "';"
+    val newBooksInCatalog: ResultSet =
+      queryStatement.executeQuery()
+//    newBooksInCatalog.first()
+    val newBook: Book =
+      newBooksInCatalog
+    Assert.assertEquals(
+      "New book not placed into catalog",
+      bookToEnter,
+      newBook
+    )
   }
 
   @org.jbehave.core.annotations.Then("the book is displayed on the window displaying the book catalog")
