@@ -198,8 +198,8 @@ class BookCatalogClientSteps
   }
 
   @org.jbehave.core.annotations.AfterStories
-  @org.jbehave.core.annotations.Pending
   def releaseTestResources(): Unit = {
+    FxToolkit.cleanupStages()
   }
 
   @org.jbehave.core.annotations.Given("the following defined categories: $existingCategories")
