@@ -5,7 +5,7 @@ import java.util.function.{Consumer, Supplier}
 
 import javafx.scene.Parent
 import javafx.scene.input.{KeyCode, MouseButton}
-import javafx.stage.{Stage, Window}
+import javafx.stage.Stage
 
 import org.jbehave.core.model.ExamplesTable
 
@@ -19,8 +19,9 @@ import scala.collection.convert.wrapAll._
 import scala.language.implicitConversions
 
 import scalafx.Includes._
-import scalafx.scene.control.ListView
-import scalafx.scene.layout.AnchorPane
+import scalafx.scene.control.{ListView, TextInputControl}
+import scalafx.scene.image.ImageView
+import scalafx.scene.layout.{AnchorPane, VBox}
 import scalafx.stage.FileChooser
 
 import org.scalamock.scalatest.MockFactory
@@ -28,7 +29,7 @@ import org.scalamock.scalatest.MockFactory
 import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
 import com.github.hobbitProg.dcm.client.books.{Categories, Descriptions}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
-import com.github.hobbitProg.dcm.client.books.control.BookCatalogControl
+import com.github.hobbitProg.dcm.client.books.control.SelectedBookControl
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
 
@@ -434,8 +435,41 @@ class BookCatalogClientSteps
   }
 
   @org.jbehave.core.annotations.Then("the window displaying the information on the selected book is empty")
-  @org.jbehave.core.annotations.Pending
   def noSelectedBookIsDisplayed(): Unit = {
+    val selectedBookControl =
+      findControl(
+        Class.forName(
+          "javafx.scene.Group"
+        )
+      )
+    selectedBookControl match {
+      case Some(bookControl) =>
+        selectedBookControlTextVerification(
+          "Title not cleared",
+          SelectedBookControl.titleControlId,
+          bookControl.asInstanceOf[javafx.scene.Group]
+        )
+        selectedBookControlTextVerification(
+          "Author not cleared",
+          SelectedBookControl.authorControlId,
+          bookControl.asInstanceOf[javafx.scene.Group]
+        )
+        selectedBookControlTextVerification(
+          "ISBN not cleared",
+          SelectedBookControl.isbnControlId,
+          bookControl.asInstanceOf[javafx.scene.Group]
+        )
+        selectedBookControlTextVerification(
+          "Description not cleared",
+          SelectedBookControl.descriptionControlId,
+          bookControl.asInstanceOf[javafx.scene.Group]
+        )
+        selectedBookControlCoverImageVerification(
+          bookControl.asInstanceOf[javafx.scene.Group]
+        )
+      case None =>
+        Assert fail "Could not retrieve selected book control"
+    }
   }
 
   private def showMainApplication(): Unit = {
@@ -515,7 +549,14 @@ class BookCatalogClientSteps
     )
   }
 
-  private def findControl[ControlType <: javafx.scene.Node]: Option[javafx.scene.Node] = {
+  /**
+    * Find given control to check
+    * @param controlType Type of control to check
+    * @return Control to check
+    */
+  private def findControl(
+    controlType: Class[_]
+  ): Option[javafx.scene.Node] = {
     // Get tab containing book information
     val existingTabs =
       desktop.tabs.toList
@@ -533,21 +574,32 @@ class BookCatalogClientSteps
         val bookTabPane: AnchorPane =
           adaptedTab.content.value.asInstanceOf[javafx.scene.layout.AnchorPane]
         bookTabPane.children.find {
-          case contentsControl:  ControlType => true
-          case _ => false
+          control =>
+            control.getClass.equals(
+              controlType
+            )
         }
       case None => None
       }
 
   }
 
+  /**
+    * Verify control containing book catalog meets given condition
+    * @param message Message indicating given condition failed
+    * @param assertionPredicate Predicate to check given property of control containing book catalog
+    */
   private def bookCatalogControlVerification(
     message: String,
     assertionPredicate: ListView[Book] => Boolean
   ) = {
     // Verify new book is displayed in control
     val possibleBookCatalogControl =
-      findControl[javafx.scene.control.ListView[Book]]
+      findControl(
+        Class.forName(
+          "javafx.scene.control.ListView"
+        )
+      )
     possibleBookCatalogControl match {
       case Some(bookCatalogControl) =>
         val catalogControl: ListView[Book] =
@@ -558,8 +610,101 @@ class BookCatalogClientSteps
             catalogControl
           )
         )
-      case None => Assert fail "Could not " +
-        "rerieve book catalog control"
+      case None =>
+        Assert fail "Could not retrieve book catalog control"
+    }
+  }
+
+  /**
+    * Verify value of field in selected book text control is empty
+    * @param message Message indicating given text field isn't empty
+    * @param fieldId ID of text control to verify
+    * @param bookControl selected book text control
+    */
+  private def selectedBookControlTextVerification(
+    message: String,
+    fieldId: String,
+    bookControl: scalafx.scene.Group
+  ) = {
+    val controlChildrenPane: AnchorPane =
+      bookControl.children.head.asInstanceOf[javafx.scene.layout.AnchorPane]
+    val nodeToVerify =
+      controlChildrenPane.children.find(
+        childNode =>
+          childNode.id.value == fieldId
+      )
+    nodeToVerify match {
+      case Some(fieldNode) =>
+        val fieldNodeControl: TextInputControl =
+          fieldNode.asInstanceOf[javafx.scene.control.TextInputControl]
+        Assert.assertEquals(
+          message,
+          "",
+          fieldNodeControl.text.value
+        )
+      case None =>
+        Assert.fail(
+          "Could not find field " + fieldId
+        )
+    }
+  }
+
+  /**
+    * Verify cover image of book in selected book control is cleared
+    * @param bookControl Selected book control
+    */
+  private def selectedBookControlCoverImageVerification(
+    bookControl: scalafx.scene.Group
+  ) = {
+    val controlChildrenPane: AnchorPane =
+      bookControl.children.head.asInstanceOf[javafx.scene.layout.AnchorPane]
+    val nodeToVerify =
+      controlChildrenPane.children.find {
+        childNode =>
+          childNode.id.value == SelectedBookControl.coverImageControlId
+      }
+    nodeToVerify match {
+      case Some(coverNode) =>
+        val fieldNodeLayout: VBox =
+          coverNode.asInstanceOf[javafx.scene.layout.VBox]
+        val fieldNodeControl: ImageView =
+          fieldNodeLayout.children.head.asInstanceOf[javafx.scene.image.ImageView]
+        Assert.assertNull(
+          "Cover image for selected book has not been cleared",
+          fieldNodeControl.image.value
+        )
+      case None =>
+        Assert fail
+          "Could not find field " + SelectedBookControl.coverImageControlId
+    }
+  }
+
+  /**
+    * Verify categories of book in selected book control is cleared
+    * @param bookControl Selected book control
+    */
+  private def selectedBookControlCategoriesVerification(
+    bookControl: scalafx.scene.Group
+  ) = {
+    val controlChildrenPane: AnchorPane =
+      bookControl.children.head.asInstanceOf[javafx.scene.layout.AnchorPane]
+    val nodeToVerify =
+      controlChildrenPane.children.find {
+        childNode =>
+          childNode.id.value == SelectedBookControl.categoriesControlId
+      }
+    nodeToVerify match {
+      case Some(categoriesNode) =>
+        val categoriesControl: ListView[Categories] =
+          categoriesNode.asInstanceOf[javafx.scene.control.ListView[Categories]]
+        Assert.assertEquals(
+          "Categories for selected book has not been cleared",
+          0,
+          categoriesControl.items.value.size()
+        )
+      case None =>
+        Assert fail
+          "Could not find field " + SelectedBookControl.categoriesControlId
     }
   }
 }

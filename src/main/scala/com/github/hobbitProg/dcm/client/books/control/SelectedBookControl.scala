@@ -27,6 +27,7 @@ class SelectedBookControl
   private val titleValue: TitleValue =
     new TitleValue
   titleValue.editable = false
+  titleValue.id = SelectedBookControl.titleControlId
 
   // Create control to display author of book
   private val authorLabel: AuthorLabel =
@@ -34,6 +35,7 @@ class SelectedBookControl
   private val authorValue: AuthorValue =
     new AuthorValue
   authorValue.editable = false
+  authorValue.id = SelectedBookControl.authorControlId
 
   // Create control to display ISBN of book
   private val isbnLabel: ISBNLabel =
@@ -41,6 +43,7 @@ class SelectedBookControl
   private val isbnValue: ISBNValue =
     new ISBNValue
   isbnValue.editable = false
+  isbnValue.id = SelectedBookControl.isbnControlId
 
   // Create control for display book description
   private val descriptionLabel: DescriptionLabel =
@@ -48,18 +51,21 @@ class SelectedBookControl
   private val descriptionValue: DescriptionValue =
     new DescriptionValue
   descriptionValue.editable = false
+  descriptionValue.id = SelectedBookControl.descriptionControlId
 
   // Create control to display cover image
   private val coverImageLabel: CoverImageLabel =
     new CoverImageLabel
   private val coverImageControl: CoverImage =
     new CoverImage
+  coverImageControl.id = SelectedBookControl.coverImageControlId
 
   // Create control to display categories associated with selected book
   private val categoryLabel: CategoryLabel =
     new CategoryLabel
   private val categoryControl: BookCategories =
     new BookCategories
+  categoryControl.id = SelectedBookControl.categoriesControlId
 
   // Set pane for dialog
   children =
@@ -153,4 +159,13 @@ class SelectedBookControl
     valueField.editable = false
 
   }
+}
+
+object SelectedBookControl {
+  val titleControlId = "titleControlId"
+  val authorControlId = "authorControlId"
+  val isbnControlId = "isbnControId"
+  val descriptionControlId = "descriptionControlId"
+  val coverImageControlId = "coverImageControlId"
+  val categoriesControlId = "categoriesControlId"
 }

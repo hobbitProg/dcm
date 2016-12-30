@@ -25,7 +25,7 @@ import com.github.hobbitProg.dcm.client.books.control.image.CoverImage
   * Verifies window containing information on currently selected book is
   * cleared when requested
   */
-class SelectedBookControlIsClearedWhenRequestedMultiJvm
+class SelectedBookControlIsClearedWhenRequested
   extends FreeSpec
     with Matchers {
   "Given a selected book control" - {
@@ -57,7 +57,7 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
         "then there is no title for the selected book" in {
           getTextControlValue(
             selectedBookScene.bookControl,
-            SelectedBookControlIsClearedWhenRequestedMultiJvm.
+            SelectedBookControlIsClearedWhenRequested.
               titleControlFieldName
           ) shouldBe ""
         }
@@ -65,7 +65,7 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
         "and there is no author for the selected book" in {
           getTextControlValue(
             selectedBookScene.bookControl,
-            SelectedBookControlIsClearedWhenRequestedMultiJvm.
+            SelectedBookControlIsClearedWhenRequested.
               authorControlFieldName
           ) shouldBe ""
         }
@@ -73,7 +73,7 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
         "and there is no ISBN for the selected book" in {
           getTextControlValue(
             selectedBookScene.bookControl,
-            SelectedBookControlIsClearedWhenRequestedMultiJvm.
+            SelectedBookControlIsClearedWhenRequested.
               isbnControlFieldName
           ) shouldBe ""
         }
@@ -81,7 +81,7 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
         "and there is no description for the selected book" in {
           getTextControlValue(
             selectedBookScene.bookControl,
-            SelectedBookControlIsClearedWhenRequestedMultiJvm.
+            SelectedBookControlIsClearedWhenRequested.
               descriptionControlFieldName
           ) shouldBe ""
         }
@@ -185,7 +185,7 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
       ).toType.members.find {
         member => {
           member.name.toString ==
-            SelectedBookControlIsClearedWhenRequestedMultiJvm.
+            SelectedBookControlIsClearedWhenRequested.
               coverImageControlFieldName
         }
       }
@@ -219,7 +219,7 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
       ).toType.members.find {
         member => {
           member.name.toString ==
-            SelectedBookControlIsClearedWhenRequestedMultiJvm.
+            SelectedBookControlIsClearedWhenRequested.
               categoryControlFieldName
         }
       }
@@ -238,7 +238,7 @@ class SelectedBookControlIsClearedWhenRequestedMultiJvm
   }
 }
 
-object SelectedBookControlIsClearedWhenRequestedMultiJvm {
+object SelectedBookControlIsClearedWhenRequested {
   private val titleControlFieldName: String = "titleValue"
   private val authorControlFieldName: String = "authorValue"
   private val isbnControlFieldName: String = "isbnValue"
