@@ -5,7 +5,6 @@ import acolyte.jdbc.Implicits._
 
 import java.net.URI
 import java.sql.{Connection, DriverManager}
-
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
 
@@ -134,6 +133,7 @@ class BooksCanBeAddedToCatalog
   private def BookCatalogHandler : StatementHandler =
     AcolyteDSL.handleStatement.withUpdateHandler {
       execution: UpdateExecution =>
+        Console println execution.sql
         execution.sql match {
           case bookAddSQL(
           newTitle,

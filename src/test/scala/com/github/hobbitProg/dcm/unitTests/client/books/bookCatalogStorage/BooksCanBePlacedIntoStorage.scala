@@ -1,6 +1,25 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogStorage
 
-import org.scalatest.FreeSpec
+import acolyte.jdbc.{AcolyteDSL, ExecutedParameter, StatementHandler, UpdateExecution, Driver => AcolyteDriver}
+import acolyte.jdbc.Implicits._
+
+import doobie.imports._
+
+import java.net.URI
+
+import org.scalatest.{FreeSpec, Matchers}
+
+import scala.collection.Set
+import scala.collection.immutable.Seq
+import scala.util.matching.Regex
+
+import scalaz._
+import scalaz.concurrent.Task
+
+import com.github.hobbitProg.dcm.client.books._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
+import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
 
 /**
   * Verifies books can be placed into storage
@@ -8,12 +27,123 @@ import org.scalatest.FreeSpec
   * @since 0.1
   */
 class BooksCanBePlacedIntoStorage
-  extends FreeSpec {
+  extends FreeSpec
+    with Matchers {
+  // ID for acolyte mock database
+  private val databaseId: String = "BookStorageTest"
+
+  // URL to connect to acolyte database
+  private  val databaseURL: String =
+    "jdbc:acolyte:dcm-tests?handler=" + databaseId
+
+  private var addedTitle: Titles = ""
+  private var addedAuthor: Authors = ""
+  private var addedISBN: ISBNs = ""
+  private var addedDescription: Descriptions = None
+  private var addedCover: CoverImageLocations = None
+  private var addedCategoryAssociations: Set[(ISBNs, Categories)] =
+    Set[(ISBNs, Categories)]()
+
   "Given a book to place into storage" - {
+    val bookToStore: Book =
+      (
+        "Ground Zero",
+        "Kevin J. Anderson",
+        "006105223X",
+        Some(
+          "Description for Ground Zero"
+        ),
+        Some(
+          getClass.getResource(
+            "/GroundZero.jpg"
+          ).toURI
+        ),
+        Set[Categories](
+          "sci-fi",
+          "conspiracy"
+        )
+      )
+
     "and storage to place book into" - {
+      addedTitle = ""
+      addedAuthor = ""
+      addedISBN = ""
+      addedDescription = None
+      addedCover = None
+      addedCategoryAssociations =
+        Set[(ISBNs, Categories)]()
+      AcolyteDriver.register(
+        databaseId,
+        bookCatalogHandler
+      )
+      val connectionTransactor =
+        DriverManagerTransactor[Task](
+          "acolyte.jdbc.Driver",
+          databaseURL
+        )
+      val bookStorage: Storage =
+        Storage(
+          connectionTransactor
+        )
+
       "when the book is placed into storage" - {
-        "then the book is placed into storage" in pending
+        bookStorage save bookToStore
+
+        "then the book is placed into storage" in {
+          val enteredBook: Book = (
+            addedTitle,
+            addedAuthor,
+            addedISBN,
+            addedDescription,
+            addedCover,
+            addedCategoryAssociations map {
+              categoryAssociation =>
+                categoryAssociation._2
+            }
+          )
+          enteredBook shouldEqual bookToStore
+          (addedCategoryAssociations map {
+            categoryAssociation =>
+              categoryAssociation._1
+          }) shouldEqual Set[ISBNs](bookToStore.isbn)
+        }
       }
     }
   }
+
+  private def bookCatalogHandler : StatementHandler =
+    AcolyteDSL.handleStatement.withUpdateHandler {
+      execution: UpdateExecution =>
+        execution.sql match {
+          case "INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES(?,?,?,?,?);" =>
+            val parameters =
+              execution.parameters
+            addedTitle =
+              parameters.head.value.asInstanceOf[Titles]
+            addedAuthor =
+              parameters(1).value.asInstanceOf[Authors]
+            addedISBN =
+              parameters(2).value.asInstanceOf[ISBNs]
+            addedDescription =
+              Some(
+                parameters(3).value.asInstanceOf[String]
+              )
+            addedCover =
+              Some(
+                new URI(
+                  parameters(4).value.asInstanceOf[String]
+                )
+              )
+          case "INSERT INTO categoryMapping(ISBN,Category)VALUES(?,?);" =>
+            val parameters =
+              execution.parameters
+            val newISBN =
+              parameters.head.value.asInstanceOf[ISBNs]
+            val newCategory =
+              parameters(1).value.asInstanceOf[Categories]
+            addedCategoryAssociations =
+              addedCategoryAssociations + ((newISBN, newCategory))
+        }
+        1
+    }
 }

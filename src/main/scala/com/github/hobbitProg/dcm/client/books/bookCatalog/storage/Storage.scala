@@ -1,0 +1,37 @@
+package com.github.hobbitProg.dcm.client.books.bookCatalog.storage
+
+import doobie.imports.Transactor
+
+import scalaz.concurrent.Task
+
+import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
+
+/**
+  * Interface for book catalog storage
+  * @author Kyle Cranmer
+  * @since 0.1
+  */
+trait Storage {
+  /**
+    * Save book into storage
+    * @param bookToSave Book to place into storage
+    */
+  def save(
+    bookToSave: Book
+  )
+}
+
+object Storage {
+  /**
+    * Create database storage for book catalog
+    * @param catalogTransactor Performs transactions on book catalog database
+    * @return Database storage for book catalog
+    */
+  def apply(
+      catalogTransactor: Transactor[Task]
+  ): Storage = {
+    new DatabaseStorage(
+      catalogTransactor
+    )
+  }
+}
