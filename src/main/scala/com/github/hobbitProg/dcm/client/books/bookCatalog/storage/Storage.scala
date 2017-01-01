@@ -2,8 +2,11 @@ package com.github.hobbitProg.dcm.client.books.bookCatalog.storage
 
 import doobie.imports.Transactor
 
+import scala.collection.Set
+
 import scalaz.concurrent.Task
 
+import com.github.hobbitProg.dcm.client.books.Categories
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
 
 /**
@@ -19,6 +22,12 @@ trait Storage {
   def save(
     bookToSave: Book
   )
+
+  /**
+    * Categories that can be associated with books
+    * @return Categories that can be associated with books
+    */
+  def definedCategories: Set[Categories]
 }
 
 object Storage {

@@ -5,9 +5,10 @@ import doobie.imports._
 import scalaz._
 import Scalaz._
 import scalaz.concurrent.Task
-
-import com.github.hobbitProg.dcm.client.books.{ISBNs, Categories}
+import com.github.hobbitProg.dcm.client.books.{Categories, ISBNs}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
+
+import scala.collection.Set
 
  /**
   * Database for book catalog storage
@@ -62,13 +63,27 @@ class DatabaseStorage(
           categoriesToInsert
         )
       } yield mainBookInsert + categoryUpdate
-//      ) yield mainBookInsert
     val insertedBook =
       insertStatement.transact(
         catalogConnection
       ).unsafePerformSync
   }
-}
+
+   /**
+     * Categories that can be associated with books
+     *
+     * @return Categories that can be associated with books
+     */
+   override def definedCategories: Set[Categories] = {
+     sql"SELECT Category FROM definedCategories;"
+       .query[Categories]
+       .vector
+       .transact(
+         catalogConnection
+       ).unsafePerformSync
+       .toSet
+   }
+ }
 
 object DatabaseStorage {
   private val bookCatalogInsertPrefix: String = "INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES"

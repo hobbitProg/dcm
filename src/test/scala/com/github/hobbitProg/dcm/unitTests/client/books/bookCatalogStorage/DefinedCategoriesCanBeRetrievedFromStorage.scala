@@ -6,12 +6,11 @@ import acolyte.jdbc.Implicits._
 
 import doobie.imports._
 
-import org.scalatest.FreeSpec
+import org.scalatest.{FreeSpec, Matchers}
 
 import scala.collection.Set
 
 import scalaz.concurrent.Task
-
 
 import com.github.hobbitProg.dcm.client.books.Categories
 import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
@@ -22,7 +21,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
   * @since 0.1
   */
 class DefinedCategoriesCanBeRetrievedFromStorage
-  extends FreeSpec {
+  extends FreeSpec
+    with Matchers {
   "Given storage containing categories can be associated with a book" - {
     AcolyteDriver.register(
       DefinedCategoriesCanBeRetrievedFromStorage.databaseId,
@@ -40,12 +40,20 @@ class DefinedCategoriesCanBeRetrievedFromStorage
 
 
     "when storage is requested to retrieve categories that can be associated with a book" - {
-      "then all categories that can be associated with a book can be retrieved" in pending
+      val definedCategoriesFromStorage =
+        bookStorage.definedCategories
+
+      "then all categories that can be associated with a book can be retrieved" in {
+        definedCategoriesFromStorage shouldEqual DefinedCategoriesCanBeRetrievedFromStorage.definedCategories
+      }
+
     }
   }
 
   private def bookStorageHandler: StatementHandler =
-    AcolyteDSL.handleStatement.withQueryHandler {
+    AcolyteDSL.handleStatement.withQueryDetection(
+      "^SELECT"
+    ).withQueryHandler {
       query: QueryExecution =>
         query.sql match {
           case "SELECT Category FROM definedCategories;" =>
