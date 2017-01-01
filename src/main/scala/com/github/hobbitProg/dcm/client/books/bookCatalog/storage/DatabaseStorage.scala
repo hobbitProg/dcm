@@ -2,23 +2,26 @@ package com.github.hobbitProg.dcm.client.books.bookCatalog.storage
 
 import doobie.imports._
 
+import java.net.URI
+
 import scalaz._
 import Scalaz._
 import scalaz.concurrent.Task
-import com.github.hobbitProg.dcm.client.books.{Categories, ISBNs}
-import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
 
 import scala.collection.Set
 
- /**
+import com.github.hobbitProg.dcm.client.books._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
+
+/**
   * Database for book catalog storage
   * @author Kyle Cranmer
   * @since 0.1
   */
-
 class DatabaseStorage(
   private val catalogConnection: Transactor[Task]
 ) extends Storage {
+  private type BookType = (Titles, Authors, ISBNs, String, String)
   private type CategoryMappingType = (ISBNs,Categories)
 
   /**
@@ -82,6 +85,56 @@ class DatabaseStorage(
          catalogConnection
        ).unsafePerformSync
        .toSet
+   }
+
+   /**
+     * Books that exist in storage
+     * @return Books that exist in storage
+     */
+   override def contents: Set[Book] = {
+     val rawBookData: Set[BookType] =
+       sql"SELECT Title,Author,ISBN,Description,Cover FROM bookCatalog;"
+         .query[BookType]
+         .vector
+         .transact(
+           catalogConnection
+         ).unsafePerformSync
+         .toSet
+     var collectedBooks: Set[Book] =
+       Set[Book]()
+     for (
+       rawBook <- rawBookData
+     ) {
+       val associatedCategories =
+         sql"SELECT Category FROM catgoryMapping WHERE ISBN=${rawBook._3};"
+         .query[Categories]
+         .vector
+         .transact(
+           catalogConnection
+         ).unsafePerformSync
+         .toSet
+       val description =
+         rawBook._4 match {
+           case "NULL" => None
+           case actualDescription => Some(actualDescription)
+         }
+       val coverImage =
+         rawBook._5 match {
+           case "NULL" => None
+           case actualCoverImage => Some(new URI(actualCoverImage))
+         }
+       collectedBooks =
+         collectedBooks +
+           new Book(
+             rawBook._1,
+             rawBook._2,
+             rawBook._3,
+             description,
+             coverImage,
+             associatedCategories
+           )
+     }
+     collectedBooks
    }
  }
 

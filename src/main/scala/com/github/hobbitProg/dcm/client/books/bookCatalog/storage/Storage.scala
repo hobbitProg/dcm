@@ -28,6 +28,12 @@ trait Storage {
     * @return Categories that can be associated with books
     */
   def definedCategories: Set[Categories]
+
+  /**
+    * Books that exist in storage
+    * @return Books that exist in storage
+    */
+  def contents: Set[Book]
 }
 
 object Storage {
