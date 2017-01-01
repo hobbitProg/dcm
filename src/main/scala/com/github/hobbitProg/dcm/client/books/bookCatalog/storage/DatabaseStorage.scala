@@ -66,7 +66,7 @@ class DatabaseStorage(
     val insertedBook =
       insertStatement.transact(
         catalogConnection
-      ).run
+      ).unsafePerformSync
   }
 }
 

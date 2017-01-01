@@ -1,6 +1,6 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogStorage
 
-import acolyte.jdbc.{AcolyteDSL, ExecutedParameter, StatementHandler, UpdateExecution, Driver => AcolyteDriver}
+import acolyte.jdbc.{AcolyteDSL, StatementHandler, UpdateExecution, Driver => AcolyteDriver}
 import acolyte.jdbc.Implicits._
 
 import doobie.imports._
@@ -10,10 +10,7 @@ import java.net.URI
 import org.scalatest.{FreeSpec, Matchers}
 
 import scala.collection.Set
-import scala.collection.immutable.Seq
-import scala.util.matching.Regex
 
-import scalaz._
 import scalaz.concurrent.Task
 
 import com.github.hobbitProg.dcm.client.books._
@@ -74,7 +71,7 @@ class BooksCanBePlacedIntoStorage
         Set[(ISBNs, Categories)]()
       AcolyteDriver.register(
         databaseId,
-        bookCatalogHandler
+        bookStorageHandler
       )
       val connectionTransactor =
         DriverManagerTransactor[Task](
@@ -111,7 +108,7 @@ class BooksCanBePlacedIntoStorage
     }
   }
 
-  private def bookCatalogHandler : StatementHandler =
+  private def bookStorageHandler : StatementHandler =
     AcolyteDSL.handleStatement.withUpdateHandler {
       execution: UpdateExecution =>
         execution.sql match {

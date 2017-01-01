@@ -1,6 +1,20 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogStorage
 
+import acolyte.jdbc.{AcolyteDSL, RowList1, Row1, StatementHandler, QueryExecution, Driver => AcolyteDriver}
+import acolyte.jdbc.RowLists.rowList1
+import acolyte.jdbc.Implicits._
+
+import doobie.imports._
+
 import org.scalatest.FreeSpec
+
+import scala.collection.Set
+
+import scalaz.concurrent.Task
+
+
+import com.github.hobbitProg.dcm.client.books.Categories
+import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
 
 /**
   * Verifies defined book categories can be retrieved from storage
@@ -10,8 +24,55 @@ import org.scalatest.FreeSpec
 class DefinedCategoriesCanBeRetrievedFromStorage
   extends FreeSpec {
   "Given storage containing categories can be associated with a book" - {
+    AcolyteDriver.register(
+      DefinedCategoriesCanBeRetrievedFromStorage.databaseId,
+      bookStorageHandler
+    )
+    val connectionTransactor =
+      DriverManagerTransactor[Task](
+        "acolyte.jdbc.Driver",
+        DefinedCategoriesCanBeRetrievedFromStorage.databaseURL
+      )
+    val bookStorage: Storage =
+      Storage(
+        connectionTransactor
+      )
+
+
     "when storage is requested to retrieve categories that can be associated with a book" - {
       "then all categories that can be associated with a book can be retrieved" in pending
     }
   }
+
+  private def bookStorageHandler: StatementHandler =
+    AcolyteDSL.handleStatement.withQueryHandler {
+      query: QueryExecution =>
+        query.sql match {
+          case "SELECT Category FROM definedCategories;" =>
+            var generatedCategories =
+              RowList1AsScala(
+                rowList1(
+                  classOf[String]
+                )
+              )
+            for (currentCategory <- DefinedCategoriesCanBeRetrievedFromStorage.definedCategories) {
+              generatedCategories =
+                generatedCategories :+ currentCategory
+            }
+            generatedCategories.asResult()
+        }
+  }
+}
+
+object DefinedCategoriesCanBeRetrievedFromStorage {
+  private val definedCategories =
+    Set[Categories](
+      "sci-fi",
+      "conspiracy",
+      "fantasy",
+      "thriller"
+    )
+  private val databaseId: String = "BookStorageTest"
+  private  val databaseURL: String =
+    "jdbc:acolyte:dcm-tests?handler=" + databaseId
 }
