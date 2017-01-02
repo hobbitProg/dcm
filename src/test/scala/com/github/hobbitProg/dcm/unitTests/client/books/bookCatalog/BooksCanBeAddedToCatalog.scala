@@ -1,72 +1,35 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog
 
-import acolyte.jdbc.{AcolyteDSL, StatementHandler, UpdateExecution, Driver => AcolyteDriver}
-import acolyte.jdbc.Implicits._
-
 import java.net.URI
-import java.sql.{Connection, DriverManager}
+
+import org.scalamock.scalatest.MockFactory
+
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
 
 import scala.collection.Set
 import scala.util.matching.Regex
 
-import com.github.hobbitProg.dcm.client.books.{Authors, Categories,
-CoverImageLocations, Descriptions, ISBNs, Titles}
+import com.github.hobbitProg.dcm.client.books._
 import com.github.hobbitProg.dcm.client.books.Conversions._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
 
 /**
   * Verifies books can be added to catalog
+  * @author Kyle Cranmer
+  * @since 0.1
   */
 class BooksCanBeAddedToCatalog
-  extends FreeSpec {
-  // ID for acolyte mock database
-  private val databaseId: String = "CatalogAddTest"
-
-  // URL to connect to acolyte database
-  private  val databaseURL: String =
-  "jdbc:acolyte:dcm-tests?handler=" + databaseId
-
-  // Regular expression to match SQL statement to add book to database
-  private val bookAddSQL: Regex =
-    ("INSERT INTO bookCatalog[(]Title,Author,ISBN,Description,Cover[)]VALUES[" +
-      "(]'([^']+)','([^']+)','([^']+)','([^']+)','([^']+)'[)]").r
-
-  // Regular expression to match SQL statement to associate category with book
-  private val categoryAddSQL: Regex =
-  ("INSERT INTO categoryMapping [(]ISBN,Category[)]VALUES[(]'([^']+)','" +
-      "([^']+)'[)]").r
-
-  private var addedTitle: Titles = ""
-  private var addedAuthor: Authors = ""
-  private var addedISBN: ISBNs = ""
-  private var addedDescription: Descriptions = ""
-  private var addedCover: CoverImageLocations = None
-  private var addedCategoryAssociations: Set[(ISBNs, Categories)] =
-    Set[(ISBNs, Categories)]()
-
+  extends FreeSpec
+    with MockFactory {
   "Given a book catalog" - {
-    addedTitle = ""
-    addedAuthor = ""
-    addedISBN = ""
-    addedDescription = ""
-    addedDescription = ""
-    addedCover = None
-    addedCategoryAssociations =
-      Set[(ISBNs, Categories)]()
-    AcolyteDriver.register(
-      databaseId,
-      BookCatalogHandler
-    )
-    val bookCatalogConnection: Connection =
-      DriverManager.getConnection(
-        databaseURL
-      )
+    val catalogStorage =
+      stub[Storage]
     val originalBookCatalog: Catalog =
-      Catalog(
-        bookCatalogConnection
+      new Catalog(
+        catalogStorage
       )
 
     "and a listener for book addition events" - {
@@ -103,23 +66,9 @@ class BooksCanBeAddedToCatalog
             originalBookCatalog + newBook
 
           "then the book is added to the catalog" in {
-            val enteredBook: Book =
-              (
-                addedTitle,
-                addedAuthor,
-                addedISBN,
-                addedDescription,
-                addedCover,
-                addedCategoryAssociations map {
-                  categoryAssociation =>
-                    categoryAssociation._2
-                }
-                )
-            enteredBook shouldEqual newBook
-            (addedCategoryAssociations map {
-              categoryAssociation =>
-                categoryAssociation._1
-            }) shouldEqual Set[ISBNs](newBook.isbn)
+            (catalogStorage.save _).verify(
+              newBook
+            )
           }
 
           "and the book is given to the listener" in {
@@ -129,36 +78,4 @@ class BooksCanBeAddedToCatalog
       }
     }
   }
-
-  private def BookCatalogHandler : StatementHandler =
-    AcolyteDSL.handleStatement.withUpdateHandler {
-      execution: UpdateExecution =>
-        Console println execution.sql
-        execution.sql match {
-          case bookAddSQL(
-          newTitle,
-          newAuthor,
-          newISBN,
-          newDescription,
-          newCover
-          ) =>
-            addedTitle = newTitle
-            addedAuthor = newAuthor
-            addedISBN = newISBN
-            addedDescription = newDescription
-            addedCover =
-              Some[URI](
-                new URI(
-                  newCover
-                )
-              )
-          case categoryAddSQL(
-          newISBN,
-          newCategory
-          ) =>
-            addedCategoryAssociations =
-              addedCategoryAssociations + ((newISBN, newCategory))
-        }
-        1
-    }
 }

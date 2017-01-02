@@ -1,3 +1,5 @@
+import doobie.imports._
+
 import java.io.File
 import java.net.URI
 import java.sql._
@@ -24,11 +26,16 @@ import scalafx.scene.image.ImageView
 import scalafx.scene.layout.{AnchorPane, VBox}
 import scalafx.stage.FileChooser
 
+import scalaz._
+import Scalaz._
+import scalaz.concurrent.Task
+
 import org.scalamock.scalatest.MockFactory
 
 import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
-import com.github.hobbitProg.dcm.client.books.{Categories, Descriptions}
+import com.github.hobbitProg.dcm.client.books._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
+import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
 import com.github.hobbitProg.dcm.client.books.control.SelectedBookControl
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
@@ -40,12 +47,12 @@ import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
   */
 class BookCatalogClientSteps
   extends MockFactory {
-  // Connection to book catalog
-  Class.forName(
-    BookCatalogClientSteps.databaseClass
-  )
-  private val bookConnection =
-    DriverManager.getConnection(
+  type BookRow = (Titles,Authors,ISBNs,String,String)
+
+  // Performs transactions on book catalog
+  private val bookTransactor =
+    DriverManagerTransactor[Task](
+      BookCatalogClientSteps.databaseClass,
       BookCatalogClientSteps.databaseURL
     )
 
@@ -112,45 +119,29 @@ class BookCatalogClientSteps
   }
 
   private implicit def sqlRow2Book(
-    bookRow: ResultSet
+    bookRow: BookRow
   ) : Book = {
     var descriptionValue: Descriptions =
-      Some(bookRow getString 4)
-    if (bookRow.wasNull()) {
-      descriptionValue = None
-    }
-    val coverLocationString =
-      bookRow getString 5
-    val coverLocation =
-      if (bookRow.wasNull()) {
-        None
-      } else {
-        Some(
-          new URI(
-            coverLocationString
-          )
-        )
+      bookRow._4 match {
+        case "NULL" => None
+        case actualDescription => Some(actualDescription)
       }
-    val categoriesStatement: PreparedStatement =
-      bookConnection prepareStatement
-        "SELECT " + BookCatalogClientSteps.categoryColumn +
-          " FROM " + BookCatalogClientSteps.categoryMappingTable +
-          " WHERE " + BookCatalogClientSteps.isbnColumn +
-          " = '" + (bookRow getString 3) + "';"
-    val associatedCategoriesInDatabase: ResultSet =
-      categoriesStatement.executeQuery()
-    var associatedCategories: Set[Categories] =
-      Set[Categories]()
-    while (!associatedCategoriesInDatabase.isAfterLast) {
-      associatedCategories =
-        associatedCategories +
-          (associatedCategoriesInDatabase getString 1)
-      associatedCategoriesInDatabase.next()
-    }
+    val coverLocation =
+      bookRow._5 match {
+        case "NULL" => None
+        case actualCover => Some(new URI(actualCover))
+      }
+    val associatedCategories: Set[Categories] =
+      sql"SELECT Category FROM categoryMapping WHERE ISBN=${bookRow._3};"
+      .query[Categories]
+      .vector
+      .transact(bookTransactor)
+      .unsafePerformSync
+      .toSet
     new Book(
-      bookRow getString 1,
-      bookRow getString 2,
-      bookRow getString 3,
+      bookRow._1,
+      bookRow._2,
+      bookRow._3,
       descriptionValue,
       coverLocation,
       associatedCategories
@@ -160,33 +151,41 @@ class BookCatalogClientSteps
   @org.jbehave.core.annotations.BeforeStories
   def defineSchemas(): Unit = {
     // Create schema for categories defined for book
-    val schemaStatement: Statement =
-      bookConnection.createStatement()
-    try {
-      schemaStatement execute
-        "CREATE TABLE " + BookCatalogClientSteps.definedCategoriesTable + " (" +
-          "categoryID integer PRIMARY KEY," +
-          BookCatalogClientSteps.categoryColumn + " TINYTEXT" +
-          ");"
-      schemaStatement execute
-        "CREATE TABLE " + BookCatalogClientSteps.bookCatalogTable + " (" +
-          "bookID integer PRIMARY KEY," +
-          BookCatalogClientSteps.titleColumn + " MEDIUMTEXT NOT NULL," +
-          BookCatalogClientSteps.authorColumn + " MEDIUMTEXT NOT NULL," +
-          BookCatalogClientSteps.isbnColumn + " MEDIUMTEXT NOT NULL," +
-          BookCatalogClientSteps.descriptionColumn + " MEDIUMTEXT," +
-          BookCatalogClientSteps.coverColumn + " MEDIUMTEXT" +
-          ");"
-      schemaStatement execute
-        "CREATE TABLE " + BookCatalogClientSteps.categoryMappingTable + " (" +
-          "mappingID integer PRIMARY KEY," +
-          BookCatalogClientSteps.isbnColumn + " MEDIUMTEXT," +
-          BookCatalogClientSteps.categoryColumn + " TINYTEXT" +
-          ");"
-    }
-    catch {
-      case sqlProblem: SQLException => System.out.println(sqlProblem.getMessage)
-    }
+    val definedCategoriesSchemaCreationStatement =
+      sql"""
+        CREATE TABLE definedCategories (
+          categoryID integer PRIMARY KEY,
+          Category TINYTEXT
+        )
+      """
+    val bookCatalogSchemaCreationStatement =
+      sql"""
+        CREATE TABLE bookCatalog (
+          bookID integer PRIMARY KEY,
+          Title MEDIUMTEXT NOT NULL,
+          Author MEDIUMTEXT NOT NULL,
+          ISBN MEDIUMTEXT NOT NULL,
+          Description MEDIUMTEXT,
+          Cover MEDIUMTEXT
+        );
+      """
+    val categoryMappingSchemaCreationStatement =
+      sql"""
+        CREATE TABLE categoryMapping (
+          mappingID integer PRIMARY KEY,
+          ISBN MEDIUMTEXT,
+          Category TINYTEXT
+        );
+      """
+    val schemaCreation =
+      for {
+        definedCategoriesCreation <- definedCategoriesSchemaCreationStatement.update.run
+        bookCatalogCreation <- bookCatalogSchemaCreationStatement.update.run
+        categoryMappingCreation <- categoryMappingSchemaCreationStatement.update.run
+      } yield definedCategoriesCreation + bookCatalogCreation + categoryMappingCreation
+    schemaCreation.transact(
+      bookTransactor
+    ).unsafePerformSync
   }
 
   @org.jbehave.core.annotations.AfterStories
@@ -207,17 +206,15 @@ class BookCatalogClientSteps
   def definedCategories(
     existingCategories: ExamplesTable
   ): Unit = {
-    val insertStatement =
-      bookConnection.createStatement()
-    for (definedCategory <- existingCategories.getRows) {
-      insertStatement executeUpdate
-        "INSERT INTO " +
-        BookCatalogClientSteps.definedCategoriesTable +
-        " (" +
-        BookCatalogClientSteps.categoryColumn +
-        ") VALUES ('" +
-        definedCategory.get("category") +
-        "')"
+    for (definedCategoryRow <- existingCategories.getRows) {
+      val definedCategory =
+        definedCategoryRow.get("category")
+      sql"INSERT INTO definedCategories (Category) VALUES ($definedCategory);"
+        .update
+        .run
+        .transact(
+          bookTransactor
+        ).unsafePerformSync
     }
   }
 
@@ -225,43 +222,45 @@ class BookCatalogClientSteps
   def catalogContents(
     preExistingBooks: ExamplesTable
   ): Unit = {
-    val insertStatement =
-      bookConnection.createStatement()
     for (existingBook <- preExistingBooks.getRows) {
-      insertStatement executeUpdate
-        "INSERT INTO " + BookCatalogClientSteps.bookCatalogTable + "(" +
-          BookCatalogClientSteps.titleColumn + "," +
-          BookCatalogClientSteps.authorColumn + ","  +
-          BookCatalogClientSteps.isbnColumn + "," +
-          BookCatalogClientSteps.descriptionColumn + "," +
-          BookCatalogClientSteps.coverColumn + ")VALUES('" +
-          existingBook.get("title") + "','" +
-          existingBook.get("author") + "','" +
-          existingBook.get("isbn") + "','" +
-          existingBook.get("description") + "','" +
-          existingBook.get("cover image") + "')"
+      val title =
+        existingBook.get("title")
+      val author =
+        existingBook.get("author")
+      val isbn =
+        existingBook.get("isbn")
+      val description =
+        existingBook.get("description")
+      val coverImage =
+        existingBook.get("cover image")
+      sql"INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES($title,$author,$isbn,$description,$coverImage);"
+        .update
+        .run
+        .transact(
+          bookTransactor
+        ).unsafePerformSync
 
       for (associatedCategory <- existingBook.get("categories").split(",")) {
-        insertStatement executeUpdate
-          "INSERT INTO " + BookCatalogClientSteps.categoryMappingTable + "(" +
-            BookCatalogClientSteps.isbnColumn + "," +
-            BookCatalogClientSteps.categoryColumn + ")VALUES('" +
-            existingBook.get("isbn") + "','" +
-            associatedCategory + "')"
+        sql"INSERT INTO categoryMapping(ISBN,Category)VALUES($isbn,$associatedCategory)"
+          .update
+          .run
+          .transact(
+            bookTransactor
+          ).unsafePerformSync
       }
 
       existingBooks =
         existingBooks +
         new Book(
-          existingBook.get("title"),
-          existingBook.get("author"),
-          existingBook.get("isbn"),
+          title,
+          author,
+          isbn,
           Some(
-            existingBook.get("description")
+            description
           ),
           Some(
             new URI(
-              existingBook.get("cover image")
+              coverImage
             )
           ),
           Set[Categories](
@@ -385,21 +384,17 @@ class BookCatalogClientSteps
 
   @org.jbehave.core.annotations.Then("the book is in the book catalogs")
   def bookExistsInCatalog(): Unit = {
-    val queryStatement: PreparedStatement =
-      bookConnection prepareStatement
-        "SELECT " +
-          BookCatalogClientSteps.titleColumn + "," +
-          BookCatalogClientSteps.authorColumn + "," +
-          BookCatalogClientSteps.isbnColumn + "," +
-          BookCatalogClientSteps.descriptionColumn + "," +
-          BookCatalogClientSteps.coverColumn +
-          " FROM " + BookCatalogClientSteps.bookCatalogTable +
-          " WHERE " + BookCatalogClientSteps.isbnColumn + " = '" +
-          bookToEnter.isbn + "';"
-    val newBooksInCatalog: ResultSet =
-      queryStatement.executeQuery()
+    val newBooksInCatalog: Set[BookRow] =
+      sql"SELECT Title,Author,ISBN,Description,Cover FROM bookCatalog WHERE ISBN = ${bookToEnter.isbn};"
+      .query[BookRow]
+      .vector
+      .transact(
+        bookTransactor
+      )
+      .unsafePerformSync
+      .toSet
     val newBook: Book =
-      newBooksInCatalog
+      newBooksInCatalog.head
     Assert.assertEquals(
       "New book not placed into catalog",
       bookToEnter,
@@ -421,7 +416,11 @@ class BookCatalogClientSteps
     bookCatalogControlVerification(
       "Existing books are not displayed in control",
       catalogControl =>
-        existingBooks subsetOf catalogControl.items.value.toSet
+        existingBooks forall {
+          book =>
+            catalogControl.items.value.toSet[Book] contains book
+        }
+//        existingBooks subsetOf catalogControl.items.value.toSet[Book]
     )
   }
 
@@ -477,8 +476,10 @@ class BookCatalogClientSteps
     desktop =
       new DCMDesktop(
         coverChooser,
-        Catalog(
-          bookConnection
+        new Catalog(
+          Storage(
+            bookTransactor
+          )
         ),
         Set[Categories](
           "sci-fi",

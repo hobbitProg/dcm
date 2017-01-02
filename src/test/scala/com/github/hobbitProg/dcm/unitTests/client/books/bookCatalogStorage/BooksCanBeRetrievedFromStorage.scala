@@ -88,7 +88,7 @@ class BooksCanBeRetrievedFromStorage
                 )
             }
             gatheredBooks.asResult()
-          case "SELECT Category FROM catgoryMapping WHERE ISBN=?;" =>
+          case "SELECT Category FROM categoryMapping WHERE ISBN=?;" =>
             var gatheredCategories =
               RowList1AsScala(
                 rowList1(

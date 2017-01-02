@@ -1,19 +1,21 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogControl
 
 import java.net.URI
-import scala.collection.Set
 
 import com.github.hobbitProg.dcm.client.books.Categories
-import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
+import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
+import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
+
+import scala.collection.Set
 
 /**
-  * Catalog for book catalog window test
+  * Populated storage for book catalog window
   * @author Kyle Cranmer
-  * @since 0.1.
+  * @since 0.1
   */
-class BookCatalogWindowCatalog
-  extends Catalog {
-  // Initial books in catalog
+class BookCatalogWindowStorage
+  extends Storage {
+  // Books in catalog
   var books: Set[Book] =
     Set[Book](
       new Book(
@@ -48,24 +50,38 @@ class BookCatalogWindowCatalog
       )
     )
 
-  // Place book into set when requested
-  addStream.listen(
-    (newBook: Book) =>
-      books = books + newBook
-  )
+  /**
+    * Save book into storage
+    *
+    * @param bookToSave Book to place into storage
+    */
+  override def save(
+    bookToSave: Book
+  ): Unit = {
+    books =
+      books + bookToSave
+  }
 
   /**
-    * Apply operation to each book in catalog
+    * Categories that can be associated with books
     *
-    * @param op Operation to apply
+    * @return Categories that can be associated with books
     */
-  override def foreach(
-    op: (Book) => Unit
-  ): Unit = {
-    for (book <- books) {
-      op(
-        book
-      )
-    }
+  override def definedCategories: Set[Categories] = {
+    Set[Categories](
+      "sci-fi",
+      "conspiracy",
+      "fantasy",
+      "thriller"
+    )
+  }
+
+  /**
+    * Books that exist in storage
+    *
+    * @return Books that exist in storage
+    */
+  override def contents: Set[Book] = {
+    books
   }
 }

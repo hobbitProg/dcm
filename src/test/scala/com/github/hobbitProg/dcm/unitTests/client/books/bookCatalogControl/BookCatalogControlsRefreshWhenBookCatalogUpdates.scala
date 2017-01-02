@@ -2,11 +2,16 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogControl
 
 import java.net.URI
 import java.util.function.{Consumer, Supplier}
+
 import javafx.application.Application
 import javafx.stage.Stage
+
 import org.scalatest.{FreeSpec, Matchers}
+
 import org.testfx.api.FxToolkit
+
 import scala.collection.Set
+
 import scalafx.Includes._
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
@@ -20,8 +25,10 @@ class BookCatalogControlsRefreshWhenBookCatalogUpdates
   extends FreeSpec
     with Matchers {
   "Given a populated book catalog" - {
-    val populatedCatalog: BookCatalogWindowCatalog =
-      new BookCatalogWindowCatalog
+    val populatedCatalog: Catalog =
+      new Catalog(
+        new BookCatalogWindowStorage
+      )
 
      "and a book catalog window" - {
        val testScene: BookCatalogScene =
@@ -59,7 +66,7 @@ class BookCatalogControlsRefreshWhenBookCatalogUpdates
           "and the books originally in the book catalog are still displayed " +
             "on the book catalog" in {
             testScene.catalogControl.items.value.toSet should contain
-              populatedCatalog.books
+              populatedCatalog.bookStorage.asInstanceOf[BookCatalogWindowStorage].books
           }
 
         }

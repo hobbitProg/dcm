@@ -51,7 +51,9 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalog
 
   "Given a book catalog" - {
     val catalog: Catalog =
-      new TestCatalog
+      new Catalog(
+        new TestStorage
+      )
     var addedBook: Book = null
     //noinspection ScalaUnusedSymbol
     val addSubscription: Catalog.Subscriptions =

@@ -106,7 +106,7 @@ class DatabaseStorage(
        rawBook <- rawBookData
      ) {
        val associatedCategories =
-         sql"SELECT Category FROM catgoryMapping WHERE ISBN=${rawBook._3};"
+         sql"SELECT Category FROM categoryMapping WHERE ISBN=${rawBook._3};"
          .query[Categories]
          .vector
          .transact(

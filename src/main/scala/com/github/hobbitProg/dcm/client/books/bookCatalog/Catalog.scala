@@ -1,15 +1,19 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog
 
 import java.sql.Connection
-import scala.collection.Seq
+
 import sodium.{Listener, StreamSink}
 
+import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
+
 /**
-  * Interface to book catalog
+  * Catalog containing book information
   * @author Kyle Cranmer
   * @since 0.1
   */
-trait Catalog {
+class Catalog(
+  val bookStorage: Storage
+) {
   // Stream containing addition books
   protected val addStream: StreamSink[Book] =
     new StreamSink[Book]
@@ -22,6 +26,7 @@ trait Catalog {
   def +(
     bookToAdd: Book
   ): Catalog = {
+    bookStorage save bookToAdd
     addStream.send(
       bookToAdd
     )
@@ -46,7 +51,14 @@ trait Catalog {
     */
   def foreach(
     op: (Book) => Unit
-  ): Unit
+  ): Unit = {
+    bookStorage.contents.foreach {
+      bookToProcess =>
+        op(
+          bookToProcess
+        )
+    }
+  }
 }
 
 object Catalog {
@@ -54,17 +66,4 @@ object Catalog {
     * Subscriptions to book catalog events
     */
   type Subscriptions = Listener
-
-  /**
-    * Create database implementation of book catalog
-    * @param databaseConnection Connection to book catalog database
-    * @return Database implementation of book catalog
-    */
-  def apply(
-    databaseConnection: Connection
-  ) : Catalog = {
-    new DatabaseCatalog(
-      databaseConnection
-    )
-  }
 }
