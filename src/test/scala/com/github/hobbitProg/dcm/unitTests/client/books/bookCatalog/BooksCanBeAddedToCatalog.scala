@@ -64,13 +64,11 @@ class BooksCanBeAddedToCatalog
           //noinspection ScalaUnusedSymbol
           val updatedBookCatalog =
             originalBookCatalog + newBook
-
           "then the book is added to the catalog" in {
             (catalogStorage.save _).verify(
               newBook
             )
           }
-
           "and the book is given to the listener" in {
             bookThatWasBroadcast shouldEqual newBook
           }
@@ -78,8 +76,8 @@ class BooksCanBeAddedToCatalog
       }
       "and a book with no defined to add to the catalog" - {
         "when the book is tried to place into the catalog" - {
-          "then the book is not placed into the catalog" pending
-          "and the book is not given to the listener"
+          "then the book is not placed into the catalog" in pending
+            "and the book is not given to the listener"
         }
       }
     }

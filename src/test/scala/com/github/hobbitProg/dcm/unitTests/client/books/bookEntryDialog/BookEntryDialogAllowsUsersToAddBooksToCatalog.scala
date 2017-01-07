@@ -173,7 +173,7 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalog
                 "and the user requests to associate categories with the new book" - {
                   "and the user selects the first category with the new book" - {
                     "and the user selects the second category with the new book" - {
-                      "then the user cannot accept the information on the new book" pending
+                      "then the user cannot accept the information on the new book" in pending
                     }
                   }
                 }

@@ -41,73 +41,74 @@ class BooksCanBePlacedIntoStorage
   private var addedCategoryAssociations: Set[(ISBNs, Categories)] =
     Set[(ISBNs, Categories)]()
 
-  // TODO - Switch storage definition step and book definition step
-  // TODO - Add verification that books with no title are not added to storage
-  "Given a book to place into storage" - {
-    val bookToStore: Book =
-      (
-        "Ground Zero",
-        "Kevin J. Anderson",
-        "006105223X",
-        Some(
-          "Description for Ground Zero"
-        ),
-        Some(
-          getClass.getResource(
-            "/GroundZero.jpg"
-          ).toURI
-        ),
-        Set[Categories](
-          "sci-fi",
-          "conspiracy"
-        )
+  "Given storage to place books into" - {
+    addedTitle = ""
+    addedAuthor = ""
+    addedISBN = ""
+    addedDescription = None
+    addedCover = None
+    addedCategoryAssociations =
+      Set[(ISBNs, Categories)]()
+    AcolyteDriver.register(
+      databaseId,
+      bookStorageHandler
+    )
+    val connectionTransactor =
+      DriverManagerTransactor[Task](
+        "acolyte.jdbc.Driver",
+        databaseURL
+      )
+    val bookStorage: Storage =
+      Storage(
+        connectionTransactor
       )
 
-    "and storage to place book into" - {
-      addedTitle = ""
-      addedAuthor = ""
-      addedISBN = ""
-      addedDescription = None
-      addedCover = None
-      addedCategoryAssociations =
-        Set[(ISBNs, Categories)]()
-      AcolyteDriver.register(
-        databaseId,
-        bookStorageHandler
-      )
-      val connectionTransactor =
-        DriverManagerTransactor[Task](
-          "acolyte.jdbc.Driver",
-          databaseURL
-        )
-      val bookStorage: Storage =
-        Storage(
-          connectionTransactor
-        )
-
-      "when the book is placed into storage" - {
-        bookStorage save bookToStore
-
-        "then the book is placed into storage" in {
-          val enteredBook: Book = (
-            addedTitle,
-            addedAuthor,
-            addedISBN,
-            addedDescription,
-            addedCover,
-            addedCategoryAssociations map {
-              categoryAssociation =>
-                categoryAssociation._2
-            }
+    "and a book containing all required information to place into storage" - {
+      val bookToStore: Book =
+        (
+          "Ground Zero",
+          "Kevin J. Anderson",
+          "006105223X",
+          Some(
+            "Description for Ground Zero"
+          ),
+          Some(
+            getClass.getResource(
+              "/GroundZero.jpg"
+            ).toURI
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
           )
-          enteredBook shouldEqual bookToStore
-          (addedCategoryAssociations map {
-            categoryAssociation =>
-              categoryAssociation._1
-          }) shouldEqual Set[ISBNs](bookToStore.isbn)
+        )
+
+      "and storage to place book into" - {
+        "when the book is placed into storage" - {
+          bookStorage save bookToStore
+
+          "then the book is placed into storage" in {
+            val enteredBook: Book = (
+              addedTitle,
+              addedAuthor,
+              addedISBN,
+              addedDescription,
+              addedCover,
+              addedCategoryAssociations map {
+                categoryAssociation =>
+                  categoryAssociation._2
+              }
+            )
+            enteredBook shouldEqual bookToStore
+            (addedCategoryAssociations map {
+              categoryAssociation =>
+                categoryAssociation._1
+            }) shouldEqual Set[ISBNs](bookToStore.isbn)
+          }
         }
       }
     }
+    // TODO - Add verification that books with no title are not added to storage
   }
 
   private def bookStorageHandler : StatementHandler =
