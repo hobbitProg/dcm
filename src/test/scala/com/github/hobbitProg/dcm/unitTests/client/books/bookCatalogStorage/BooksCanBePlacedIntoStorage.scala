@@ -83,32 +83,36 @@ class BooksCanBePlacedIntoStorage
           )
         )
 
-      "and storage to place book into" - {
-        "when the book is placed into storage" - {
-          bookStorage save bookToStore
+      "when the book is placed into storage" - {
+        bookStorage save bookToStore
 
-          "then the book is placed into storage" in {
-            val enteredBook: Book = (
-              addedTitle,
-              addedAuthor,
-              addedISBN,
-              addedDescription,
-              addedCover,
-              addedCategoryAssociations map {
-                categoryAssociation =>
-                  categoryAssociation._2
-              }
-            )
-            enteredBook shouldEqual bookToStore
-            (addedCategoryAssociations map {
+        "then storage is updated" in pending
+        "and the book is placed into storage" in {
+          val enteredBook: Book = (
+            addedTitle,
+            addedAuthor,
+            addedISBN,
+            addedDescription,
+            addedCover,
+            addedCategoryAssociations map {
               categoryAssociation =>
-                categoryAssociation._1
-            }) shouldEqual Set[ISBNs](bookToStore.isbn)
-          }
+                categoryAssociation._2
+            }
+          )
+          enteredBook shouldEqual bookToStore
+          (addedCategoryAssociations map {
+            categoryAssociation =>
+              categoryAssociation._1
+          }) shouldEqual Set[ISBNs](bookToStore.isbn)
         }
       }
     }
-    // TODO - Add verification that books with no title are not added to storage
+
+    "and a book without a title to place into storage" - {
+      "when the book is placed into storage" - {
+        "then the book is not placed into storage" in pending
+      }
+    }
   }
 
   private def bookStorageHandler : StatementHandler =
