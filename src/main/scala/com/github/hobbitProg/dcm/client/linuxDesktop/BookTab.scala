@@ -62,6 +62,7 @@ class BookTab(
   // Add control to display currently added book
   val selectedBookControl: SelectedBookControl =
     new SelectedBookControl
+  //noinspection ScalaUnusedSymbol
   addButton.onAction =
     (event: ActionEvent) => {
       selectedBookControl.clear()

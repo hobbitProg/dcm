@@ -5,6 +5,7 @@ import scala.math.Ordering.StringOrdering
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.collections.ObservableBuffer
+import scalafx.collections.transformation.SortedBuffer
 import scalafx.scene.control.{ListCell, ListView}
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
@@ -30,8 +31,8 @@ class BookCatalogControl(
                 text =
                   newBook.title
               }
-              items.value sortWith {
-                (left, right) =>
+              items.value sort {
+                (left: Book, right: Book) =>
                   lt(
                     left.title, right.title
                   )
@@ -49,8 +50,8 @@ class BookCatalogControl(
   for (initialBook <- source) {
     items.value += initialBook
   }
-  items.value sortWith {
-    (left, right) =>
+  items.value sort {
+    (left: Book, right: Book) =>
       lt(
         left.title, right.title
       )
@@ -62,5 +63,11 @@ class BookCatalogControl(
     source onAdd {
       newBook =>
         items.value += newBook
+        items.value sort {
+          (left: Book, right: Book) =>
+            lt(
+              left.title, right.title
+            )
+        }
     }
 }

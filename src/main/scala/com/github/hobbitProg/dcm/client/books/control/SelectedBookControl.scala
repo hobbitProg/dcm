@@ -164,7 +164,7 @@ class SelectedBookControl
 object SelectedBookControl {
   val titleControlId = "titleControlId"
   val authorControlId = "authorControlId"
-  val isbnControlId = "isbnControId"
+  val isbnControlId = "isbnControlId"
   val descriptionControlId = "descriptionControlId"
   val coverImageControlId = "coverImageControlId"
   val categoriesControlId = "categoriesControlId"
