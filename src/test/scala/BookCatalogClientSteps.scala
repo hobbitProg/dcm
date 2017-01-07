@@ -476,16 +476,8 @@ class BookCatalogClientSteps
     desktop =
       new DCMDesktop(
         coverChooser,
-        new Catalog(
-          Storage(
-            bookTransactor
-          )
-        ),
-        Set[Categories](
-          "sci-fi",
-          "conspiracy",
-          "fantasy",
-          "thriller"
+        Storage(
+          bookTransactor
         )
       )
     FxToolkit.setupSceneRoot(
