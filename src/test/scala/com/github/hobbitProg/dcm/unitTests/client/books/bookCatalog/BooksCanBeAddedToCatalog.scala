@@ -42,7 +42,7 @@ class BooksCanBeAddedToCatalog
             bookThatWasBroadcast = addedBook
         }
 
-      "and a book to add to the catalog" - {
+      "and a book containing all needed information to add to the catalog" - {
         val newBook: Book =
           (
             "Ground Zero",
@@ -74,6 +74,12 @@ class BooksCanBeAddedToCatalog
           "and the book is given to the listener" in {
             bookThatWasBroadcast shouldEqual newBook
           }
+        }
+      }
+      "and a book with no defined to add to the catalog" - {
+        "when the book is tried to place into the catalog" - {
+          "then the book is not placed into the catalog" pending
+          "and the book is not given to the listener"
         }
       }
     }

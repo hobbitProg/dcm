@@ -41,6 +41,8 @@ class BooksCanBePlacedIntoStorage
   private var addedCategoryAssociations: Set[(ISBNs, Categories)] =
     Set[(ISBNs, Categories)]()
 
+  // TODO - Switch storage definition step and book definition step
+  // TODO - Add verification that books with no title are not added to storage
   "Given a book to place into storage" - {
     val bookToStore: Book =
       (

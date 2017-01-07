@@ -142,7 +142,7 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalog
                           CategorySelectionDialog.saveButtonId
                         )
 
-                        "when the user accepts the information on the new " +
+                        "and the user accepts the information on the new " +
                           "book" - {
                           activateControl(
                             BookEntryDialog.saveButtonId
@@ -158,6 +158,22 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalog
                           }
                         }
                       }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        "when the user enters the author of the new book" - {
+          "and the user enters the ISBN of the new book" - {
+            "and the user enters the description of the new book" - {
+              "and the user selects the cover image for the new book" - {
+                "and the user requests to associate categories with the new book" - {
+                  "and the user selects the first category with the new book" - {
+                    "and the user selects the second category with the new book" - {
+                      "then the user cannot accept the information on the new book" pending
                     }
                   }
                 }
