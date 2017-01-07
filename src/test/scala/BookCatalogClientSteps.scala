@@ -381,6 +381,10 @@ class BookCatalogClientSteps
       MouseButton.PRIMARY
     )
   }
+  @org.jbehave.core.annotations.When("I accept the information on the book")
+  @org.jbehave.core.annotations.Pending
+  def acceptEnteredBook(): Unit = {}
+
 
   @org.jbehave.core.annotations.Then("the book is in the book catalogs")
   def bookExistsInCatalog(): Unit = {
@@ -470,6 +474,10 @@ class BookCatalogClientSteps
         Assert fail "Could not retrieve selected book control"
     }
   }
+
+  @org.jbehave.core.annotations.Then("I cannot accept the information on the book")
+  @org.jbehave.core.annotations.Pending
+  def enteredBookCannotBeAccepted(): Unit = {}
 
   private def showMainApplication(): Unit = {
     FxToolkit.registerPrimaryStage()
