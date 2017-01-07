@@ -33,46 +33,56 @@ class DatabaseStorage(
   override def save(
     bookToSave: Book
   ): Option[Storage] = {
-    val descriptionSQL =
-      bookToSave.description match {
-        case Some(descriptionValue) => descriptionValue
-        case None => "NULL"
-      }
-    val coverImageSQL =
-      bookToSave.coverImage match {
-        case Some(bookCover) => bookCover.toString
-        case None => "NULL"
-      }
-    val dataToInsert: String =
-      "'${bookToSave.title}','${bookToSave.author}','${bookToSave.isbn}','$descriptionSQL','$coverImageSQL'"
-    val categoriesToInsert =
-      bookToSave.categories.map(
-        category =>
-          new CategoryMappingType(
-            bookToSave.isbn,
-            category
+    bookToSave match {
+      case noTitleDefined if bookToSave.title == "" => None
+      case _ =>
+        val descriptionSQL =
+          bookToSave.description match {
+            case Some (descriptionValue) => descriptionValue
+            case None => "NULL"
+          }
+        val coverImageSQL =
+          bookToSave.coverImage match {
+            case Some (bookCover) => bookCover.toString
+            case None => "NULL"
+          }
+        val dataToInsert: String =
+          "'${bookToSave.title}','${bookToSave.author}','${bookToSave.isbn}','$descriptionSQL','$coverImageSQL'"
+        val categoriesToInsert =
+          bookToSave.categories.map (
+            category =>
+              new CategoryMappingType (
+                bookToSave.isbn,
+                category
+              )
+          ).toList
+        val mainBookStatement =
+          sql"INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES(${
+            bookToSave.title
+          },${
+            bookToSave.author
+          },${
+            bookToSave.isbn
+          },$descriptionSQL,$coverImageSQL);"
+        val statementToInsertCategories =
+          Update[CategoryMappingType] (
+            "INSERT INTO categoryMapping(ISBN,Category)VALUES(?,?);"
           )
-      ).toList
-    val mainBookStatement =
-      sql"INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES(${bookToSave.title},${bookToSave.author},${bookToSave.isbn},$descriptionSQL,$coverImageSQL);"
-    val statementToInsertCategories =
-      Update[CategoryMappingType](
-        "INSERT INTO categoryMapping(ISBN,Category)VALUES(?,?);"
-      )
-    val insertStatement =
-      for {
-        mainBookInsert <- mainBookStatement.update.run
-        categoryUpdate <-
-        statementToInsertCategories.updateMany(
-          categoriesToInsert
-        )
-      } yield mainBookInsert + categoryUpdate
-    val insertedBook =
-      insertStatement.transact(
-        catalogConnection
-      ).unsafePerformSync
+        val insertStatement =
+          for {
+            mainBookInsert <- mainBookStatement.update.run
+            categoryUpdate <-
+            statementToInsertCategories.updateMany (
+              categoriesToInsert
+            )
+          } yield mainBookInsert + categoryUpdate
+        val insertedBook =
+          insertStatement.transact (
+            catalogConnection
+          ).unsafePerformSync
 
-    Some(this)
+        Some (this)
+    }
   }
 
    /**

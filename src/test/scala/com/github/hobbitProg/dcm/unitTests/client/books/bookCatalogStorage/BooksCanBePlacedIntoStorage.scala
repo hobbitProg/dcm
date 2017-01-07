@@ -133,7 +133,12 @@ class BooksCanBePlacedIntoStorage
         )
 
       "when the book is placed into storage" - {
-        "then the book is not placed into storage" in pending
+        val updatedStorage =
+          bookStorage save bookToStore
+
+        "then the book is not placed into storage" in {
+          updatedStorage shouldBe empty
+        }
       }
     }
   }
