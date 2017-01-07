@@ -84,9 +84,13 @@ class BooksCanBePlacedIntoStorage
         )
 
       "when the book is placed into storage" - {
-        bookStorage save bookToStore
+        val updatedStorage =
+          bookStorage save bookToStore
 
-        "then storage is updated" in pending
+        "then storage is updated" in {
+          updatedStorage shouldBe defined
+        }
+
         "and the book is placed into storage" in {
           val enteredBook: Book = (
             addedTitle,

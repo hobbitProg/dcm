@@ -28,10 +28,11 @@ class DatabaseStorage(
     * Save book into storage
     *
     * @param bookToSave Book to place into storage
+    * @return Updated storage when book can be added to be storage
     */
   override def save(
     bookToSave: Book
-  ): Unit = {
+  ): Option[Storage] = {
     val descriptionSQL =
       bookToSave.description match {
         case Some(descriptionValue) => descriptionValue
@@ -70,6 +71,8 @@ class DatabaseStorage(
       insertStatement.transact(
         catalogConnection
       ).unsafePerformSync
+
+    Some(this)
   }
 
    /**

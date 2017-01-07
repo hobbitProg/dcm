@@ -18,10 +18,11 @@ trait Storage {
   /**
     * Save book into storage
     * @param bookToSave Book to place into storage
+    * @return Updated storage when book can be added to be storage
     */
   def save(
     bookToSave: Book
-  )
+  ): Option[Storage]
 
   /**
     * Categories that can be associated with books

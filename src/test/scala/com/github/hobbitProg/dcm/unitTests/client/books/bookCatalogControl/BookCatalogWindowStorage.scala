@@ -57,9 +57,10 @@ class BookCatalogWindowStorage
     */
   override def save(
     bookToSave: Book
-  ): Unit = {
+  ): Option[Storage] = {
     books =
       books + bookToSave
+    Some(this)
   }
 
   /**

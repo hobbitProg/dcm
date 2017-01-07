@@ -20,7 +20,8 @@ class TestStorage
     */
   override def save(
     bookToSave: Book
-  ): Unit = {
+  ): Option[Storage] = {
+    Some(this)
   }
 
   /**
