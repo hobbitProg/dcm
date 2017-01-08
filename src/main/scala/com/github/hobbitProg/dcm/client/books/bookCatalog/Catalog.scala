@@ -1,7 +1,5 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog
 
-import java.sql.Connection
-
 import sodium.{Listener, StreamSink}
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
@@ -25,12 +23,17 @@ class Catalog(
     */
   def +(
     bookToAdd: Book
-  ): Catalog = {
-    bookStorage save bookToAdd
-    addStream.send(
-      bookToAdd
-    )
-    this
+  ): Option[Catalog] = {
+    val updatedStorage: Option[Storage] =
+      bookStorage save bookToAdd
+    updatedStorage match {
+      case Some(storageWithNewBook) =>
+        addStream.send(
+          bookToAdd
+        )
+        Some(this)
+      case None => None
+    }
   }
 
   /**

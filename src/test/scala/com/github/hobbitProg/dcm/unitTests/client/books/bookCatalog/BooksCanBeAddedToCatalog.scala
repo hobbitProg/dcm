@@ -59,12 +59,18 @@ class BooksCanBeAddedToCatalog
               "conspiracy"
             )
           )
+        (catalogStorage.save _).when(
+          newBook
+        ).returns(
+          Some(catalogStorage)
+        )
 
         "when the book is added to the catalog" - {
           //noinspection ScalaUnusedSymbol
           val updatedBookCatalog =
             originalBookCatalog + newBook
           "then the book is added to the catalog" in {
+            updatedBookCatalog shouldBe defined
             (catalogStorage.save _).verify(
               newBook
             )

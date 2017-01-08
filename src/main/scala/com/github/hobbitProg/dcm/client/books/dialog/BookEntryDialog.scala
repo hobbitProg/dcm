@@ -186,11 +186,16 @@ class BookEntryDialog(
   //noinspection ScalaUnusedSymbol
   saveButton.onAction =
     (event: ActionEvent) => {
-      updatedCatalog =
+      val catalogResult =
         catalog + bookBeingEdited
-      val parentStage: Stage =
-        window.value.asInstanceOf[javafx.stage.Stage]
-      parentStage.close
+      catalogResult match {
+        case Some(catalogWithNewBook) =>
+          updatedCatalog = catalogWithNewBook
+          val parentStage: Stage =
+            window.value.asInstanceOf[javafx.stage.Stage]
+          parentStage.close
+        case None => updatedCatalog = updatedCatalog
+      }
     }
   AnchorPane.setTopAnchor(
     saveButton,
