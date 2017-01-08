@@ -259,6 +259,24 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalog
           }
         }
       }
+
+      "and dialog to fill with details of book to add to catalog" - {
+        "when the user enters the title of the new book" - {
+          "and the user enters the ISBN of the new book" - {
+            "and the user enters the description of the new book" - {
+              "and the user selects the cover image for the new book" - {
+                "and the user requests to associate categories with the new book" - {
+                  "and the user selects the first category with the new book" - {
+                    "and the user selects the second category with the new book" - {
+                      "then the dialog is closed" in pending
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 
