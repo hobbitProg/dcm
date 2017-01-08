@@ -32,38 +32,38 @@ class BooksCanBeAddedToCatalog
         catalogStorage
       )
 
-    "and a listener for book addition events" - {
-      var bookThatWasBroadcast: Book =
-        null
-      //noinspection ScalaUnusedSymbol
-      val additionListener: Catalog.Subscriptions =
-        originalBookCatalog onAdd {
-          addedBook =>
-            bookThatWasBroadcast = addedBook
-        }
-
-      "and a book containing all needed information to add to the catalog" - {
-        val newBook: Book =
-          (
-            "Ground Zero",
-            "Kevin J. Anderson",
-            "006105223X",
-            Some("Description for Ground Zero"),
-            Some[URI](
-              getClass.getResource(
-                "/GroundZero.jpg"
-              ).toURI
-            ),
-            Set[String](
-              "sci-fi",
-              "conspiracy"
-            )
+    "and a book containing all needed information to add to the catalog" - {
+      val newBook: Book =
+        (
+          "Ground Zero",
+          "Kevin J. Anderson",
+          "006105223X",
+          Some("Description for Ground Zero"),
+          Some[URI](
+            getClass.getResource(
+              "/GroundZero.jpg"
+            ).toURI
+          ),
+          Set[String](
+            "sci-fi",
+            "conspiracy"
           )
-        (catalogStorage.save _).when(
-          newBook
-        ).returns(
-          Some(catalogStorage)
         )
+      (catalogStorage.save _).when(
+        newBook
+      ).returns(
+        Some(catalogStorage)
+      )
+
+      "and a listener for book addition events" - {
+        var bookThatWasBroadcast: Book = null
+
+        //noinspection ScalaUnusedSymbol
+        val additionListener: Catalog.Subscriptions =
+          originalBookCatalog onAdd {
+            addedBook =>
+              bookThatWasBroadcast = addedBook
+          }
 
         "when the book is added to the catalog" - {
           val updatedBookCatalog =
@@ -81,28 +81,40 @@ class BooksCanBeAddedToCatalog
           }
         }
       }
-      "and a book with no defined to add to the catalog" - {
-        val newBook: Book =
-          (
-            "",
-            "Kevin J. Anderson",
-            "006105223X",
-            Some("Description for Ground Zero"),
-            Some[URI](
-              getClass.getResource(
-                "/GroundZero.jpg"
-              ).toURI
-            ),
-            Set[String](
-              "sci-fi",
-              "conspiracy"
-            )
+    }
+
+    "and a book with no defined title to add to the catalog" - {
+      val newBook: Book =
+        (
+          "",
+          "Kevin J. Anderson",
+          "006105223X",
+          Some("Description for Ground Zero"),
+          Some[URI](
+            getClass.getResource(
+              "/GroundZero.jpg"
+            ).toURI
+          ),
+          Set[String](
+            "sci-fi",
+            "conspiracy"
           )
-        (catalogStorage.save _).when(
-          newBook
-        ).returns(
-          None
         )
+      (catalogStorage.save _).when(
+        newBook
+      ).returns(
+        None
+      )
+
+      "and a listener for book addition events" - {
+        var bookThatWasBroadcast: Book =
+          null
+        //noinspection ScalaUnusedSymbol
+        val additionListener: Catalog.Subscriptions =
+          originalBookCatalog onAdd {
+            addedBook =>
+              bookThatWasBroadcast = addedBook
+          }
 
         "when the book is tried to place into the catalog" - {
           val updatedBookCatalog =
@@ -112,7 +124,9 @@ class BooksCanBeAddedToCatalog
             updatedBookCatalog shouldBe None
           }
 
-          "and the book is not given to the listener" in pending
+          "and the book is not given to the listener" in {
+            bookThatWasBroadcast shouldBe null
+          }
         }
       }
     }
