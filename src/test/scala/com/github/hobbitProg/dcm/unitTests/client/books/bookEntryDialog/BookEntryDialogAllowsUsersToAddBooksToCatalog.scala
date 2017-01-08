@@ -20,6 +20,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 
+import scalafx.scene.layout.AnchorPane
+
 /**
   * Verifies dialog that allows books to be edited can add books to catalog
   */
@@ -165,15 +167,90 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalog
             }
           }
         }
+      }
+
+      "and dialog to fill with details of book to add to catalog" - {
+        val bookAdditionDialog: Scene =
+          createBookAdditionDialog(
+            catalog,
+            definedCategories
+          )
 
         "when the user enters the author of the new book" - {
+          activateControl(
+            BookEntryDialog.authorControlId
+          )
+          enterDataIntoControl(
+            validNewBook.author
+          )
+
           "and the user enters the ISBN of the new book" - {
+            activateControl(
+              BookEntryDialog.isbnControlId
+            )
+            enterDataIntoControl(
+              validNewBook.isbn
+            )
+
             "and the user enters the description of the new book" - {
+              activateControl(
+                BookEntryDialog.descriptionControlId
+              )
+              enterDataIntoControl(
+                validNewBook.description match {
+                  case Some(existingDescription) => existingDescription
+                  case None => ""
+                }
+              )
+
               "and the user selects the cover image for the new book" - {
+                activateControl(
+                  BookEntryDialog.bookCoverButtonId
+                )
+
                 "and the user requests to associate categories with the new book" - {
+                  activateControl(
+                    BookEntryDialog.categorySelectionButtonId
+                  )
+
                   "and the user selects the first category with the new book" - {
+                    selectCategory(
+                      validNewBook.categories.head
+                    )
+
                     "and the user selects the second category with the new book" - {
-                      "then the user cannot accept the information on the new book" in pending
+                      selectCategory(
+                        validNewBook.categories.last
+                      )
+                      activateControl(
+                        CategorySelectionDialog.availableButtonId
+                      )
+                      activateControl(
+                        CategorySelectionDialog.saveButtonId
+                      )
+
+                      "then the user cannot accept the information on the new book" in {
+                        val dialogPane: AnchorPane =
+                          bookAdditionDialog.content.head.asInstanceOf[javafx.scene.layout.AnchorPane]
+                        val saveButton =
+                          dialogPane.children.find {
+                            childControl =>
+                              childControl match {
+                                case childButton: javafx.scene.control.Button =>
+                                  childButton.getText == "Save"
+                                case _ => false
+                              }
+                          }
+
+                        saveButton match {
+                          case Some(saveControl) =>
+                            saveControl.disable.value shouldBe true
+                          case None =>
+                            fail(
+                              "Save button not found"
+                            )
+                        }
+                      }
                     }
                   }
                 }

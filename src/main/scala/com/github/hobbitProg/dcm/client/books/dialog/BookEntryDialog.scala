@@ -50,11 +50,14 @@ class BookEntryDialog(
     new ObservableBuffer[String](
       FXCollections.observableArrayList(
         definedCategories.toList.sortWith(
-          (leftCategory, rightCategory) =>
+          (
+          leftCategory,
+          rightCategory
+          ) =>
             leftCategory.compareTo(
               rightCategory
             ) < 0
-        ):_*
+        ): _*
       )
     )
 
@@ -74,7 +77,7 @@ class BookEntryDialog(
   private val authorControl: AuthorValue =
     new AuthorValue
   authorControl.id = BookEntryDialog.authorControlId
-  authorControl.text.onChange{
+  authorControl.text.onChange {
     bookBeingEdited.author = authorControl.text.value
   }
 
@@ -125,7 +128,7 @@ class BookEntryDialog(
         )
       coverImageControl.image =
         coverImageFile.toURI
-  }
+    }
   AnchorPane.setLeftAnchor(
     coverImageSelectionButton,
     BookEntryDialog.coverImageSelectionLeftBorder
@@ -183,6 +186,11 @@ class BookEntryDialog(
     )
   saveButton.id =
     BookEntryDialog.saveButtonId
+  saveButton.disable = true
+  titleControl.text.onChange {
+    saveButton.disable = bookUnableToBeSaved
+  }
+
   //noinspection ScalaUnusedSymbol
   saveButton.onAction =
     (event: ActionEvent) => {
@@ -228,6 +236,15 @@ class BookEntryDialog(
           saveButton
         )
     }
+
+  /**
+    * Determines if book cannot be saved
+    *
+    * @return True if book cannot be saved and false otherwise
+    */
+  private def bookUnableToBeSaved: Boolean = {
+    titleControl.text.value == ""
+  }
 }
 
 object BookEntryDialog {
