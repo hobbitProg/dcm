@@ -141,6 +141,12 @@ class BooksCanBePlacedIntoStorage
         }
       }
     }
+
+    "and a book without an author to place into storage" - {
+      "when the book is placed into storage" - {
+        "then the book is not placed into storage" in pending
+      }
+    }
   }
 
   private def bookStorageHandler : StatementHandler =
