@@ -374,16 +374,14 @@ class BookCatalogClientSteps
       NodeQueryUtils hasId CategorySelectionDialog.saveButtonId,
       MouseButton.PRIMARY
     )
-
-    // Accept information on new book
+  }
+  @org.jbehave.core.annotations.When("I accept the information on the book")
+  def acceptEnteredBook(): Unit = {
     bookClientRobot.clickOn(
       NodeQueryUtils hasId BookEntryDialog.saveButtonId,
       MouseButton.PRIMARY
     )
   }
-  @org.jbehave.core.annotations.When("I accept the information on the book")
-  @org.jbehave.core.annotations.Pending
-  def acceptEnteredBook(): Unit = {}
 
 
   @org.jbehave.core.annotations.Then("the book is in the book catalogs")
