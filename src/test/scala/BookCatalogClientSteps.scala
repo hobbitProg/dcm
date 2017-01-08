@@ -1,37 +1,29 @@
 import doobie.imports._
-
 import java.io.File
 import java.net.URI
 import java.sql._
-import java.util.function.{Consumer, Supplier}
-
+import java.util.function.{Consumer, Predicate, Supplier}
 import javafx.scene.Parent
 import javafx.scene.input.{KeyCode, MouseButton}
 import javafx.stage.Stage
 
 import org.jbehave.core.model.ExamplesTable
-
 import org.junit.Assert
-
-import org.testfx.api.{FxRobot, FxRobotInterface, FxToolkit}
+import org.testfx.api.{FxRobot, FxRobotContext, FxRobotInterface, FxToolkit}
 import org.testfx.util.{NodeQueryUtils, WaitForAsyncUtils}
 
 import scala.collection.Set
 import scala.collection.convert.wrapAll._
 import scala.language.implicitConversions
-
 import scalafx.Includes._
 import scalafx.scene.control.{ListView, TextInputControl}
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.{AnchorPane, VBox}
-import scalafx.stage.FileChooser
-
+import scalafx.stage.{FileChooser, Window}
 import scalaz._
 import Scalaz._
 import scalaz.concurrent.Task
-
 import org.scalamock.scalatest.MockFactory
-
 import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
 import com.github.hobbitProg.dcm.client.books._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
@@ -146,6 +138,19 @@ class BookCatalogClientSteps
       coverLocation,
       associatedCategories
     )
+  }
+
+  // Create predicate based on given anonymous routine
+  private implicit def anonymousPredicateToJavaPredicate[PredicateDomain](
+    anonymousPredicate: PredicateDomain => Boolean
+  ): java.util.function.Predicate[PredicateDomain] = {
+    new Predicate[PredicateDomain] {
+      override def test(t: PredicateDomain): Boolean = {
+        anonymousPredicate(
+          t
+        )
+      }
+    }
   }
 
   @org.jbehave.core.annotations.BeforeStories
@@ -422,7 +427,6 @@ class BookCatalogClientSteps
           book =>
             catalogControl.items.value.toSet[Book] contains book
         }
-//        existingBooks subsetOf catalogControl.items.value.toSet[Book]
     )
   }
 
@@ -474,8 +478,43 @@ class BookCatalogClientSteps
   }
 
   @org.jbehave.core.annotations.Then("I cannot accept the information on the book")
-  @org.jbehave.core.annotations.Pending
-  def enteredBookCannotBeAccepted(): Unit = {}
+  def enteredBookCannotBeAccepted(): Unit = {
+    val context =
+      new FxRobotContext
+    val bookEntryDialogPredicate: java.util.function.Predicate[javafx.stage.Window] =
+      (currentWindow: javafx.stage.Window) => {
+        val convertedWindow: scalafx.stage.Stage = currentWindow.asInstanceOf[javafx.stage.Stage]
+        convertedWindow.title.value == "Add Book To Catalog"
+      }
+    val bookEntryDialog: Window =
+      context.getWindowFinder.window(
+        bookEntryDialogPredicate
+      )
+    if (bookEntryDialog == null) {
+      Assert fail "Could not find book entry dialog"
+    }
+    else {
+      val bookEntryPane: AnchorPane =
+        bookEntryDialog.scene.value.content.head.asInstanceOf[javafx.scene.layout.AnchorPane]
+      val saveButton =
+        bookEntryPane.children.find {
+          childNode =>
+            childNode match {
+              case buttonNode: javafx.scene.control.Button => buttonNode.text.value == "Save"
+              case _ => false
+            }
+        }
+      saveButton match {
+        case Some(saveButtonNode) =>
+          Assert.assertTrue(
+            "Save button is enabled",
+            saveButtonNode.disable.value
+          )
+        case None =>
+          Assert fail "Could not find save button"
+      }
+    }
+  }
 
   private def showMainApplication(): Unit = {
     FxToolkit.registerPrimaryStage()
