@@ -143,8 +143,32 @@ class BooksCanBePlacedIntoStorage
     }
 
     "and a book without an author to place into storage" - {
+      val bookToStore: Book =
+        (
+          "Ground Zero",
+          "",
+          "006105223X",
+          Some(
+            "Description for Ground Zero"
+          ),
+          Some(
+            getClass.getResource(
+              "/GroundZero.jpg"
+            ).toURI
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+
       "when the book is placed into storage" - {
-        "then the book is not placed into storage" in pending
+        val updatedStorage =
+          bookStorage save bookToStore
+
+        "then the book is not placed into storage" in {
+          updatedStorage shouldBe empty
+        }
       }
     }
   }
