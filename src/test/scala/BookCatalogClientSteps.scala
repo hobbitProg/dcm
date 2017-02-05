@@ -1,29 +1,39 @@
 import doobie.imports._
+
 import java.io.File
 import java.net.URI
 import java.sql._
 import java.util.function.{Consumer, Predicate, Supplier}
+
+import javafx.application.Application
 import javafx.scene.Parent
 import javafx.scene.input.{KeyCode, MouseButton}
 import javafx.stage.Stage
 
 import org.jbehave.core.model.ExamplesTable
+
 import org.junit.Assert
+
 import org.testfx.api.{FxRobot, FxRobotContext, FxRobotInterface, FxToolkit}
 import org.testfx.util.{NodeQueryUtils, WaitForAsyncUtils}
 
 import scala.collection.Set
 import scala.collection.convert.wrapAll._
 import scala.language.implicitConversions
+
 import scalafx.Includes._
 import scalafx.scene.control.{ListView, TextInputControl}
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.{AnchorPane, VBox}
 import scalafx.stage.{FileChooser, Window}
+
 import scalaz._
 import Scalaz._
 import scalaz.concurrent.Task
+
 import org.scalamock.scalatest.MockFactory
+
+import com.github.hobbitProg.dcm.acceptanceTests.AcceptanceApplication
 import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
 import com.github.hobbitProg.dcm.client.books._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
@@ -56,11 +66,13 @@ class BookCatalogClientSteps
   private var bookToEnter: Book = _
 
   // Chooses cover of book
-  private val coverChooser =
-    mock[FileChooser]
+  private val coverChooser: FileChooser = mock[FileChooser]
 
   // Desktop for distributed catalog manager
   private var desktop: DCMDesktop = _
+
+  // Distributed catalog manager application
+  private var dcmApplication: Application = _
 
   // Books already in books
   private var existingBooks: Set[Book] =
@@ -153,7 +165,7 @@ class BookCatalogClientSteps
     }
   }
 
-  @org.jbehave.core.annotations.BeforeStories
+  @org.jbehave.core.annotations.BeforeScenario
   def defineSchemas(): Unit = {
     // Create schema for categories defined for book
     val definedCategoriesSchemaCreationStatement =
@@ -193,7 +205,7 @@ class BookCatalogClientSteps
     ).unsafePerformSync
   }
 
-  @org.jbehave.core.annotations.AfterStories
+  @org.jbehave.core.annotations.AfterScenario
   def removeTestCatalog(): Unit = {
     val dbFile =
       new File(
@@ -202,9 +214,12 @@ class BookCatalogClientSteps
     dbFile.delete()
   }
 
-  @org.jbehave.core.annotations.AfterStories
+  @org.jbehave.core.annotations.AfterScenario
   def releaseTestResources(): Unit = {
     FxToolkit.cleanupStages()
+    FxToolkit.cleanupApplication(
+      dcmApplication
+    )
   }
 
   @org.jbehave.core.annotations.Given("the following defined categories: $existingCategories")
@@ -525,24 +540,18 @@ class BookCatalogClientSteps
           bookTransactor
         )
       )
-    FxToolkit.setupSceneRoot(
-      new Supplier[Parent] {
-        override def get(): Parent = {
-          desktop
-        }
-      }
-    )
-    WaitForAsyncUtils.waitForFxEvents()
-    FxToolkit.setupStage(
-      new Consumer[Stage] {
-        override def accept(t: Stage): Unit = {
-          if (!t.showingProperty().value) {
-            t.show()
+
+    dcmApplication =
+      FxToolkit.setupApplication(
+        new Supplier[Application] {
+          override def get(): Application = {
+            new AcceptanceApplication(
+              desktop
+            )
           }
         }
-      }
-    )
-    WaitForAsyncUtils.waitForFxEvents()
+      )
+    FxToolkit.showStage()
   }
 
   /**
