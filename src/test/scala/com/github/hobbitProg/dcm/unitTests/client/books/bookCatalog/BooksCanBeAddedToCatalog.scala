@@ -83,7 +83,7 @@ class BooksCanBeAddedToCatalog
       }
     }
 
-    "and a book with missing information" - {
+    "and a book with no title" - {
       val newBook: Book =
         (
           "",
@@ -116,7 +116,7 @@ class BooksCanBeAddedToCatalog
               bookThatWasBroadcast = addedBook
           }
 
-        "when the book is tried to place into the catalog" - {
+        "when the book is tried to be placed into the catalog" - {
           val updatedBookCatalog =
             originalBookCatalog + newBook
 
@@ -127,6 +127,24 @@ class BooksCanBeAddedToCatalog
           "and the book is not given to the listener" in {
             bookThatWasBroadcast shouldBe null
           }
+        }
+      }
+    }
+
+    "and a book with no author" - {
+      "and a listener for book addition events" - {
+        "when the book is tried to be placed into the catalog" - {
+          "then the book is not placed into the catalog" in pending
+          "and the book is not given to the listener" in pending
+        }
+      }
+    }
+
+    "and a book with no ISBN" - {
+      "and a listener for book addition events" - {
+        "when the book is tried to be placed into the catalog" - {
+          "then the book is not placed into the catalog" in pending
+          "and the book is not given to the listener" in pending
         }
       }
     }

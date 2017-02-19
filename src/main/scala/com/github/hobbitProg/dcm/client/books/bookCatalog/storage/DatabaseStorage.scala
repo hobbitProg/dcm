@@ -36,6 +36,7 @@ class DatabaseStorage(
     bookToSave match {
       case noTitleDefined if bookToSave.title == "" => None
       case noAuthorDefined if bookToSave.author == "" => None
+      case noISBNDefined if bookToSave.isbn == "" => None
       case _ =>
         val descriptionSQL =
           bookToSave.description match {
