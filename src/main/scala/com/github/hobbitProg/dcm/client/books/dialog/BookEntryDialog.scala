@@ -193,6 +193,9 @@ class BookEntryDialog(
   authorControl.text.onChange {
     saveButton.disable = bookUnableToBeSaved
   }
+  isbnControl.text.onChange {
+    saveButton.disable = bookUnableToBeSaved
+  }
 
   //noinspection ScalaUnusedSymbol
   saveButton.onAction =
@@ -247,7 +250,8 @@ class BookEntryDialog(
     */
   private def bookUnableToBeSaved: Boolean = {
     titleControl.text.value == "" ||
-    authorControl.text.value == ""
+    authorControl.text.value == "" ||
+    isbnControl.text.value == ""
   }
 }
 
