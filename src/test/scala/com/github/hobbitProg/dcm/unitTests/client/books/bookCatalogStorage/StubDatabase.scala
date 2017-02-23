@@ -1,6 +1,7 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogStorage
 
-import acolyte.jdbc.{AcolyteDSL, StatementHandler, UpdateExecution, Driver => AcolyteDriver}
+import acolyte.jdbc.{AcolyteDSL, StatementHandler, UpdateExecution,
+  QueryExecution, RowLists, QueryResult, Driver => AcolyteDriver}
 import acolyte.jdbc.Implicits._
 
 import doobie.imports._
@@ -21,8 +22,12 @@ class StubDatabase {
   private val databaseId: String = "BookStorageTest"
 
   // URL to connect to acolyte database
-  private  val databaseURL: String =
+  private val databaseURL: String =
     "jdbc:acolyte:dcm-tests?handler=" + databaseId
+
+  // Information on book that already exists within storage
+  private val existingTitle : String = "Ruins"
+  private val existingAuthor: String = "Kevin J. Anderson"
 
   var addedTitle: Titles = ""
   var addedAuthor: Authors = ""
@@ -31,6 +36,9 @@ class StubDatabase {
   var addedCover: CoverImageLocations = None
   var addedCategoryAssociations: Set[(ISBNs, Categories)] =
     Set[(ISBNs, Categories)]()
+
+  private var queriedTitle: Titles = ""
+  private var queriedAuthor: Authors = ""
 
   AcolyteDriver.register(
     databaseId,
@@ -43,7 +51,9 @@ class StubDatabase {
     )
 
   private def bookStorageHandler : StatementHandler =
-    AcolyteDSL.handleStatement.withUpdateHandler {
+    AcolyteDSL.handleStatement.withQueryDetection(
+      "^SELECT "
+    ).withUpdateHandler {
       execution: UpdateExecution =>
         execution.sql match {
           case "INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES(?,?,?,?,?);" =>
@@ -76,5 +86,25 @@ class StubDatabase {
               addedCategoryAssociations + ((newISBN, newCategory))
         }
         1
+    } withQueryHandler {
+      query: QueryExecution =>
+      query.sql match {
+        case "SELECT Title FROM bookCatalog WHERE Title=? AND Author=?;" =>
+          val parameters =
+            query.parameters
+          queriedTitle =
+            parameters.head.value.asInstanceOf[Titles]
+          queriedAuthor =
+            parameters.last.value.asInstanceOf[Authors]
+          if (queriedTitle == existingTitle &&
+            queriedAuthor == existingAuthor) {
+            RowLists.stringList(
+              existingTitle
+            )
+          }
+          else {
+            QueryResult.Nil
+          }
+      }
     }
 }

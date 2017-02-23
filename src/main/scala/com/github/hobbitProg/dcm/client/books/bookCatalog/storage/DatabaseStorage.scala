@@ -37,6 +37,10 @@ class DatabaseStorage(
       case noTitleDefined if bookToSave.title == "" => None
       case noAuthorDefined if bookToSave.author == "" => None
       case noISBNDefined if bookToSave.isbn == "" => None
+      case titleAuthorPairAlreadyExists if alreadyExists(
+        bookToSave.title,
+        bookToSave.author
+      ) => None
       case _ =>
         val descriptionSQL =
           bookToSave.description match {
@@ -151,6 +155,19 @@ class DatabaseStorage(
      }
      collectedBooks
    }
+
+  private def alreadyExists(
+    title: String,
+    author: String
+  ) : Boolean = {
+    !sql"SELECT Title FROM bookCatalog WHERE Title=${title} AND Author=${author};"
+      .query[String]
+      .list
+      .transact(catalogConnection)
+      .unsafePerformSync
+      .isEmpty
+  }
+
  }
 
 object DatabaseStorage {

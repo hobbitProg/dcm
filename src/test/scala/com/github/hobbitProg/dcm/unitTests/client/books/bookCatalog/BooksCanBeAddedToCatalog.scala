@@ -254,4 +254,16 @@ class BooksCanBeAddedToCatalog
       }
     }
   }
+
+  "Given a book catalog" - {
+    "and a book containing the same title/author pair as a book already in " +
+    "the catalog" - {
+      "and a listener for book addition events" - {
+        "when the book is placed into the catalog" - {
+          "then the book is not placed into the catalog" in pending
+          "and the book is not given to the listener" in pending
+        }
+      }
+    }
+  }
 }

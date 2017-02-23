@@ -191,4 +191,44 @@ class BooksCanBePlacedIntoStorage
       }
     }
   }
+
+  "Given storage to place books into (with books already in storage)" - {
+    val database =
+      new StubDatabase
+    val bookStorage: Storage =
+      Storage(
+        database.connectionTransactor
+      )
+
+    "and a book containing the same name and author as a book that is " +
+    "already in storage" - {
+      val bookToStore: Book =
+        (
+          "Ruins",
+          "Kevin J. Anderson",
+          "006105223X",
+          Some(
+            "Description for Ruins"
+          ),
+          Some(
+            getClass.getResource(
+              "/Ruins.jpg"
+            ).toURI
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+
+      "when the book is placed into storage" - {
+        val updatedStorage =
+          bookStorage save bookToStore
+
+        "then the book is not placed into storage" in {
+          updatedStorage shouldBe empty
+        }
+      }
+    }
+  }
 }
