@@ -38,8 +38,19 @@ class StorageCanBeQueriedToSeeIfBookCanBeInserted
     }
 
     "and a title and author of a book that already exists within storage" - {
+      val title: Titles = "Ruins"
+      val author: Authors = "Kevin J. Anderson"
+
       "when the storage is queried to see if the associated book can be placed into storage" - {
-        "then storage indicates the associated book cannot be placed into storage" in pending
+        val bookCanBePlacedIntoStorage: Boolean =
+          bookStorage bookCanBePlacedIntoStorage (
+            title,
+            author
+          )
+
+        "then storage indicates the associated book cannot be placed into storage" in {
+          bookCanBePlacedIntoStorage shouldEqual false
+        }
       }
     }
   }

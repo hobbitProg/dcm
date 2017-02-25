@@ -26,8 +26,8 @@ class StubDatabase {
     "jdbc:acolyte:dcm-tests?handler=" + databaseId
 
   // Information on book that already exists within storage
-  private val existingTitle : String = "Ruins"
-  private val existingAuthor: String = "Kevin J. Anderson"
+  private val existingTitle : Titles = "Ruins"
+  private val existingAuthor: Authors = "Kevin J. Anderson"
 
   var addedTitle: Titles = ""
   var addedAuthor: Authors = ""
