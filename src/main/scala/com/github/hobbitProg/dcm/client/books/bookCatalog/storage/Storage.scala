@@ -6,7 +6,7 @@ import scala.collection.Set
 
 import scalaz.concurrent.Task
 
-import com.github.hobbitProg.dcm.client.books.Categories
+import com.github.hobbitProg.dcm.client.books._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
 
 /**
@@ -23,6 +23,18 @@ trait Storage {
   def save(
     bookToSave: Book
   ): Option[Storage]
+
+  /**
+    * Determine if book with given title and author can be placed into storage
+    * @param title Title of book that is to be placed into storage
+    * @param author Author of book that is to be placed into storage
+    * @return True if book with given title and author can be placed into
+    * storage and false otherwise
+    */
+  def bookCanBePlacedIntoStorage(
+    title: Titles,
+    author: Authors
+  ): Boolean
 
   /**
     * Categories that can be associated with books

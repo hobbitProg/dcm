@@ -2,7 +2,7 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogControl
 
 import java.net.URI
 
-import com.github.hobbitProg.dcm.client.books.Categories
+import com.github.hobbitProg.dcm.client.books._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
 import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
 
@@ -61,6 +61,20 @@ class BookCatalogWindowStorage
     books =
       books + bookToSave
     Some(this)
+  }
+
+  /**
+    * Determine if book with given title and author can be placed into storage
+    * @param title Title of book that is to be placed into storage
+    * @param author Author of book that is to be placed into storage
+    * @return True if book with given title and author can be placed into
+    * storage and false otherwise
+    */
+  override def bookCanBePlacedIntoStorage(
+    title: Titles,
+    author: Authors
+  ) = {
+    true
   }
 
   /**

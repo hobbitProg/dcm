@@ -91,20 +91,37 @@ class DatabaseStorage(
     }
   }
 
-   /**
-     * Categories that can be associated with books
-     *
-     * @return Categories that can be associated with books
-     */
-   override def definedCategories: Set[Categories] = {
-     sql"SELECT Category FROM definedCategories;"
-       .query[Categories]
-       .vector
-       .transact(
-         catalogConnection
-       ).unsafePerformSync
-       .toSet
-   }
+    /**
+    * Determine if book with given title and author can be placed into storage
+    * @param title Title of book that is to be placed into storage
+    * @param author Author of book that is to be placed into storage
+    * @return True if book with given title and author can be placed into
+    * storage and false otherwise
+    */
+  override def bookCanBePlacedIntoStorage(
+    title: Titles,
+    author: Authors
+  ): Boolean = {
+    !alreadyExists(
+      title,
+      author
+    )
+  }
+
+  /**
+    * Categories that can be associated with books
+    *
+    * @return Categories that can be associated with books
+    */
+  override def definedCategories: Set[Categories] = {
+    sql"SELECT Category FROM definedCategories;"
+      .query[Categories]
+      .vector
+      .transact(
+        catalogConnection
+      ).unsafePerformSync
+      .toSet
+  }
 
    /**
      * Books that exist in storage
@@ -157,8 +174,8 @@ class DatabaseStorage(
    }
 
   private def alreadyExists(
-    title: String,
-    author: String
+    title: Titles,
+    author: Authors
   ) : Boolean = {
     !sql"SELECT Title FROM bookCatalog WHERE Title=${title} AND Author=${author};"
       .query[String]
