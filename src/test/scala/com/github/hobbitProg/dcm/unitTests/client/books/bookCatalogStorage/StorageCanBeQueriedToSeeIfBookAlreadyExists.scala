@@ -5,7 +5,7 @@ import org.scalatest.{FreeSpec, Matchers}
 import com.github.hobbitProg.dcm.client.books._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
 
-class StorageCanBeQueriedToSeeIfBookCanBeInserted
+class StorageCanBeQueriedToSeeIfBookAlreadyExists
     extends FreeSpec
     with Matchers {
   "Given populated storage to place books into" - {
@@ -22,17 +22,16 @@ class StorageCanBeQueriedToSeeIfBookCanBeInserted
       val title: Titles = "Ground Zero"
       val author: Authors = "Kevin J. Anderson"
 
-      "when the storage is queried to see if the associated book can be " +
-      "placed into storage" - {
-        val bookCanBePlacedIntoStorage: Boolean =
-          bookStorage bookCanBePlacedIntoStorage (
+      "when the storage is queried to see if the associated book is already " +
+      "in storage" - {
+        val bookAlreadyExistsInStorage: Boolean =
+          bookStorage alreadyContains (
             title,
             author
           )
 
-        "then storage indicates the associated book can be placed into " +
-        "storage" in {
-          bookCanBePlacedIntoStorage shouldEqual true
+        "then storage indicates the associated book is not in storage" in {
+          bookAlreadyExistsInStorage shouldEqual false
         }
       }
     }
@@ -41,15 +40,17 @@ class StorageCanBeQueriedToSeeIfBookCanBeInserted
       val title: Titles = "Ruins"
       val author: Authors = "Kevin J. Anderson"
 
-      "when the storage is queried to see if the associated book can be placed into storage" - {
-        val bookCanBePlacedIntoStorage: Boolean =
-          bookStorage bookCanBePlacedIntoStorage (
+      "when the storage is queried to see if the associated book already " +
+      "exists in storage" - {
+        val bookExistsInStorage: Boolean =
+          bookStorage alreadyContains (
             title,
             author
           )
 
-        "then storage indicates the associated book cannot be placed into storage" in {
-          bookCanBePlacedIntoStorage shouldEqual false
+        "then storage indicates the associated book already exists in " +
+        "storage" in {
+          bookExistsInStorage shouldEqual true
         }
       }
     }

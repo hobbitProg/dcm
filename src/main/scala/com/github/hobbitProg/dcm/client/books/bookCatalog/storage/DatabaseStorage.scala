@@ -37,7 +37,7 @@ class DatabaseStorage(
       case noTitleDefined if bookToSave.title == "" => None
       case noAuthorDefined if bookToSave.author == "" => None
       case noISBNDefined if bookToSave.isbn == "" => None
-      case titleAuthorPairAlreadyExists if alreadyExists(
+      case titleAuthorPairAlreadyExists if alreadyContains(
         bookToSave.title,
         bookToSave.author
       ) => None
@@ -91,21 +91,23 @@ class DatabaseStorage(
     }
   }
 
-    /**
-    * Determine if book with given title and author can be placed into storage
+  /**
+    * Determine if book with given title and author already exists in storage
     * @param title Title of book that is to be placed into storage
     * @param author Author of book that is to be placed into storage
-    * @return True if book with given title and author can be placed into
+    * @return True if book with given title and author already exists in
     * storage and false otherwise
     */
-  override def bookCanBePlacedIntoStorage(
+  override def alreadyContains(
     title: Titles,
     author: Authors
   ): Boolean = {
-    !alreadyExists(
-      title,
-      author
-    )
+    !sql"SELECT Title FROM bookCatalog WHERE Title=${title} AND Author=${author};"
+      .query[String]
+      .list
+      .transact(catalogConnection)
+      .unsafePerformSync
+      .isEmpty
   }
 
   /**
@@ -172,20 +174,7 @@ class DatabaseStorage(
      }
      collectedBooks
    }
-
-  private def alreadyExists(
-    title: Titles,
-    author: Authors
-  ) : Boolean = {
-    !sql"SELECT Title FROM bookCatalog WHERE Title=${title} AND Author=${author};"
-      .query[String]
-      .list
-      .transact(catalogConnection)
-      .unsafePerformSync
-      .isEmpty
-  }
-
- }
+}
 
 object DatabaseStorage {
   private val bookCatalogInsertPrefix: String = "INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES"

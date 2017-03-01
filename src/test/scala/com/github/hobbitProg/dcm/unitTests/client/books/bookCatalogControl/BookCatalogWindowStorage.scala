@@ -64,17 +64,17 @@ class BookCatalogWindowStorage
   }
 
   /**
-    * Determine if book with given title and author can be placed into storage
+    * Determine if book with given title and author already exists in storage
     * @param title Title of book that is to be placed into storage
     * @param author Author of book that is to be placed into storage
-    * @return True if book with given title and author can be placed into
+    * @return True if book with given title and author already exists in
     * storage and false otherwise
     */
-  override def bookCanBePlacedIntoStorage(
+  override def alreadyContains(
     title: Titles,
     author: Authors
   ) = {
-    true
+    false
   }
 
   /**
