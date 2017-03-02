@@ -251,7 +251,13 @@ class BookEntryDialog(
   private def bookUnableToBeSaved: Boolean = {
     titleControl.text.value == "" ||
     authorControl.text.value == "" ||
-    isbnControl.text.value == ""
+    isbnControl.text.value == "" ||
+    (titleControl.text.value != "" &&
+      authorControl.text.value != "" &&
+      catalog.alreadyContains (
+        titleControl.text.value,
+        authorControl.text.value
+      ))
   }
 }
 

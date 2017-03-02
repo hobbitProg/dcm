@@ -50,6 +50,18 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalog
         "sci-fi",
         "conspiracy"
       ))
+  private val bookWithDuplicateTitleAndAuthor: Book =
+    ("Ruins",
+      "Kevin J. Anderson",
+      "006105223X",
+      Some("Description for Ground Zero"),
+      Some[URI](
+        bookImageLocation
+      ),
+      Set[String](
+        "sci-fi",
+        "conspiracy"
+      ))
 
   "Given a book catalog" - {
     val catalog: Catalog =
@@ -512,25 +524,125 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalog
   }
 
   "Given a book catalog that contains books" - {
+    val catalog: Catalog =
+      new Catalog(
+        new TestStorage
+      )
+
     "and a collection of defined categories" - {
+      val definedCategories: Set[String] =
+        Set[String](
+          "sci-fi",
+          "conspiracy",
+          "fantasy",
+          "thriller"
+        )
+
       "and a dialog to fill with the details of the book to add to the " +
       "catalog" - {
+        val bookAdditionDialog: Scene =
+          createBookAdditionDialog(
+            catalog,
+            definedCategories
+          )
+
         "and an action to perform when adding a book to the catalog" - {
+          var addedBook: Book = null
+          val addSubscription: Catalog.Subscriptions =
+            catalog onAdd {
+              newBook =>
+              addedBook = newBook
+            }
+
           "when the user enters the title of the new book (which already " +
           "exists within the catalog)" - {
+            activateControl(
+              BookEntryDialog.titleControlId
+            )
+            enterDataIntoControl(
+              bookWithDuplicateTitleAndAuthor.title
+            )
+
             "and the user enters the author of the new book (which also " +
             "already exists within the catalog)" - {
+              activateControl(
+                BookEntryDialog.authorControlId
+              )
+              enterDataIntoControl(
+                bookWithDuplicateTitleAndAuthor.author
+              )
+
               "and the user enters the ISBN of the new book" - {
+                activateControl(
+                  BookEntryDialog.isbnControlId
+                )
+                enterDataIntoControl(
+                  bookWithDuplicateTitleAndAuthor.isbn
+                )
+
                 "and the user enters the description of the new book" - {
+                  activateControl(
+                    BookEntryDialog.descriptionControlId
+                  )
+                  enterDataIntoControl(
+                    bookWithDuplicateTitleAndAuthor.description match {
+                      case Some(existingDescription) => existingDescription
+                      case None => ""
+                    }
+                  )
+
                   "and the user selects the cover image for the new book" - {
+                    activateControl(
+                      BookEntryDialog.bookCoverButtonId
+                    )
+
                     "and the user requests to associate categories with the " +
                     "new book" - {
+                      activateControl(
+                        BookEntryDialog.categorySelectionButtonId
+                      )
+
                       "and the user selects the first category with the new " +
                       "book" - {
+                        selectCategory(
+                          bookWithDuplicateTitleAndAuthor.categories.head
+                        )
+
                         "and the user selects the second category with the " +
                         "new book" - {
+                          selectCategory(
+                            bookWithDuplicateTitleAndAuthor.categories.last
+                          )
+                          activateControl(
+                            CategorySelectionDialog.availableButtonId
+                          )
+                          activateControl(
+                            CategorySelectionDialog.saveButtonId
+                          )
+
                           "then the user cannot accept the information on " +
-                          "the new book" in pending
+                          "the new book" in {
+                            val dialogPane: AnchorPane =
+                              bookAdditionDialog.content.head.asInstanceOf[javafx.scene.layout.AnchorPane]
+                            val saveButton =
+                              dialogPane.children.find {
+                                childControl =>
+                                childControl match {
+                                  case childButton: javafx.scene.control.Button =>
+                                    childButton.getText == "Save"
+                                  case _ => false
+                                }
+                              }
+
+                            saveButton match {
+                              case Some(saveControl) =>
+                                saveControl.disable.value shouldBe true
+                              case None =>
+                                fail(
+                                  "Save button not found"
+                                )
+                            }
+                          }
                         }
                       }
                     }

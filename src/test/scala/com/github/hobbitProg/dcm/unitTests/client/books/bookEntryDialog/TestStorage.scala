@@ -35,7 +35,8 @@ class TestStorage
     title: Titles,
     author: Authors
   ): Boolean = {
-    false
+    title == "Ruins" &&
+    author == "Kevin J. Anderson"
   }
 
   /**
