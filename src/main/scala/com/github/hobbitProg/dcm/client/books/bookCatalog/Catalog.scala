@@ -2,6 +2,7 @@ package com.github.hobbitProg.dcm.client.books.bookCatalog
 
 import sodium.{Listener, StreamSink}
 
+import com.github.hobbitProg.dcm.client.books._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
 
 /**
@@ -61,6 +62,23 @@ class Catalog(
           bookToProcess
         )
     }
+  }
+
+  /**
+    * Determine if catalog already contains book with title/author pair
+    * @param title Title of book being examined
+    * @param author Author of book being examined
+    * @return True if catalog contains book with given title/author pair and
+    * false otherwise
+    */
+  def alreadyContains(
+    title: Titles,
+    author: Authors
+  ): Boolean = {
+    bookStorage alreadyContains (
+      title,
+      author
+    )
   }
 }
 
