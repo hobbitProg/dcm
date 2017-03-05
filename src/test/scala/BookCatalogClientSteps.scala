@@ -18,7 +18,7 @@ import org.testfx.api.{FxRobot, FxRobotContext, FxRobotInterface, FxToolkit}
 import org.testfx.util.{NodeQueryUtils, WaitForAsyncUtils}
 
 import scala.collection.Set
-import scala.collection.convert.wrapAll._
+import scala.collection.convert.ImplicitConversions._
 import scala.language.implicitConversions
 
 import scalafx.Includes._
@@ -296,7 +296,9 @@ class BookCatalogClientSteps
   def bookToAdd(
     newBook: ExamplesTable
   ): Unit = {
-    bookToEnter = mapAsScalaMap(newBook getRow 0)
+    val bookRow : scala.collection.mutable.Map[String, String] =
+      newBook getRow 0
+    bookToEnter = bookRow
   }
 
   @org.jbehave.core.annotations.When("I enter this book into the book catalog")

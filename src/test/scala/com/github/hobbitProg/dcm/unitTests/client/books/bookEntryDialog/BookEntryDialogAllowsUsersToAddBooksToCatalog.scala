@@ -30,686 +30,686 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalog
     with MockFactory
     with Matchers {
   // Robot to automate entering in information
-  val newBookRobot: FxRobotInterface =
-    new FxRobot
+//  val newBookRobot: FxRobotInterface =
+//    new FxRobot
 
   // Valid new book to add
-  val bookImageLocation: URI =
-    getClass.getResource(
-      "/GroundZero.jpg"
-    ).toURI
-  private val validNewBook: Book =
-    ("Ground Zero",
-      "Kevin J. Anderson",
-      "006105223X",
-      Some("Description for Ground Zero"),
-      Some[URI](
-        bookImageLocation
-      ),
-      Set[String](
-        "sci-fi",
-        "conspiracy"
-      ))
-  private val bookWithDuplicateTitleAndAuthor: Book =
-    ("Ruins",
-      "Kevin J. Anderson",
-      "006105223X",
-      Some("Description for Ground Zero"),
-      Some[URI](
-        bookImageLocation
-      ),
-      Set[String](
-        "sci-fi",
-        "conspiracy"
-      ))
-
-  "Given a book catalog" - {
-    val catalog: Catalog =
-      new Catalog(
-        new TestStorage
-      )
-
-    "and a collection of defined categories" - {
-      val definedCategories: Set[String] =
-        Set[String](
-          "sci-fi",
-          "conspiracy",
-          "fantasy",
-          "thriller"
-        )
-
-      "and dialog to fill with details of book to add to catalog" - {
-        val bookAdditionDialog: Scene =
-          createBookAdditionDialog(
-            catalog,
-            definedCategories
-          )
-
-        "and an action to perform when adding a book to the catalog" - {
-          var addedBook: Book = null
-          val addSubscription: Catalog.Subscriptions =
-            catalog onAdd {
-              newBook =>
-              addedBook = newBook
-            }
-
-          "when the user enters the title of the new book" - {
-            activateControl(
-              BookEntryDialog.titleControlId
-            )
-            enterDataIntoControl(
-              validNewBook.title
-            )
-
-            "and the user enters the author of the new book" - {
-              activateControl(
-                BookEntryDialog.authorControlId
-              )
-              enterDataIntoControl(
-                validNewBook.author
-              )
-
-              "and the user enters the ISBN of the new book" - {
-                activateControl(
-                  BookEntryDialog.isbnControlId
-                )
-                enterDataIntoControl(
-                  validNewBook.isbn
-                )
-
-                "and the user enters the description of the new book" - {
-                  activateControl(
-                    BookEntryDialog.descriptionControlId
-                  )
-                  enterDataIntoControl(
-                    validNewBook.description match {
-                      case Some(existingDescription) => existingDescription
-                      case None => ""
-                    }
-                  )
-
-                  "and the user selects the cover image for the new book" - {
-                    activateControl(
-                      BookEntryDialog.bookCoverButtonId
-                    )
-
-                    "and the user requests to associate categories with the new" +
-                    " book" - {
-                      activateControl(
-                        BookEntryDialog.categorySelectionButtonId
-                      )
-
-                      "and the user selects the first category with the new " +
-                      "book" - {
-                        selectCategory(
-                          validNewBook.categories.head
-                        )
-
-                        "and the user selects the second category with the new " +
-                        "book" - {
-                          selectCategory(
-                            validNewBook.categories.last
-                          )
-                          activateControl(
-                            CategorySelectionDialog.availableButtonId
-                          )
-                          activateControl(
-                            CategorySelectionDialog.saveButtonId
-                          )
-
-                          "and the user accepts the information on the new " +
-                          "book" - {
-                            activateControl(
-                              BookEntryDialog.saveButtonId
-                            )
-
-                            "then the dialog is closed" in {
-                              (bookAdditionDialog.window.value == null ||
-                                !bookAdditionDialog.window.value.showing.value) shouldBe true
-                            }
-
-                            "and the book was added to the catalog" in {
-                              addedBook shouldEqual validNewBook
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  "Given a book catalog" - {
-    val catalog: Catalog =
-      new Catalog(
-        new TestStorage
-      )
-
-    "and a collection of defined categories" - {
-      val definedCategories: Set[String] =
-        Set[String](
-          "sci-fi",
-          "conspiracy",
-          "fantasy",
-          "thriller"
-        )
-
-      "and dialog to fill with details of book to add to catalog" - {
-        val bookAdditionDialog: Scene =
-          createBookAdditionDialog(
-            catalog,
-            definedCategories
-          )
-
-        "when the user enters the author of the new book" - {
-          activateControl(
-            BookEntryDialog.authorControlId
-          )
-          enterDataIntoControl(
-            validNewBook.author
-          )
-
-          "and the user enters the ISBN of the new book" - {
-            activateControl(
-              BookEntryDialog.isbnControlId
-            )
-            enterDataIntoControl(
-              validNewBook.isbn
-            )
-
-            "and the user enters the description of the new book" - {
-              activateControl(
-                BookEntryDialog.descriptionControlId
-              )
-              enterDataIntoControl(
-                validNewBook.description match {
-                  case Some(existingDescription) => existingDescription
-                  case None => ""
-                }
-              )
-
-              "and the user selects the cover image for the new book" - {
-                activateControl(
-                  BookEntryDialog.bookCoverButtonId
-                )
-
-                "and the user requests to associate categories with the new book" - {
-                  activateControl(
-                    BookEntryDialog.categorySelectionButtonId
-                  )
-
-                  "and the user selects the first category with the new book" - {
-                    selectCategory(
-                      validNewBook.categories.head
-                    )
-
-                    "and the user selects the second category with the new book" - {
-                      selectCategory(
-                        validNewBook.categories.last
-                      )
-                      activateControl(
-                        CategorySelectionDialog.availableButtonId
-                      )
-                      activateControl(
-                        CategorySelectionDialog.saveButtonId
-                      )
-
-                      "then the user cannot accept the information on the new book" in {
-                        val dialogPane: AnchorPane =
-                          bookAdditionDialog.content.head.asInstanceOf[javafx.scene.layout.AnchorPane]
-                        val saveButton =
-                          dialogPane.children.find {
-                            childControl =>
-                              childControl match {
-                                case childButton: javafx.scene.control.Button =>
-                                  childButton.getText == "Save"
-                                case _ => false
-                              }
-                          }
-
-                        saveButton match {
-                          case Some(saveControl) =>
-                            saveControl.disable.value shouldBe true
-                          case None =>
-                            fail(
-                              "Save button not found"
-                            )
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  "Given a book catalog" - {
-    val catalog: Catalog =
-      new Catalog(
-        new TestStorage
-      )
-
-    "and a collection of defined categories" - {
-      val definedCategories: Set[String] =
-        Set[String](
-          "sci-fi",
-          "conspiracy",
-          "fantasy",
-          "thriller"
-        )
-
-      "and dialog to fill with details of book to add to catalog" - {
-        val bookAdditionDialog: Scene =
-          createBookAdditionDialog(
-            catalog,
-            definedCategories
-          )
-
-        "when the user enters the title of the new book" - {
-          activateControl(
-            BookEntryDialog.titleControlId
-          )
-          enterDataIntoControl(
-            validNewBook.title
-          )
-
-          "and the user enters the ISBN of the new book" - {
-            activateControl(
-              BookEntryDialog.isbnControlId
-            )
-            enterDataIntoControl(
-              validNewBook.isbn
-            )
-
-            "and the user enters the description of the new book" - {
-              activateControl(
-                BookEntryDialog.descriptionControlId
-              )
-              enterDataIntoControl(
-                validNewBook.description match {
-                  case Some(existingDescription) => existingDescription
-                  case None => ""
-                }
-              )
-
-              "and the user selects the cover image for the new book" - {
-                activateControl(
-                  BookEntryDialog.bookCoverButtonId
-                )
-
-                "and the user requests to associate categories with the new book" - {
-                  activateControl(
-                    BookEntryDialog.categorySelectionButtonId
-                  )
-
-                  "and the user selects the first category with the new book" - {
-                      selectCategory(
-                        validNewBook.categories.head
-                      )
-
-                    "and the user selects the second category with the new book" - {
-                        selectCategory(
-                          validNewBook.categories.last
-                        )
-                        activateControl(
-                          CategorySelectionDialog.availableButtonId
-                        )
-                        activateControl(
-                          CategorySelectionDialog.saveButtonId
-                        )
-
-                      "then the user cannot accept the information on the new book" in {
-                        val dialogPane: AnchorPane =
-                          bookAdditionDialog.content.head.asInstanceOf[javafx.scene.layout.AnchorPane]
-                        val saveButton =
-                          dialogPane.children.find {
-                            childControl =>
-                              childControl match {
-                                case childButton: javafx.scene.control.Button =>
-                                  childButton.getText == "Save"
-                                case _ => false
-                              }
-                          }
-
-                        saveButton match {
-                          case Some(saveControl) =>
-                            saveControl.disable.value shouldBe true
-                          case None =>
-                            fail(
-                              "Save button not found"
-                            )
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  "Given a book catalog" - {
-    val catalog: Catalog =
-      new Catalog(
-        new TestStorage
-      )
-
-    "and a collection of defined categories" - {
-      val definedCategories: Set[String] =
-        Set[String](
-          "sci-fi",
-          "conspiracy",
-          "fantasy",
-          "thriller"
-        )
-
-      "and a dialog to fill with the details of the book to add to the " +
-      "catalog" - {
-        val bookAdditionDialog: Scene =
-          createBookAdditionDialog(
-            catalog,
-            definedCategories
-          )
-
-        "and an action to perform when adding a book to the catalog" - {
-          var addedBook: Book = null
-          val addSubscription: Catalog.Subscriptions =
-            catalog onAdd {
-              newBook =>
-              addedBook = newBook
-            }
-
-          "when the user enters the title of the new book" - {
-            activateControl(
-              BookEntryDialog.titleControlId
-            )
-            enterDataIntoControl(
-              validNewBook.title
-            )
-
-            "and the user enters the author of the new book" - {
-              activateControl(
-                BookEntryDialog.authorControlId
-              )
-              enterDataIntoControl(
-                validNewBook.author
-              )
-
-              "and the user enters the description of the new book" - {
-                  activateControl(
-                    BookEntryDialog.descriptionControlId
-                  )
-                  enterDataIntoControl(
-                    validNewBook.description match {
-                      case Some(existingDescription) => existingDescription
-                      case None => ""
-                    }
-                  )
-
-                "and the user selects the cover image for the new book" - {
-                    activateControl(
-                      BookEntryDialog.bookCoverButtonId
-                    )
-
-                  "and the user requests to associate categories with the " +
-                  "new book" - {
-                      activateControl(
-                        BookEntryDialog.categorySelectionButtonId
-                      )
-
-                    "and the user selects the first category with the new " +
-                    "book" - {
-                        selectCategory(
-                          validNewBook.categories.head
-                        )
-
-                      "and the user selects the second category with the " +
-                      "new book" - {
-                          selectCategory(
-                            validNewBook.categories.last
-                          )
-                          activateControl(
-                            CategorySelectionDialog.availableButtonId
-                          )
-                          activateControl(
-                            CategorySelectionDialog.saveButtonId
-                          )
-
-                        "then the user cannot accept the information on " +
-                        "the new book" in {
-                          val dialogPane: AnchorPane =
-                            bookAdditionDialog.content.head.asInstanceOf[javafx.scene.layout.AnchorPane]
-                          val saveButton =
-                            dialogPane.children.find {
-                              childControl =>
-                              childControl match {
-                                case childButton: javafx.scene.control.Button =>
-                                  childButton.getText == "Save"
-                                case _ => false
-                              }
-                            }
-
-                          saveButton match {
-                            case Some(saveControl) =>
-                              saveControl.disable.value shouldBe true
-                            case None =>
-                              fail(
-                                "Save button not found"
-                              )
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  "Given a book catalog that contains books" - {
-    val catalog: Catalog =
-      new Catalog(
-        new TestStorage
-      )
-
-    "and a collection of defined categories" - {
-      val definedCategories: Set[String] =
-        Set[String](
-          "sci-fi",
-          "conspiracy",
-          "fantasy",
-          "thriller"
-        )
-
-      "and a dialog to fill with the details of the book to add to the " +
-      "catalog" - {
-        val bookAdditionDialog: Scene =
-          createBookAdditionDialog(
-            catalog,
-            definedCategories
-          )
-
-        "and an action to perform when adding a book to the catalog" - {
-          var addedBook: Book = null
-          val addSubscription: Catalog.Subscriptions =
-            catalog onAdd {
-              newBook =>
-              addedBook = newBook
-            }
-
-          "when the user enters the title of the new book (which already " +
-          "exists within the catalog)" - {
-            activateControl(
-              BookEntryDialog.titleControlId
-            )
-            enterDataIntoControl(
-              bookWithDuplicateTitleAndAuthor.title
-            )
-
-            "and the user enters the author of the new book (which also " +
-            "already exists within the catalog)" - {
-              activateControl(
-                BookEntryDialog.authorControlId
-              )
-              enterDataIntoControl(
-                bookWithDuplicateTitleAndAuthor.author
-              )
-
-              "and the user enters the ISBN of the new book" - {
-                activateControl(
-                  BookEntryDialog.isbnControlId
-                )
-                enterDataIntoControl(
-                  bookWithDuplicateTitleAndAuthor.isbn
-                )
-
-                "and the user enters the description of the new book" - {
-                  activateControl(
-                    BookEntryDialog.descriptionControlId
-                  )
-                  enterDataIntoControl(
-                    bookWithDuplicateTitleAndAuthor.description match {
-                      case Some(existingDescription) => existingDescription
-                      case None => ""
-                    }
-                  )
-
-                  "and the user selects the cover image for the new book" - {
-                    activateControl(
-                      BookEntryDialog.bookCoverButtonId
-                    )
-
-                    "and the user requests to associate categories with the " +
-                    "new book" - {
-                      activateControl(
-                        BookEntryDialog.categorySelectionButtonId
-                      )
-
-                      "and the user selects the first category with the new " +
-                      "book" - {
-                        selectCategory(
-                          bookWithDuplicateTitleAndAuthor.categories.head
-                        )
-
-                        "and the user selects the second category with the " +
-                        "new book" - {
-                          selectCategory(
-                            bookWithDuplicateTitleAndAuthor.categories.last
-                          )
-                          activateControl(
-                            CategorySelectionDialog.availableButtonId
-                          )
-                          activateControl(
-                            CategorySelectionDialog.saveButtonId
-                          )
-
-                          "then the user cannot accept the information on " +
-                          "the new book" in {
-                            val dialogPane: AnchorPane =
-                              bookAdditionDialog.content.head.asInstanceOf[javafx.scene.layout.AnchorPane]
-                            val saveButton =
-                              dialogPane.children.find {
-                                childControl =>
-                                childControl match {
-                                  case childButton: javafx.scene.control.Button =>
-                                    childButton.getText == "Save"
-                                  case _ => false
-                                }
-                              }
-
-                            saveButton match {
-                              case Some(saveControl) =>
-                                saveControl.disable.value shouldBe true
-                              case None =>
-                                fail(
-                                  "Save button not found"
-                                )
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+//  val bookImageLocation: URI =
+//    getClass.getResource(
+//      "/GroundZero.jpg"
+//    ).toURI
+//  private val validNewBook: Book =
+//    ("Ground Zero",
+//      "Kevin J. Anderson",
+//      "006105223X",
+//      Some("Description for Ground Zero"),
+//      Some[URI](
+//        bookImageLocation
+//      ),
+//      Set[String](
+//        "sci-fi",
+//        "conspiracy"
+//      ))
+//  private val bookWithDuplicateTitleAndAuthor: Book =
+//    ("Ruins",
+//      "Kevin J. Anderson",
+//      "006105223X",
+//      Some("Description for Ground Zero"),
+//      Some[URI](
+//        bookImageLocation
+//      ),
+//      Set[String](
+//        "sci-fi",
+//        "conspiracy"
+//      ))
+
+//  "Given a book catalog" - {
+//    val catalog: Catalog =
+//      new Catalog(
+//        new TestStorage
+//      )
+
+//    "and a collection of defined categories" - {
+//      val definedCategories: Set[String] =
+//        Set[String](
+//          "sci-fi",
+//          "conspiracy",
+//          "fantasy",
+//          "thriller"
+//        )
+
+//      "and dialog to fill with details of book to add to catalog" - {
+//        val bookAdditionDialog: Scene =
+//          createBookAdditionDialog(
+//            catalog,
+//            definedCategories
+//          )
+
+//        "and an action to perform when adding a book to the catalog" - {
+//          var addedBook: Book = null
+//          val addSubscription: Catalog.Subscriptions =
+//            catalog onAdd {
+//              newBook =>
+//              addedBook = newBook
+//            }
+
+//          "when the user enters the title of the new book" - {
+//            activateControl(
+//              BookEntryDialog.titleControlId
+//            )
+//            enterDataIntoControl(
+//              validNewBook.title
+//            )
+
+//            "and the user enters the author of the new book" - {
+//              activateControl(
+//                BookEntryDialog.authorControlId
+//              )
+//              enterDataIntoControl(
+//                validNewBook.author
+//              )
+
+//              "and the user enters the ISBN of the new book" - {
+//                activateControl(
+//                  BookEntryDialog.isbnControlId
+//                )
+//                enterDataIntoControl(
+//                  validNewBook.isbn
+//                )
+
+//                "and the user enters the description of the new book" - {
+//                  activateControl(
+//                    BookEntryDialog.descriptionControlId
+//                  )
+//                  enterDataIntoControl(
+//                    validNewBook.description match {
+//                      case Some(existingDescription) => existingDescription
+//                      case None => ""
+//                    }
+//                  )
+
+//                  "and the user selects the cover image for the new book" - {
+//                    activateControl(
+//                      BookEntryDialog.bookCoverButtonId
+//                    )
+
+//                    "and the user requests to associate categories with the new" +
+//                    " book" - {
+//                      activateControl(
+//                        BookEntryDialog.categorySelectionButtonId
+//                      )
+
+//                      "and the user selects the first category with the new " +
+//                      "book" - {
+//                        selectCategory(
+//                          validNewBook.categories.head
+//                        )
+
+//                        "and the user selects the second category with the new " +
+//                        "book" - {
+//                          selectCategory(
+//                            validNewBook.categories.last
+//                          )
+//                          activateControl(
+//                            CategorySelectionDialog.availableButtonId
+//                          )
+//                          activateControl(
+//                            CategorySelectionDialog.saveButtonId
+//                          )
+
+//                          "and the user accepts the information on the new " +
+//                          "book" - {
+//                            activateControl(
+//                              BookEntryDialog.saveButtonId
+//                            )
+
+//                            "then the dialog is closed" in {
+//                              (bookAdditionDialog.window.value == null ||
+//                                !bookAdditionDialog.window.value.showing.value) shouldBe true
+//                            }
+
+//                            "and the book was added to the catalog" in {
+//                              addedBook shouldEqual validNewBook
+//                            }
+//                          }
+//                        }
+//                      }
+//                    }
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
+
+//  "Given a book catalog" - {
+//    val catalog: Catalog =
+//      new Catalog(
+//        new TestStorage
+//      )
+
+//    "and a collection of defined categories" - {
+//      val definedCategories: Set[String] =
+//        Set[String](
+//          "sci-fi",
+//          "conspiracy",
+//          "fantasy",
+//          "thriller"
+//        )
+
+//      "and dialog to fill with details of book to add to catalog" - {
+//        val bookAdditionDialog: Scene =
+//          createBookAdditionDialog(
+//            catalog,
+//            definedCategories
+//          )
+
+//        "when the user enters the author of the new book" - {
+//          activateControl(
+//            BookEntryDialog.authorControlId
+//          )
+//          enterDataIntoControl(
+//            validNewBook.author
+//          )
+
+//          "and the user enters the ISBN of the new book" - {
+//            activateControl(
+//              BookEntryDialog.isbnControlId
+//            )
+//            enterDataIntoControl(
+//              validNewBook.isbn
+//            )
+
+//            "and the user enters the description of the new book" - {
+//              activateControl(
+//                BookEntryDialog.descriptionControlId
+//              )
+//              enterDataIntoControl(
+//                validNewBook.description match {
+//                  case Some(existingDescription) => existingDescription
+//                  case None => ""
+//                }
+//              )
+
+//              "and the user selects the cover image for the new book" - {
+//                activateControl(
+//                  BookEntryDialog.bookCoverButtonId
+//                )
+
+//                "and the user requests to associate categories with the new book" - {
+//                  activateControl(
+//                    BookEntryDialog.categorySelectionButtonId
+//                  )
+
+//                  "and the user selects the first category with the new book" - {
+//                    selectCategory(
+//                      validNewBook.categories.head
+//                    )
+
+//                    "and the user selects the second category with the new book" - {
+//                      selectCategory(
+//                        validNewBook.categories.last
+//                      )
+//                      activateControl(
+//                        CategorySelectionDialog.availableButtonId
+//                      )
+//                      activateControl(
+//                        CategorySelectionDialog.saveButtonId
+//                      )
+
+//                      "then the user cannot accept the information on the new book" in {
+//                        val dialogPane: AnchorPane =
+//                          bookAdditionDialog.content.head.asInstanceOf[javafx.scene.layout.AnchorPane]
+//                        val saveButton =
+//                          dialogPane.children.find {
+//                            childControl =>
+//                              childControl match {
+//                                case childButton: javafx.scene.control.Button =>
+//                                  childButton.getText == "Save"
+//                                case _ => false
+//                              }
+//                          }
+
+//                        saveButton match {
+//                          case Some(saveControl) =>
+//                            saveControl.disable.value shouldBe true
+//                          case None =>
+//                            fail(
+//                              "Save button not found"
+//                            )
+//                        }
+//                      }
+//                    }
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
+
+//  "Given a book catalog" - {
+//    val catalog: Catalog =
+//      new Catalog(
+//        new TestStorage
+//      )
+
+//    "and a collection of defined categories" - {
+//      val definedCategories: Set[String] =
+//        Set[String](
+//          "sci-fi",
+//          "conspiracy",
+//          "fantasy",
+//          "thriller"
+//        )
+
+//      "and dialog to fill with details of book to add to catalog" - {
+//        val bookAdditionDialog: Scene =
+//          createBookAdditionDialog(
+//            catalog,
+//            definedCategories
+//          )
+
+//        "when the user enters the title of the new book" - {
+//          activateControl(
+//            BookEntryDialog.titleControlId
+//          )
+//          enterDataIntoControl(
+//            validNewBook.title
+//          )
+
+//          "and the user enters the ISBN of the new book" - {
+//            activateControl(
+//              BookEntryDialog.isbnControlId
+//            )
+//            enterDataIntoControl(
+//              validNewBook.isbn
+//            )
+
+//            "and the user enters the description of the new book" - {
+//              activateControl(
+//                BookEntryDialog.descriptionControlId
+//              )
+//              enterDataIntoControl(
+//                validNewBook.description match {
+//                  case Some(existingDescription) => existingDescription
+//                  case None => ""
+//                }
+//              )
+
+//              "and the user selects the cover image for the new book" - {
+//                activateControl(
+//                  BookEntryDialog.bookCoverButtonId
+//                )
+
+//                "and the user requests to associate categories with the new book" - {
+//                  activateControl(
+//                    BookEntryDialog.categorySelectionButtonId
+//                  )
+
+//                  "and the user selects the first category with the new book" - {
+//                      selectCategory(
+//                        validNewBook.categories.head
+//                      )
+
+//                    "and the user selects the second category with the new book" - {
+//                        selectCategory(
+//                          validNewBook.categories.last
+//                        )
+//                        activateControl(
+//                          CategorySelectionDialog.availableButtonId
+//                        )
+//                        activateControl(
+//                          CategorySelectionDialog.saveButtonId
+//                        )
+
+//                      "then the user cannot accept the information on the new book" in {
+//                        val dialogPane: AnchorPane =
+//                          bookAdditionDialog.content.head.asInstanceOf[javafx.scene.layout.AnchorPane]
+//                        val saveButton =
+//                          dialogPane.children.find {
+//                            childControl =>
+//                              childControl match {
+//                                case childButton: javafx.scene.control.Button =>
+//                                  childButton.getText == "Save"
+//                                case _ => false
+//                              }
+//                          }
+
+//                        saveButton match {
+//                          case Some(saveControl) =>
+//                            saveControl.disable.value shouldBe true
+//                          case None =>
+//                            fail(
+//                              "Save button not found"
+//                            )
+//                        }
+//                      }
+//                    }
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
+
+//  "Given a book catalog" - {
+//    val catalog: Catalog =
+//      new Catalog(
+//        new TestStorage
+//      )
+
+//    "and a collection of defined categories" - {
+//      val definedCategories: Set[String] =
+//        Set[String](
+//          "sci-fi",
+//          "conspiracy",
+//          "fantasy",
+//          "thriller"
+//        )
+
+//      "and a dialog to fill with the details of the book to add to the " +
+//      "catalog" - {
+//        val bookAdditionDialog: Scene =
+//          createBookAdditionDialog(
+//            catalog,
+//            definedCategories
+//          )
+
+//        "and an action to perform when adding a book to the catalog" - {
+//          var addedBook: Book = null
+//          val addSubscription: Catalog.Subscriptions =
+//            catalog onAdd {
+//              newBook =>
+//              addedBook = newBook
+//            }
+
+//          "when the user enters the title of the new book" - {
+//            activateControl(
+//              BookEntryDialog.titleControlId
+//            )
+//            enterDataIntoControl(
+//              validNewBook.title
+//            )
+
+//            "and the user enters the author of the new book" - {
+//              activateControl(
+//                BookEntryDialog.authorControlId
+//              )
+//              enterDataIntoControl(
+//                validNewBook.author
+//              )
+
+//              "and the user enters the description of the new book" - {
+//                  activateControl(
+//                    BookEntryDialog.descriptionControlId
+//                  )
+//                  enterDataIntoControl(
+//                    validNewBook.description match {
+//                      case Some(existingDescription) => existingDescription
+//                      case None => ""
+//                    }
+//                  )
+
+//                "and the user selects the cover image for the new book" - {
+//                    activateControl(
+//                      BookEntryDialog.bookCoverButtonId
+//                    )
+
+//                  "and the user requests to associate categories with the " +
+//                  "new book" - {
+//                      activateControl(
+//                        BookEntryDialog.categorySelectionButtonId
+//                      )
+
+//                    "and the user selects the first category with the new " +
+//                    "book" - {
+//                        selectCategory(
+//                          validNewBook.categories.head
+//                        )
+
+//                      "and the user selects the second category with the " +
+//                      "new book" - {
+//                          selectCategory(
+//                            validNewBook.categories.last
+//                          )
+//                          activateControl(
+//                            CategorySelectionDialog.availableButtonId
+//                          )
+//                          activateControl(
+//                            CategorySelectionDialog.saveButtonId
+//                          )
+
+//                        "then the user cannot accept the information on " +
+//                        "the new book" in {
+//                          val dialogPane: AnchorPane =
+//                            bookAdditionDialog.content.head.asInstanceOf[javafx.scene.layout.AnchorPane]
+//                          val saveButton =
+//                            dialogPane.children.find {
+//                              childControl =>
+//                              childControl match {
+//                                case childButton: javafx.scene.control.Button =>
+//                                  childButton.getText == "Save"
+//                                case _ => false
+//                              }
+//                            }
+
+//                          saveButton match {
+//                            case Some(saveControl) =>
+//                              saveControl.disable.value shouldBe true
+//                            case None =>
+//                              fail(
+//                                "Save button not found"
+  //                            )
+//                          }
+//                        }
+//                      }
+//                    }
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
+
+//  "Given a book catalog that contains books" - {
+//    val catalog: Catalog =
+//      new Catalog(
+//        new TestStorage
+//      )
+
+//    "and a collection of defined categories" - {
+//      val definedCategories: Set[String] =
+//        Set[String](
+//          "sci-fi",
+//          "conspiracy",
+//          "fantasy",
+//          "thriller"
+//        )
+
+//      "and a dialog to fill with the details of the book to add to the " +
+//      "catalog" - {
+//        val bookAdditionDialog: Scene =
+//          createBookAdditionDialog(
+//            catalog,
+//            definedCategories
+//          )
+
+//        "and an action to perform when adding a book to the catalog" - {
+//          var addedBook: Book = null
+//          val addSubscription: Catalog.Subscriptions =
+//            catalog onAdd {
+//              newBook =>
+//              addedBook = newBook
+//            }
+
+//          "when the user enters the title of the new book (which already " +
+//          "exists within the catalog)" - {
+//            activateControl(
+//              BookEntryDialog.titleControlId
+//            )
+//            enterDataIntoControl(
+//              bookWithDuplicateTitleAndAuthor.title
+//            )
+
+//            "and the user enters the author of the new book (which also " +
+//            "already exists within the catalog)" - {
+//              activateControl(
+//                BookEntryDialog.authorControlId
+//              )
+//              enterDataIntoControl(
+//                bookWithDuplicateTitleAndAuthor.author
+//              )
+
+  //            "and the user enters the ISBN of the new book" - {
+//                activateControl(
+//                  BookEntryDialog.isbnControlId
+//                )
+//                enterDataIntoControl(
+//                  bookWithDuplicateTitleAndAuthor.isbn
+//                )
+
+//                "and the user enters the description of the new book" - {
+//                  activateControl(
+//                    BookEntryDialog.descriptionControlId
+//                  )
+//                  enterDataIntoControl(
+//                    bookWithDuplicateTitleAndAuthor.description match {
+//                      case Some(existingDescription) => existingDescription
+//                      case None => ""
+//                    }
+//                  )
+
+//                  "and the user selects the cover image for the new book" - {
+//                    activateControl(
+//                      BookEntryDialog.bookCoverButtonId
+//                    )
+
+//                    "and the user requests to associate categories with the " +
+//                    "new book" - {
+//                      activateControl(
+//                        BookEntryDialog.categorySelectionButtonId
+//                      )
+
+//                      "and the user selects the first category with the new " +
+//                      "book" - {
+//                        selectCategory(
+//                          bookWithDuplicateTitleAndAuthor.categories.head
+//                        )
+
+//                        "and the user selects the second category with the " +
+//                        "new book" - {
+//                          selectCategory(
+//                            bookWithDuplicateTitleAndAuthor.categories.last
+//                          )
+//                          activateControl(
+//                            CategorySelectionDialog.availableButtonId
+//                          )
+//                          activateControl(
+//                            CategorySelectionDialog.saveButtonId
+//                          )
+
+//                          "then the user cannot accept the information on " +
+//                          "the new book" in {
+//                            val dialogPane: AnchorPane =
+//                              bookAdditionDialog.content.head.asInstanceOf[javafx.scene.layout.AnchorPane]
+//                            val saveButton =
+//                              dialogPane.children.find {
+//                                childControl =>
+//                                childControl match {
+//                                  case childButton: javafx.scene.control.Button =>
+//                                    childButton.getText == "Save"
+//                                  case _ => false
+//                                }
+//                              }
+
+//                            saveButton match {
+//                              case Some(saveControl) =>
+//                                saveControl.disable.value shouldBe true
+//                              case None =>
+//                                fail(
+//                                  "Save button not found"
+//                                )
+//                            }
+//                          }
+//                        }
+//                      }
+//                    }
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
 
   /**
     * Activate control to edit
     * @param controlId ID of control to activate
     */
-  private def activateControl(
-    controlId: String
-  ) = {
-    newBookRobot.clickOn(
-      NodeQueryUtils hasId controlId,
-      MouseButton.PRIMARY
-    )
-  }
+//  private def activateControl(
+//    controlId: String
+//  ) = {
+//    newBookRobot.clickOn(
+//      NodeQueryUtils hasId controlId,
+//      MouseButton.PRIMARY
+//    )
+//  }
 
   /**
     * Select given category
     * @param category Category to select
     */
-  private def selectCategory(
-    category: String
-  ) = {
-    newBookRobot.press(
-      KeyCode.CONTROL
-    )
-    newBookRobot.clickOn(
-      NodeQueryUtils hasText category,
-      MouseButton.PRIMARY
-    )
-    newBookRobot.release(
-      KeyCode.CONTROL
-    )
-  }
+//  private def selectCategory(
+//    category: String
+//  ) = {
+//    newBookRobot.press(
+//      KeyCode.CONTROL
+//    )
+//    newBookRobot.clickOn(
+//      NodeQueryUtils hasText category,
+//      MouseButton.PRIMARY
+//    )
+//    newBookRobot.release(
+//      KeyCode.CONTROL
+//    )
+//  }
 
   /**
     * Enter data into currently active control
     * @param dataToEnter Data to place into control
     */
-  private def enterDataIntoControl(
-    dataToEnter: String
-  ) = {
-    //noinspection ScalaUnusedSymbol,ScalaUnusedSymbol
-    dataToEnter.toCharArray foreach {
-      case current@upperCase if current.isLetter && current.isUpper =>
-        newBookRobot push(
-          KeyCode.SHIFT,
-          KeyCode getKeyCode upperCase.toString
-        )
-      case current@space if current == ' ' =>
-        newBookRobot push KeyCode.SPACE
-      case current@period if current == '.' =>
-        newBookRobot push KeyCode.PERIOD
-      case current =>
-        newBookRobot push (KeyCode getKeyCode current.toUpper.toString)
-    }
-  }
+//  private def enterDataIntoControl(
+//    dataToEnter: String
+//  ) = {
+//    //noinspection ScalaUnusedSymbol,ScalaUnusedSymbol
+//    dataToEnter.toCharArray foreach {
+//      case current@upperCase if current.isLetter && current.isUpper =>
+//        newBookRobot push(
+//          KeyCode.SHIFT,
+//          KeyCode getKeyCode upperCase.toString
+//        )
+//      case current@space if current == ' ' =>
+//        newBookRobot push KeyCode.SPACE
+//      case current@period if current == '.' =>
+//        newBookRobot push KeyCode.PERIOD
+//      case current =>
+//        newBookRobot push (KeyCode getKeyCode current.toUpper.toString)
+//    }
+//  }
 
   /**
     * Create dialog to add book to catalog
@@ -719,52 +719,52 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalog
     *
     * @return Dialog to add book to catalog
     */
-  private def createBookAdditionDialog(
-    catalog: Catalog,
-    definedCategories: Set[String]
-  ): Scene = {
+//  private def createBookAdditionDialog(
+//    catalog: Catalog,
+//    definedCategories: Set[String]
+//  ): Scene = {
     // Create mock file chooser
-    val coverImageChooser =
-      mock[FileChooser]
+//    val coverImageChooser =
+//      mock[FileChooser]
 
     // Create test application
-    FxToolkit.registerPrimaryStage()
-    FxToolkit.setupApplication(
-      new Supplier[Application] {
-        override def get(): BookEntryUnitTestApplication = {
-          new BookEntryUnitTestApplication
-        }
-      }
-    )
-    FxToolkit.showStage()
+//    FxToolkit.registerPrimaryStage()
+//    FxToolkit.setupApplication(
+//      new Supplier[Application] {
+//        override def get(): BookEntryUnitTestApplication = {
+//          new BookEntryUnitTestApplication
+//        }
+//      }
+//    )
+//    FxToolkit.showStage()
 
     // Create dialog to add book to catalog
-    val bookEntryDialog =
-      new BookEntryDialog(
-        coverImageChooser,
-        catalog,
-        definedCategories
-      )
-    val bookEntryStage: javafx.stage.Stage =
-      FxToolkit.setupStage(
-        new Consumer[javafx.stage.Stage] {
-          override def accept(t: javafx.stage.Stage): Unit = {
-            t.scene = bookEntryDialog
-          }
-        }
-      )
+//    val bookEntryDialog =
+//      new BookEntryDialog(
+//        coverImageChooser,
+//        catalog,
+//        definedCategories
+//      )
+//    val bookEntryStage: javafx.stage.Stage =
+//      FxToolkit.setupStage(
+//        new Consumer[javafx.stage.Stage] {
+//          override def accept(t: javafx.stage.Stage): Unit = {
+//            t.scene = bookEntryDialog
+//          }
+//        }
+//      )
 
     // Create expectations for mock file chooser
-    (coverImageChooser.showOpenDialog _).expects(
-      jfxStage2sfx(
-        bookEntryStage
-      )
-    ).returning(
-      new File(
-        bookImageLocation
-      )
-    )
+//    (coverImageChooser.showOpenDialog _).expects(
+//      jfxStage2sfx(
+//        bookEntryStage
+//      )
+//    ).returning(
+//      new File(
+//        bookImageLocation
+//      )
+//    )
 
-    bookEntryDialog
-  }
+//    bookEntryDialog
+//  }
 }

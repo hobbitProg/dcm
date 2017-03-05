@@ -33,7 +33,7 @@ class BookCatalogControl(
               }
               items.value sort {
                 (left: Book, right: Book) =>
-                  lt(
+                  compare(
                     left.title, right.title
                   )
               }
@@ -52,7 +52,7 @@ class BookCatalogControl(
   }
   items.value sort {
     (left: Book, right: Book) =>
-      lt(
+      compare(
         left.title, right.title
       )
   }
@@ -65,7 +65,7 @@ class BookCatalogControl(
         items.value += newBook
         items.value sort {
           (left: Book, right: Book) =>
-            lt(
+            compare(
               left.title, right.title
             )
         }

@@ -24,92 +24,92 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
 class BookCatalogControlsRefreshWhenBookCatalogUpdates
   extends FreeSpec
     with Matchers {
-  "Given a populated book catalog" - {
-    val populatedCatalog: Catalog =
-      new Catalog(
-        new BookCatalogWindowStorage
-      )
+//  "Given a populated book catalog" - {
+//    val populatedCatalog: Catalog =
+//      new Catalog(
+//        new BookCatalogWindowStorage
+//      )
 
-     "and a book catalog window" - {
-       val testScene: BookCatalogScene =
-         createBookCatalogControlScene(
-           populatedCatalog
-         )
+//     "and a book catalog window" - {
+//       val testScene: BookCatalogScene =
+//         createBookCatalogControlScene(
+//           populatedCatalog
+//         )
 
-      "and a book to place into the book catalog" - {
-        val newBook: Book =
-          (
-            "Ground Zero",
-            "Kevin J. Anderson",
-            "006105223X",
-            Some("Description for Ground Zero"),
-            Some[URI](
-              getClass.getResource(
-                "/GroundZero.jpg"
-              ).toURI
-            ),
-            Set(
-              "sci-fi",
-              "conspiracy"
-            )
-          )
+//      "and a book to place into the book catalog" - {
+//        val newBook: Book =
+//          (
+//            "Ground Zero",
+//            "Kevin J. Anderson",
+//            "006105223X",
+//            Some("Description for Ground Zero"),
+//            Some[URI](
+//              getClass.getResource(
+//                "/GroundZero.jpg"
+//              ).toURI
+//            ),
+//            Set(
+//              "sci-fi",
+//              "conspiracy"
+//            )
+//          )
 
-        "when the book is placed into the book catalog" - {
-          //noinspection ScalaUnusedSymbol
-          val updatedCatalog =
-            populatedCatalog + newBook
+//        "when the book is placed into the book catalog" - {
+//          //noinspection ScalaUnusedSymbol
+//          val updatedCatalog =
+//            populatedCatalog + newBook
 
-          "then the new book is displayed on the book catalog window" in {
-            testScene.catalogControl.items.value.toSet should contain (newBook)
-          }
+//          "then the new book is displayed on the book catalog window" in {
+//            testScene.catalogControl.items.value.toSet should contain (newBook)
+//          }
 
-          "and the books originally in the book catalog are still displayed " +
-            "on the book catalog" in {
-            testScene.catalogControl.items.value.toSet should contain
-              populatedCatalog.bookStorage.asInstanceOf[BookCatalogWindowStorage].books
-          }
+//          "and the books originally in the book catalog are still displayed " +
+//            "on the book catalog" in {
+//            testScene.catalogControl.items.value.toSet should contain
+//              populatedCatalog.bookStorage.asInstanceOf[BookCatalogWindowStorage].books
+//          }
 
-        }
-      }
-    }
-  }
+//        }
+//      }
+//    }
+//  }
 
   /**
     * Create scene that contains book catalog control
     * @param catalog Book catalog to use in control
     * @return Scene that contains book catalog control
     */
-  private def createBookCatalogControlScene(
-    catalog: Catalog
-  ): BookCatalogScene = {
+//  private def createBookCatalogControlScene(
+//    catalog: Catalog
+//  ): BookCatalogScene = {
     // Create test application
-    FxToolkit.registerPrimaryStage()
-    FxToolkit.setupApplication(
-      new Supplier[Application] {
-        override def get(): BookCatalogControlUnitTestApplication = {
-          new BookCatalogControlUnitTestApplication
-        }
-      }
-    )
-    FxToolkit.showStage()
+//    FxToolkit.registerPrimaryStage()
+//    FxToolkit.setupApplication(
+//      new Supplier[Application] {
+//        override def get(): BookCatalogControlUnitTestApplication = {
+//          new BookCatalogControlUnitTestApplication
+//        }
+//      }
+//    )
+//    FxToolkit.showStage()
 
     // Create scene that contains book catalog control
-    val catalogScene: BookCatalogScene =
-      new BookCatalogScene(
-        catalog
-      )
-    FxToolkit.setupStage(
-      new Consumer[Stage] {
-        override def accept(
-          t: Stage
-        ): Unit = {
-          t.scene =
-            catalogScene
-        }
-      }
-    )
-    FxToolkit.showStage()
+//    val catalogScene: BookCatalogScene =
+//      new BookCatalogScene(
+//        catalog
+//      )
+//    FxToolkit.setupStage(
+//      new Consumer[Stage] {
+//        override def accept(
+//          t: Stage
+//        ): Unit = {
+//          t.scene =
+//            catalogScene
+//        }
+//      }
+//    )
+//    FxToolkit.showStage()
 
-    catalogScene
-  }
+//    catalogScene
+//  }
 }
