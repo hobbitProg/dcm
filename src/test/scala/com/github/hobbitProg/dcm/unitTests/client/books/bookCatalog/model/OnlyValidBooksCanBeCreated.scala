@@ -40,6 +40,7 @@ class OnlyValidBooksCanBeCreated
           coverImage,
           categories
         )
+
       "then a book is created" in {
         newBook shouldBe valid
       }
@@ -112,8 +113,32 @@ class OnlyValidBooksCanBeCreated
   }
 
   "Given information on a book with no title" - {
+    val title: Titles = ""
+    val author: Authors = "Kevin J. Anderson"
+    val isbn: ISBNs = "0061052477"
+    val description: Description = Some("Description for Ruins")
+    val coverImage: CoverImages =
+      Some(getClass.getResource("/Ruins.jpg").toURI)
+    val categories: Set[Categories] =
+      Set(
+        "sci-fi",
+        "conspiracy"
+      )
+
     "when a new book is requested" - {
-      "then no book is created" in pending
+      val newBook: Validated[String, Book] =
+        Book.book(
+          title,
+          author,
+          isbn,
+          description,
+          coverImage,
+          categories
+        )
+
+      "then no book is created" in {
+        newBook shouldBe invalid
+      }
     }
   }
 
