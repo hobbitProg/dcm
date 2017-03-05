@@ -143,14 +143,62 @@ class OnlyValidBooksCanBeCreated
   }
 
   "Given information on a book with no author" - {
+    val title: Titles = "Ruins"
+    val author: Authors = ""
+    val isbn: ISBNs = "0061052477"
+    val description: Description = Some("Description for Ruins")
+    val coverImage: CoverImages =
+      Some(getClass.getResource("/Ruins.jpg").toURI)
+    val categories: Set[Categories] =
+      Set(
+        "sci-fi",
+        "conspiracy"
+      )
+
     "when a new book is requested" - {
-      "then no book is created" in pending
+      val newBook: Validated[String, Book] =
+        Book.book(
+          title,
+          author,
+          isbn,
+          description,
+          coverImage,
+          categories
+        )
+
+      "then no book is created" in {
+        newBook shouldBe invalid
+      }
     }
   }
 
   "Given information on a book with no ISBN" - {
+    val title: Titles = "Ruins"
+    val author: Authors = "Kevin J. Anderson"
+    val isbn: ISBNs = ""
+    val description: Description = Some("Description for Ruins")
+    val coverImage: CoverImages =
+      Some(getClass.getResource("/Ruins.jpg").toURI)
+    val categories: Set[Categories] =
+      Set(
+        "sci-fi",
+        "conspiracy"
+      )
+
     "when a new book is requested" - {
-      "then no book is created" in pending
+      val newBook: Validated[String, Book] =
+        Book.book(
+          title,
+          author,
+          isbn,
+          description,
+          coverImage,
+          categories
+        )
+
+      "then no book is created" in {
+        newBook shouldBe invalid
+      }
       }
     }
 }

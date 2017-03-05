@@ -22,12 +22,18 @@ object Book {
   /**
     * Verify information to place in new book
     * @param title Title of new book
+    * @param author Author of new book
+    * @param isbn ISBN of new book
     * @return True if given information is valid and false otherwise
     */
   private def isValid(
-    title: Titles
+    title: Titles,
+    author: Authors,
+    isbn: ISBNs
   ): Boolean = {
-    title != ""
+    title != "" &&
+    author != "" &&
+    isbn != ""
   }
 
   /**
@@ -51,7 +57,9 @@ object Book {
     categories: Set[Categories]
   ): Validated[String, Book] = {
     if (isValid(
-          title
+          title,
+          author,
+          isbn
         )) {
       Valid(
         Book(
