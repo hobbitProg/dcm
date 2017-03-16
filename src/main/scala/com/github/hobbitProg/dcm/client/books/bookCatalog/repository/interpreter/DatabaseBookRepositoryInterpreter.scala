@@ -120,7 +120,7 @@ object DatabaseBookRepositoryInterpreter extends BookRepository {
     * @return True if book with given title and author already exists in
     * storage and false otherwise
     */
-  private def alreadyContains(
+  def alreadyContains(
     title: Titles,
     author: Authors
   ): Boolean = {
