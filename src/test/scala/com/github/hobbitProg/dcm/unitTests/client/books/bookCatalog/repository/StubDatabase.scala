@@ -1,16 +1,21 @@
-package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogStorage
+package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository
 
 import acolyte.jdbc.{AcolyteDSL, StatementHandler, UpdateExecution,
   QueryExecution, RowLists, QueryResult, Driver => AcolyteDriver}
 import acolyte.jdbc.Implicits._
 
+import cats._
+import cats.data._
+import cats.implicits._
+
 import doobie.imports._
+
+import fs2.Task
+import fs2.interop.cats._
 
 import java.net.URI
 
 import scala.collection.Set
-
-import scalaz.concurrent.Task
 
 import com.github.hobbitProg.dcm.client.books._
 

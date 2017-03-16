@@ -104,12 +104,12 @@
     </dependency>
     <dependency>
       <groupId>org.tpolecat</groupId>
-      <artifactId>doobie-core_2.12</artifactId>
+      <artifactId>doobie-core-cats_2.12</artifactId>
       <version>0.4.1</version>
     </dependency>
     <dependency>
       <groupId>org.tpolecat</groupId>
-      <artifactId>doobie-scalatest_2.12</artifactId>
+      <artifactId>doobie-scalatest-cats_2.12</artifactId>
       <version>0.4.1</version>
     </dependency>
     <dependency>
@@ -121,6 +121,16 @@
       <groupId>com.ironcorelabs</groupId>
       <artifactId>cats-scalatest_2.12</artifactId>
       <version>2.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>co.fs2</groupId>
+      <artifactId>fs2-core_2.12</artifactId>
+      <version>0.9.4</version>
+    </dependency>
+    <dependency>
+      <groupId>co.fs2</groupId>
+      <artifactId>fs2-cats_2.12</artifactId>
+      <version>0.3.0</version>
     </dependency>
  </dependencies>
 

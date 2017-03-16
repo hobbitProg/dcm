@@ -10,12 +10,12 @@ import org.scalatest.{FreeSpec, Matchers}
 
 import scala.collection.Set
 
-import scalaz.concurrent.Task
+//import scalaz.concurrent.Task
 
 import com.github.hobbitProg.dcm.client.books.Categories
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
+//import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
 
 /**
   * Verifies books can be retrieved from storage
@@ -25,30 +25,30 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
 class BooksCanBeRetrievedFromStorage
   extends FreeSpec
     with Matchers {
-  "Given populated book storage" - {
-    AcolyteDriver.register(
-      BooksCanBeRetrievedFromStorage.databaseId,
-      bookStorageHandler
-    )
-    val connectionTransactor =
-      DriverManagerTransactor[Task](
-        "acolyte.jdbc.Driver",
-        BooksCanBeRetrievedFromStorage.databaseURL
-      )
-    val bookStorage: Storage =
-      Storage(
-        connectionTransactor
-      )
+//  "Given populated book storage" - {
+//    AcolyteDriver.register(
+//      BooksCanBeRetrievedFromStorage.databaseId,
+//      bookStorageHandler
+//    )
+//    val connectionTransactor =
+//      DriverManagerTransactor[Task](
+//        "acolyte.jdbc.Driver",
+//        BooksCanBeRetrievedFromStorage.databaseURL
+//      )
+//    val bookStorage: Storage =
+//      Storage(
+//        connectionTransactor
+//      )
 
-    "when books are requested from storage" - {
-      val booksFromStorage: Set[Book] =
-        bookStorage.contents
+//    "when books are requested from storage" - {
+//      val booksFromStorage: Set[Book] =
+//        bookStorage.contents
 
-      "then books are retrieved from storage" in {
-        booksFromStorage shouldEqual BooksCanBeRetrievedFromStorage.definedBooks
-      }
-    }
-  }
+//      "then books are retrieved from storage" in {
+//        booksFromStorage shouldEqual BooksCanBeRetrievedFromStorage.definedBooks
+//      }
+//    }
+//  }
 
   private def bookStorageHandler: StatementHandler =
     AcolyteDSL.handleStatement.withQueryDetection(

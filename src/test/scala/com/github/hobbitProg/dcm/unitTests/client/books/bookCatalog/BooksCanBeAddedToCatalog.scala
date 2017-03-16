@@ -14,7 +14,7 @@ import com.github.hobbitProg.dcm.client.books._
 import com.github.hobbitProg.dcm.client.books.Conversions._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
+//import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
 
 /**
   * Verifies books can be added to catalog

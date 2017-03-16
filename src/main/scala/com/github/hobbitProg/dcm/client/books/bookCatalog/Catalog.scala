@@ -3,7 +3,7 @@ package com.github.hobbitProg.dcm.client.books.bookCatalog
 import sodium.{Listener, StreamSink}
 
 import com.github.hobbitProg.dcm.client.books._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
+//import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
 
 /**
   * Catalog containing book information
@@ -11,7 +11,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
   * @since 0.1
   */
 class Catalog(
-  val bookStorage: Storage
+//  val bookStorage: Storage
 ) {
   // Stream containing addition books
   protected val addStream: StreamSink[Book] =
@@ -25,16 +25,17 @@ class Catalog(
   def +(
     bookToAdd: Book
   ): Option[Catalog] = {
-    val updatedStorage: Option[Storage] =
-      bookStorage save bookToAdd
-    updatedStorage match {
-      case Some(storageWithNewBook) =>
-        addStream.send(
-          bookToAdd
-        )
-        Some(this)
-      case None => None
-    }
+//    val updatedStorage: Option[Storage] =
+//      bookStorage save bookToAdd
+//    updatedStorage match {
+//      case Some(storageWithNewBook) =>
+//        addStream.send(
+//          bookToAdd
+//        )
+//        Some(this)
+//      case None => None
+//    }
+    None
   }
 
   /**
@@ -56,12 +57,12 @@ class Catalog(
   def foreach(
     op: (Book) => Unit
   ): Unit = {
-    bookStorage.contents.foreach {
-      bookToProcess =>
-        op(
-          bookToProcess
-        )
-    }
+//    bookStorage.contents.foreach {
+//      bookToProcess =>
+//        op(
+//          bookToProcess
+//        )
+//    }
   }
 
   /**
@@ -75,10 +76,11 @@ class Catalog(
     title: Titles,
     author: Authors
   ): Boolean = {
-    bookStorage alreadyContains (
-      title,
-      author
-    )
+//    bookStorage alreadyContains (
+//      title,
+//      author
+//    )
+    true
   }
 }
 

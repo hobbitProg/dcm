@@ -7,7 +7,7 @@ import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.stage.FileChooser
 
-import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
+//import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
 
 /**
   * Main program to run distributed catalog manager on Linux desktop
@@ -15,15 +15,15 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
   * @since 0.1
   */
 class DCMApp(
-  private val bookStorage: Storage
+//  private val bookStorage: Storage
 )
   extends JFXApp {
-  stage = new PrimaryStage {
-    scene = new Scene {
-      root = new DCMDesktop(
-        new FileChooser(),
-        bookStorage
-      )
-    }
-  }
+//  stage = new PrimaryStage {
+//    scene = new Scene {
+//      root = new DCMDesktop(
+//        new FileChooser(),
+//        bookStorage
+//      )
+//    }
+//  }
 }

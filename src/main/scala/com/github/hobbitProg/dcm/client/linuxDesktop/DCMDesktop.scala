@@ -7,7 +7,7 @@ import scalafx.stage.FileChooser
 
 import com.github.hobbitProg.dcm.client.books.Categories
 import com.github.hobbitProg.dcm.client.books.bookCatalog.Catalog
-import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
+//import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
 
 /**
   * Main desktop for distributed catalog manager
@@ -15,8 +15,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
   * @since 0.1
   */
 class DCMDesktop(
-  private val coverChooser: FileChooser,
-  private val catalogStorage: Storage
+  private val coverChooser: FileChooser
+//  private val catalogStorage: Storage
 )
   extends TabPane {
 
@@ -24,13 +24,13 @@ class DCMDesktop(
   prefHeight = DCMDesktop.height
 
   // Add tab that contains book information
-  this += new BookTab(
-    coverChooser,
-    new Catalog(
-      catalogStorage
-    ),
-    catalogStorage.definedCategories
-  )
+//  this += new BookTab(
+//    coverChooser,
+//    new Catalog(
+//      catalogStorage
+//    ),
+//    catalogStorage.definedCategories
+//  )
 }
 
 object DCMDesktop {

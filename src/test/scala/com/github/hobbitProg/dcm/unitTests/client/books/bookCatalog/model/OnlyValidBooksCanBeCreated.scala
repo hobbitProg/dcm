@@ -13,6 +13,10 @@ import scala.collection.Set
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 
+/**
+  * Verifies books can be created
+  * @author Kyle Cranmer
+  */
 class OnlyValidBooksCanBeCreated
     extends FreeSpec
     with Matchers

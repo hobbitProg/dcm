@@ -8,14 +8,13 @@ import scala.collection.Set
 /**
   * Model of book to place into catalog
   */
-case class Book (
-  title: Titles,
-  author: Authors,
-  isbn: ISBNs,
-  description: Description,
-  coverImage: CoverImages,
-  categories: Set[Categories]
-) {
+trait Book {
+  def title: Titles
+  def author: Authors
+  def isbn: ISBNs
+  def description: Description
+  def coverImage: CoverImages
+  def categories: Set[Categories]
 }
 
 object Book {
@@ -62,7 +61,7 @@ object Book {
           isbn
         )) {
       Valid(
-        Book(
+        BookImpl(
           title,
           author,
           isbn,
@@ -77,5 +76,15 @@ object Book {
         "Given information is invalid for a book"
       )
     }
+  }
+
+  private case class BookImpl(
+    title: Titles,
+    author: Authors,
+    isbn: ISBNs,
+    description: Description,
+    coverImage: CoverImages,
+    categories: Set[Categories]
+  ) extends Book {
   }
 }
