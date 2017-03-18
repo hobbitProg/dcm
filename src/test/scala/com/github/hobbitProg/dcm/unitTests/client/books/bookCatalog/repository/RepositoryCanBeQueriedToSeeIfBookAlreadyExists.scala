@@ -3,7 +3,7 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository
 import org.scalatest.{FreeSpec, Matchers}
 
 import com.github.hobbitProg.dcm.client.books._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.interpreter.DatabaseBookRepositoryInterpreter._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.interpreter.DatabaseBookRepositoryInterpreter
 
 class RepositoryCanBeQueriedToSeeIfBookAlreadyExists
     extends FreeSpec
@@ -11,7 +11,7 @@ class RepositoryCanBeQueriedToSeeIfBookAlreadyExists
   "Given populated storage to place books into" - {
     val database =
       new StubDatabase
-    setConnection(
+    DatabaseBookRepositoryInterpreter.setConnection(
       database.connectionTransactor
     )
 
@@ -24,7 +24,7 @@ class RepositoryCanBeQueriedToSeeIfBookAlreadyExists
       "when the storage is queried to see if the associated book is already " +
       "in storage" - {
         val bookAlreadyExistsInStorage: Boolean =
-          alreadyContains (
+          DatabaseBookRepositoryInterpreter.alreadyContains (
             title,
             author
           )
@@ -42,7 +42,7 @@ class RepositoryCanBeQueriedToSeeIfBookAlreadyExists
       "when the storage is queried to see if the associated book already " +
       "exists in storage" - {
         val bookExistsInStorage: Boolean =
-          alreadyContains (
+          DatabaseBookRepositoryInterpreter.alreadyContains (
             title,
             author
           )

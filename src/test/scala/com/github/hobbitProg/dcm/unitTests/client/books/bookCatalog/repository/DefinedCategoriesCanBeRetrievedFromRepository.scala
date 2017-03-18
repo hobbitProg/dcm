@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogStorage
+package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository
 
 import acolyte.jdbc.{AcolyteDSL, RowList1, Row1, StatementHandler, QueryExecution, Driver => AcolyteDriver}
 import acolyte.jdbc.RowLists.rowList1
@@ -6,47 +6,43 @@ import acolyte.jdbc.Implicits._
 
 import doobie.imports._
 
+import fs2.Task
+
 import org.scalatest.{FreeSpec, Matchers}
 
 import scala.collection.Set
 
-//import scalaz.concurrent.Task
-
 import com.github.hobbitProg.dcm.client.books.Categories
-//import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.interpreter.DatabaseBookRepositoryInterpreter
 
 /**
   * Verifies defined book categories can be retrieved from storage
   * @author Kyle Cranmer
   * @since 0.1
   */
-class DefinedCategoriesCanBeRetrievedFromStorage
+class DefinedCategoriesCanBeRetrievedFromRepository
   extends FreeSpec
     with Matchers {
-//  "Given storage containing categories can be associated with a book" - {
-//    AcolyteDriver.register(
-//      DefinedCategoriesCanBeRetrievedFromStorage.databaseId,
-//      bookStorageHandler
-//    )
-//    val connectionTransactor =
-//      DriverManagerTransactor[Task](
-//        "acolyte.jdbc.Driver",
-//        DefinedCategoriesCanBeRetrievedFromStorage.databaseURL
-//      )
-//    val bookStorage: Storage =
-//      Storage(
-//        connectionTransactor
-//      )
+  "Given storage containing categories can be associated with a book" - {
+    AcolyteDriver.register(
+      DefinedCategoriesCanBeRetrievedFromRepository.databaseId,
+      bookStorageHandler
+    )
+    val connectionTransactor =
+      DriverManagerTransactor[Task](
+        "acolyte.jdbc.Driver",
+        DefinedCategoriesCanBeRetrievedFromRepository.databaseURL
+      )
 
-//    "when storage is requested to retrieve categories that can be associated with a book" - {
-//      val definedCategoriesFromStorage =
-//        bookStorage.definedCategories
+    "when storage is requested to retrieve categories that can be associated with a book" - {
+      val definedCategoriesFromStorage =
+        DatabaseBookRepositoryInterpreter.definedCategories
 
-//      "then all categories that can be associated with a book can be retrieved" in {
-//        definedCategoriesFromStorage shouldEqual DefinedCategoriesCanBeRetrievedFromStorage.definedCategories
-//      }
-//    }
-//  }
+      "then all categories that can be associated with a book can be retrieved" in {
+        definedCategoriesFromStorage shouldEqual DefinedCategoriesCanBeRetrievedFromRepository.definedCategories
+      }
+    }
+  }
 
   private def bookStorageHandler: StatementHandler =
     AcolyteDSL.handleStatement.withQueryDetection(
@@ -61,7 +57,7 @@ class DefinedCategoriesCanBeRetrievedFromStorage
                   classOf[String]
                 )
               )
-            for (currentCategory <- DefinedCategoriesCanBeRetrievedFromStorage.definedCategories) {
+            for (currentCategory <- DefinedCategoriesCanBeRetrievedFromRepository.definedCategories) {
               generatedCategories =
                 generatedCategories :+ currentCategory
             }
@@ -70,7 +66,7 @@ class DefinedCategoriesCanBeRetrievedFromStorage
   }
 }
 
-object DefinedCategoriesCanBeRetrievedFromStorage {
+object DefinedCategoriesCanBeRetrievedFromRepository {
   private val definedCategories =
     Set[Categories](
       "sci-fi",

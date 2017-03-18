@@ -114,6 +114,17 @@ object DatabaseBookRepositoryInterpreter extends BookRepository {
   }
 
   /**
+    * Categories available for books
+    */
+  override def definedCategories: Set[Categories] = {
+    sql"SELECT Category FROM definedCategories;"
+      .query[Categories]
+      .to[Set]
+      .transact(databaseConnection)
+      .unsafeRun
+  }
+
+  /**
     * Determine if book with given title and author already exists in storage
     * @param title Title of book that is to be placed into storage
     * @param author Author of book that is to be placed into storage
@@ -125,7 +136,7 @@ object DatabaseBookRepositoryInterpreter extends BookRepository {
     author: Authors
   ): Boolean = {
     !sql"SELECT Title FROM bookCatalog WHERE Title=${title} AND Author=${author};"
-      .query[String]
+      .query[Titles]
       .list
       .transact(databaseConnection)
       .unsafeRun

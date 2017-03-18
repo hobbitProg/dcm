@@ -1,5 +1,6 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog.repository
 
+import scala.collection.Set
 import scala.util.Either
 
 import com.github.hobbitProg.dcm.client.books._
@@ -20,6 +21,11 @@ trait BookRepository {
   def save(
     bookToSave: Book
   ): Either[String, Book]
+
+  /**
+    * Categories available for books
+    */
+  def definedCategories: Set[Categories]
 
   /**
     * Determine if book with given title and author already exists in storage

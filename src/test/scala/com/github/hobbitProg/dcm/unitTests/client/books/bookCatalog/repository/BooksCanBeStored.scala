@@ -8,7 +8,7 @@ import scala.collection.Set
 import scala.math.Ordering._
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.interpreter.DatabaseBookRepositoryInterpreter._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.interpreter.DatabaseBookRepositoryInterpreter
 
 /**
   * Verifies books can be stored into repository
@@ -41,7 +41,7 @@ class BooksCanBeStored
   "Given storage to place books into" - {
     val database =
       new StubDatabase
-    setConnection(
+    DatabaseBookRepositoryInterpreter.setConnection(
       database.connectionTransactor
     )
 
@@ -67,7 +67,7 @@ class BooksCanBeStored
 
       "when the book is placed into storage" - {
         val saveResult =
-          save(
+          DatabaseBookRepositoryInterpreter.save(
             bookToStore getOrElse emptyBook
           )
 
@@ -103,7 +103,7 @@ class BooksCanBeStored
   "Given storage to place books into" - {
     val database =
       new StubDatabase
-    setConnection(
+    DatabaseBookRepositoryInterpreter.setConnection(
       database.connectionTransactor
     )
 
@@ -129,7 +129,7 @@ class BooksCanBeStored
 
       "when the book is placed into storage" - {
         val saveResult =
-          save(
+          DatabaseBookRepositoryInterpreter.save(
             bookToStore
           )
 
@@ -143,7 +143,7 @@ class BooksCanBeStored
   "Given storage to place books into" - {
     val database =
       new StubDatabase
-    setConnection(
+    DatabaseBookRepositoryInterpreter.setConnection(
       database.connectionTransactor
     )
 
@@ -169,7 +169,7 @@ class BooksCanBeStored
 
       "when the book is placed into storage" - {
         val saveResult =
-          save(
+          DatabaseBookRepositoryInterpreter.save(
             bookToStore
           )
 
@@ -183,7 +183,7 @@ class BooksCanBeStored
   "Given storage to place books into" - {
     val database =
       new StubDatabase
-    setConnection(
+    DatabaseBookRepositoryInterpreter.setConnection(
       database.connectionTransactor
     )
 
@@ -209,7 +209,7 @@ class BooksCanBeStored
 
       "when the book is placed into storage" - {
         val saveResult =
-          save(
+          DatabaseBookRepositoryInterpreter.save(
             bookToStore
           )
 
@@ -223,7 +223,7 @@ class BooksCanBeStored
   "Given storage to place books into (with books already in storage)" - {
     val database =
       new StubDatabase
-    setConnection(
+    DatabaseBookRepositoryInterpreter.setConnection(
       database.connectionTransactor
     )
 
@@ -250,7 +250,7 @@ class BooksCanBeStored
 
       "when the book is placed into storage" - {
         val saveResult =
-          save(
+          DatabaseBookRepositoryInterpreter.save(
             bookToStore
           )
 
