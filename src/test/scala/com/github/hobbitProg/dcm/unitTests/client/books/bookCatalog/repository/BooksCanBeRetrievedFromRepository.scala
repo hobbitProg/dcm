@@ -6,49 +6,45 @@ import acolyte.jdbc.Implicits._
 
 import doobie.imports._
 
+import fs2.Task
+
 import org.scalatest.{FreeSpec, Matchers}
 
 import scala.collection.Set
 
-//import scalaz.concurrent.Task
-
 import com.github.hobbitProg.dcm.client.books.Categories
-import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
-import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
-//import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.interpreter.DatabaseBookRepositoryInterpreter
 
 /**
   * Verifies books can be retrieved from storage
   * @author Kyle Cranmer
   * @since 0.1
   */
-class BooksCanBeRetrievedFromStorage
+class BooksCanBeRetrievedFromRepository
   extends FreeSpec
     with Matchers {
-//  "Given populated book storage" - {
-//    AcolyteDriver.register(
-//      BooksCanBeRetrievedFromStorage.databaseId,
-//      bookStorageHandler
-//    )
-//    val connectionTransactor =
-//      DriverManagerTransactor[Task](
-//        "acolyte.jdbc.Driver",
-//        BooksCanBeRetrievedFromStorage.databaseURL
-//      )
-//    val bookStorage: Storage =
-//      Storage(
-//        connectionTransactor
-//      )
+  "Given populated book storage" - {
+    AcolyteDriver.register(
+      BooksCanBeRetrievedFromRepository.databaseId,
+      bookStorageHandler
+    )
+    val connectionTransactor =
+      DriverManagerTransactor[Task](
+        "acolyte.jdbc.Driver",
+        BooksCanBeRetrievedFromRepository.databaseURL
+      )
+    DatabaseBookRepositoryInterpreter setConnection connectionTransactor
 
-//    "when books are requested from storage" - {
-//      val booksFromStorage: Set[Book] =
-//        bookStorage.contents
+    "when books are requested from storage" - {
+      val booksFromStorage =
+        DatabaseBookRepositoryInterpreter.contents
 
-//      "then books are retrieved from storage" in {
-//        booksFromStorage shouldEqual BooksCanBeRetrievedFromStorage.definedBooks
-//      }
-//    }
-//  }
+      "then books are retrieved from storage" in {
+        booksFromStorage shouldEqual BooksCanBeRetrievedFromRepository.definedBooks
+      }
+    }
+  }
 
   private def bookStorageHandler: StatementHandler =
     AcolyteDSL.handleStatement.withQueryDetection(
@@ -67,7 +63,7 @@ class BooksCanBeRetrievedFromStorage
                   classOf[String]
                 )
               )
-            for (currentBook <- BooksCanBeRetrievedFromStorage.definedBooks) {
+            for (currentBook <- BooksCanBeRetrievedFromRepository.definedBooks) {
               val definedDescription =
                 currentBook.description match {
                   case Some(bookDescription) => bookDescription
@@ -96,7 +92,7 @@ class BooksCanBeRetrievedFromStorage
                 )
               )
             val associatedBook =
-              BooksCanBeRetrievedFromStorage.definedBooks find {
+              BooksCanBeRetrievedFromRepository.definedBooks find {
                 book =>
                   book.isbn == query.parameters.head.value
               }
@@ -113,14 +109,23 @@ class BooksCanBeRetrievedFromStorage
     }
 }
 
-object BooksCanBeRetrievedFromStorage {
+object BooksCanBeRetrievedFromRepository {
+  private class TestBook(
+    val title: Titles,
+    val author: Authors,
+    val isbn: ISBNs,
+    val description: Description,
+    val coverImage: CoverImages,
+    val categories: Set[Categories]
+  ) extends Book {
+  }
   private val databaseId: String = "BookStorageTest"
-  private  val databaseURL: String =
+  private val databaseURL: String =
     "jdbc:acolyte:dcm-tests?handler=" + databaseId
   // Contents of book storage
   private val definedBooks: Set[Book] =
     Set[Book](
-      (
+      Book.book(
         "Ruins",
         "Kevin J. Anderson",
         "0061052477",
@@ -136,8 +141,17 @@ object BooksCanBeRetrievedFromStorage {
           "sci-fi",
           "conspiracy"
         )
+      ).getOrElse(
+        new TestBook(
+          "",
+          "",
+          "",
+          None,
+          None,
+          Set()
+        )
       ),
-      (
+      Book.book(
         "Goblins",
         "Charles Grant",
         "0061054143",
@@ -152,6 +166,15 @@ object BooksCanBeRetrievedFromStorage {
         Set[Categories](
           "sci-fi",
           "conspiracy"
+        )
+      ).getOrElse(
+        new TestBook(
+          "",
+          "",
+          "",
+          None,
+          None,
+          Set()
         )
       )
     )

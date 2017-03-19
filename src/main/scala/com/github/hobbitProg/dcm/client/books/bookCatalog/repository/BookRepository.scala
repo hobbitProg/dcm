@@ -28,6 +28,11 @@ trait BookRepository {
   def definedCategories: Set[Categories]
 
   /**
+    * All books that exist within repository
+    */
+  def contents: Set[Book]
+
+  /**
     * Determine if book with given title and author already exists in storage
     * @param title Title of book that is to be placed into storage
     * @param author Author of book that is to be placed into storage
