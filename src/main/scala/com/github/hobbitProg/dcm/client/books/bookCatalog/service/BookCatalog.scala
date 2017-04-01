@@ -32,4 +32,12 @@ trait BookCatalog {
     cover: CoverImages,
     categories: Set[Categories]
   ): Reader[BookRepository, Try[Book]]
+
+  /**
+    * Register action to perform when book is added to catalog
+    * @param addAction Action to perform
+    */
+  def onAdd(
+    addAction: Book => Unit
+  ): Unit
 }

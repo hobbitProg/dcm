@@ -1,5 +1,11 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog.service.interpreter
 
+import akka.NotUsed
+import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, OverflowStrategy}
+import akka.stream.actor.ActorPublisher
+import akka.stream.scaladsl.{BroadcastHub, Keep, Source, SourceQueueWithComplete, RunnableGraph}
+
 import cats.data.Reader
 import cats.data.Validated._
 
@@ -15,6 +21,40 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookReposit
   * @since 0.1
   */
 object BookCatalogInterpreter extends BookCatalog {
+  // Generates actors to generate streams
+  implicit val system =
+    ActorSystem(
+      "BookCatalog"
+    )
+
+  // Materializes streams
+  implicit val materializer = ActorMaterializer()
+
+  // Queue where add events are placed
+  val addEventQueue =
+    system.actorOf(
+      AddEventManager.props
+    )
+
+  // Graph for add event stream
+  val addEventSource: Source[Book, NotUsed] =
+    Source.fromPublisher(
+      ActorPublisher[Book](
+        addEventQueue
+      )
+    )
+  val addEventGraph: RunnableGraph[Source[Book, NotUsed]] =
+    addEventSource.toMat(
+      BroadcastHub.sink(
+        512
+      )
+    )(
+      Keep.right
+    )
+
+  // Producer to place add events into
+  val addEventProducer =
+    addEventGraph.run()
 
   /**
     * Place new book into catalog
@@ -56,6 +96,7 @@ object BookCatalogInterpreter extends BookCatalog {
                   )
                 )
               case Right(savedBook) =>
+                addEventQueue ! savedBook
                 Success(
                   savedBook
                 )
@@ -66,6 +107,18 @@ object BookCatalogInterpreter extends BookCatalog {
             )
         }
       }
+    }
+  }
+
+  /**
+    * Register action to perform when book is added to catalog
+    * @param addAction Action to perform
+    */
+  def onAdd(
+    addAction: Book => Unit
+  ): Unit = {
+    addEventProducer runForeach {
+      addAction
     }
   }
 }

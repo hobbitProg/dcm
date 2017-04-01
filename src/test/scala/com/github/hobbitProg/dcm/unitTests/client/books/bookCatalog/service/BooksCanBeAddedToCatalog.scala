@@ -40,6 +40,11 @@ class BooksCanBeAddedToCatalog
         )
 
       "and a listener for book addition events" - {
+        var sentBook: Book = null
+        onAdd(
+          addedBook => sentBook = addedBook
+        )
+
         "when the book is added to the catalog" - {
           val resultingBook =
             add(
@@ -54,16 +59,24 @@ class BooksCanBeAddedToCatalog
             )
 
           "then the book is added to the catalog" in {
-            resultingBook shouldBe an[Success[Book]]
-            resultingBook.get.title shouldBe newTitle
-            resultingBook.get.author shouldBe newAuthor
-            resultingBook.get.isbn shouldBe newISBN
-            resultingBook.get.description shouldBe newDescription
-            resultingBook.get.coverImage shouldBe newCover
-            resultingBook.get.categories shouldBe newCategories
-            testRepository.savedBook shouldBe resultingBook.get
+            resultingBook should be (an[Success[_]])
+            resultingBook.get.title should be (newTitle)
+            resultingBook.get.author should be (newAuthor)
+            resultingBook.get.isbn should be (newISBN)
+            resultingBook.get.description should be (newDescription)
+            resultingBook.get.coverImage should be (newCover)
+            resultingBook.get.categories should be (newCategories)
+            testRepository.savedBook should be (resultingBook.get)
           }
-          "and the book is given to the listener" in pending
+          "and the book is given to the listener" in {
+            sentBook should not be (null)
+            sentBook.title should be (newTitle)
+            sentBook.author should be (newAuthor)
+            sentBook.isbn should be (newISBN)
+            sentBook.description should be (newDescription)
+            sentBook.coverImage should be (newCover)
+            sentBook.categories should be (newCategories)
+          }
         }
       }
     }
