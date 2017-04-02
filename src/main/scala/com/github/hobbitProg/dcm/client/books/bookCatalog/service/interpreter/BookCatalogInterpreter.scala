@@ -32,16 +32,12 @@ object BookCatalogInterpreter extends BookCatalog {
 
   // Queue where add events are placed
   val addEventQueue =
-    system.actorOf(
-      AddEventManager.props
-    )
+    new NewBookPublisher()
 
   // Graph for add event stream
   val addEventSource: Source[Book, NotUsed] =
     Source.fromPublisher(
-      ActorPublisher[Book](
-        addEventQueue
-      )
+      addEventQueue
     )
   val addEventGraph: RunnableGraph[Source[Book, NotUsed]] =
     addEventSource.toMat(
@@ -96,7 +92,7 @@ object BookCatalogInterpreter extends BookCatalog {
                   )
                 )
               case Right(savedBook) =>
-                addEventQueue ! savedBook
+                addEventQueue publish savedBook
                 Success(
                   savedBook
                 )
