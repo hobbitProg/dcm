@@ -143,11 +143,59 @@ class BooksCanBeAddedToCatalog
   }
 
   "Given a repository that contains the catalog" - {
+    val testRepository =
+      new FakeRepository
+
     "and information on a book with no author" - {
+      val newTitle =
+        "Ground Zero"
+      val newAuthor =
+        ""
+      val newISBN =
+        "006105223X"
+      val newDescription =
+        Some(
+          "Description for Ground Zero"
+        )
+      val newCover =
+        Some(
+          getClass().
+            getResource(
+              "/GroundZero.jpg"
+            ).toURI
+        )
+      val newCategories =
+        Set(
+          "sci-fi",
+          "conspiracy"
+        )
+
       "and a listener for book addition events" - {
+        var sentBook: Book = null
+        onAdd(
+          addedBook => sentBook = addedBook
+        )
+
         "when the book information is attempted to be added to the catalog" - {
-          "then the book is not placed into the catalog" in pending
-          "and the book is not given to the listener" in pending
+          val resultingBook =
+            add(
+              newTitle,
+              newAuthor,
+              newISBN,
+              newDescription,
+              newCover,
+              newCategories
+            )(
+              testRepository
+            )
+
+          "then the book is not placed into the catalog" in {
+            resultingBook should be (a[Failure[_]])
+          }
+
+          "and the book is not given to the listener" in {
+            sentBook should be (null)
+          }
         }
       }
     }
