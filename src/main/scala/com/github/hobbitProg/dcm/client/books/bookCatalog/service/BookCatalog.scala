@@ -52,5 +52,5 @@ trait BookCatalog {
   def existsInCatalog(
     title: Titles,
     author: Authors
-  ): Boolean
+  ): Reader[BookRepository, Boolean]
 }

@@ -69,42 +69,39 @@ object BookCatalogInterpreter extends BookCatalog {
     description: Description,
     cover: CoverImages,
     categories: Set[Categories]
-  ): Reader[BookRepository, Try[Book]] = {
-    {
-      Reader{
-        repository: BookRepository =>
-        Book.book(
-          title,
-          author,
-          isbn,
-          description,
-          cover,
-          categories
-        ) match {
-          case Valid(newBook) =>
-            repository.save(
-              newBook
-            ) match {
-              case Left(error) =>
-                Failure(
-                  new StoreException(
-                    error
-                  )
+  ): Reader[BookRepository, Try[Book]] =
+    Reader {
+      repository: BookRepository =>
+      Book.book(
+        title,
+        author,
+        isbn,
+        description,
+        cover,
+        categories
+      ) match {
+        case Valid(newBook) =>
+          repository.save(
+            newBook
+          ) match {
+            case Left(error) =>
+              Failure(
+                new StoreException(
+                  error
                 )
-              case Right(savedBook) =>
-                addEventQueue publish savedBook
-                Success(
-                  savedBook
-                )
-            }
-          case Invalid(_) =>
-            Failure(
-              new InvalidBookException()
-            )
-        }
+              )
+            case Right(savedBook) =>
+              addEventQueue publish savedBook
+              Success(
+                savedBook
+              )
+          }
+        case Invalid(_) =>
+          Failure(
+            new InvalidBookException()
+          )
       }
     }
-  }
 
   /**
     * Register action to perform when book is added to catalog
@@ -129,5 +126,12 @@ object BookCatalogInterpreter extends BookCatalog {
   def existsInCatalog(
     title: Titles,
     author: Authors
-  ): Boolean = false
+  ): Reader[BookRepository, Boolean] =
+    Reader {
+      repository: BookRepository =>
+      repository alreadyContains (
+        title,
+        author
+      )
+    }
 }

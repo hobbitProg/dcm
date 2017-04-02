@@ -23,6 +23,8 @@ class BookCatalogCanDetermineIfABookAlreadyExists
           existsInCatalog(
             title,
             author
+          )(
+            bookRepository
           )
 
         "then the catalog indicates there is no book in the catalog that has the given title and author" in {
@@ -33,9 +35,27 @@ class BookCatalogCanDetermineIfABookAlreadyExists
   }
 
   "Given a repository that contains books" - {
+    val bookRepository: BookRepository =
+      new FakeRepository()
+
     "and the title/author pair of a book that already exists in the catalog" - {
+      val title =
+        "Goblins"
+      val author =
+        "Charles Grant"
+
       "when the catalog is queried to see if a book already exists with the given title and author" - {
-        "then the catalog indicates there is a book in the catalog that has the given title and author" in pending
+        val bookExistsInCatalog: Boolean =
+          existsInCatalog(
+            title,
+            author
+          )(
+            bookRepository
+          )
+
+        "then the catalog indicates there is a book in the catalog that has the given title and author" in {
+          bookExistsInCatalog should be (true)
+        }
       }
     }
   }

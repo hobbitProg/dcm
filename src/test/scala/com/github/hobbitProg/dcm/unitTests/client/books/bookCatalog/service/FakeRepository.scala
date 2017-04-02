@@ -49,5 +49,8 @@ class FakeRepository
   def alreadyContains(
     title: Titles,
     author: Authors
-  ): Boolean = false
+  ): Boolean = {
+    title == "Goblins" &&
+    author == "Charles Grant"
+  }
 }
