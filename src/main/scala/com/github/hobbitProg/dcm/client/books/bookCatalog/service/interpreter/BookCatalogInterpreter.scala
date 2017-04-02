@@ -117,4 +117,17 @@ object BookCatalogInterpreter extends BookCatalog {
       addAction
     }
   }
+
+  /**
+    * Determine if book with given title and author already exists in book
+    * catalog
+    * @param title Title of book being examined
+    * @param author Author of book being examined
+    * @return True if book with given title and author already exists in book
+    * catalog and false otherwise
+    */
+  def existsInCatalog(
+    title: Titles,
+    author: Authors
+  ): Boolean = false
 }

@@ -40,4 +40,17 @@ trait BookCatalog {
   def onAdd(
     addAction: Book => Unit
   ): Unit
+
+  /**
+    * Determine if book with given title and author already exists in book
+    * catalog
+    * @param title Title of book being examined
+    * @param author Author of book being examined
+    * @return True if book with given title and author already exists in book
+    * catalog and false otherwise
+    */
+  def existsInCatalog(
+    title: Titles,
+    author: Authors
+  ): Boolean
 }
