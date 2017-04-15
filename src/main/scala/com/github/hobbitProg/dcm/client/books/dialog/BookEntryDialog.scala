@@ -4,6 +4,8 @@ import java.net.URI
 import javafx.collections.FXCollections
 
 import scala.collection.Set
+import scala.util.{Success, Failure}
+
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
@@ -12,8 +14,9 @@ import scalafx.scene.control.Button
 import scalafx.scene.layout.AnchorPane
 import scalafx.stage.{FileChooser, Stage}
 
-import com.github.hobbitProg.dcm.client.books.Conversions._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model.Book
+import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalog
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookRepository
 import com.github.hobbitProg.dcm.client.books.control.image._
 import com.github.hobbitProg.dcm.client.books.control.label._
 import com.github.hobbitProg.dcm.client.books.control.listView._
@@ -22,28 +25,29 @@ import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
 
 /**
   * Dialog for entering information on book for catalog
-  * @param coverImageChooser Creates dialog to select cover image for book
   * @param catalog Catalog to update
+  * @param repository Repository to place book catalog into
+  * @param coverImageChooser Creates dialog to select cover image for book
   * @param definedCategories Categories that can be associated with book
   * @author Kyle Cranmer
   * @since 0.1
   */
 
 class BookEntryDialog(
-  private var coverImageChooser: FileChooser,
-  private val catalog: Catalog,
+  private val catalog: BookCatalog,
+  private val repository: BookRepository,
+  private val coverImageChooser: FileChooser,
   private val definedCategories: Set[String]
 )
   extends Scene(
     BookEntryDialog.dialogWidth,
     BookEntryDialog.dialogHeight
-  ) {
-  // Book being edited
-  private val bookBeingEdited: Book =
-    new Book
+) {
+  import catalog._
 
-  // Updated book catalog
-  var updatedCatalog: Catalog = _
+  // Book being edited
+  private val bookBeingEdited: BookModel =
+    new BookModel
 
   // Defined categories that are not associated with book
   val unassociatedCategories: ObservableBuffer[String] =
@@ -99,7 +103,10 @@ class BookEntryDialog(
   descriptionControl.id =
     BookEntryDialog.descriptionControlId
   descriptionControl.text.onChange {
-    bookBeingEdited.description = descriptionControl.text.value
+    bookBeingEdited.description =
+      Some(
+        descriptionControl.text.value
+      )
   }
 
   // Create control to display cover image
@@ -200,15 +207,23 @@ class BookEntryDialog(
   //noinspection ScalaUnusedSymbol
   saveButton.onAction =
     (event: ActionEvent) => {
-      val catalogResult =
-        catalog + bookBeingEdited
-      catalogResult match {
-        case Some(catalogWithNewBook) =>
-          updatedCatalog = catalogWithNewBook
+      val addResult =
+        add(
+          bookBeingEdited.title,
+          bookBeingEdited.author,
+          bookBeingEdited.isbn,
+          bookBeingEdited.description,
+          bookBeingEdited.coverImage,
+          bookBeingEdited.categories
+        )(
+          repository
+        )
+      addResult match {
+        case Success(_) =>
           val parentStage: Stage =
             window.value.asInstanceOf[javafx.stage.Stage]
           parentStage.close
-        case None => updatedCatalog = updatedCatalog
+        case Failure(_) =>
       }
     }
   AnchorPane.setTopAnchor(
@@ -254,9 +269,11 @@ class BookEntryDialog(
     isbnControl.text.value == "" ||
     (titleControl.text.value != "" &&
       authorControl.text.value != "" &&
-      catalog.alreadyContains (
+      existsInCatalog(
         titleControl.text.value,
         authorControl.text.value
+      )(
+        repository
       ))
   }
 }

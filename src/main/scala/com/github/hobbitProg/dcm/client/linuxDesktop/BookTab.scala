@@ -72,8 +72,9 @@ class BookTab(
         BookTab.addBookTitle
       dialogStage.scene =
         new BookEntryDialog(
+          null,
+          null,
           coverChooser,
-          catalog,
           definedCategories
         )
       dialogStage.showAndWait()

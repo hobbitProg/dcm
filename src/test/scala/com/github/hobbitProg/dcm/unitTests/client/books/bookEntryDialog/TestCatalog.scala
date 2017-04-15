@@ -1,19 +1,28 @@
-package com.github.hobbitProg.dcm.client.books.bookCatalog.service
+package com.github.hobbitProg.dcm.unitTests.client.books.bookEntryDialog
 
 import cats.data.Reader
 
 import scala.collection.Set
-import scala.util.Try
+import scala.util.{Success, Try}
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookRepository
+import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalog
 
 /**
-  * Algebra for catalog containing books
+  * Book catalog interpreter for verifying book entry dialog
   * @author Kyle Cranmer
   * @since 0.1
   */
-trait BookCatalog {
+class TestCatalog
+    extends BookCatalog {
+  var newTitle: Titles = _
+  var newAuthor: Authors = _
+  var newISBN: ISBNs = _
+  var newDescription: Description = _
+  var newCover: CoverImages = _
+  var newCategories: Set[Categories] = _
+
   /**
     * Place new book into catalog
     * @param title Title of new book
@@ -31,7 +40,29 @@ trait BookCatalog {
     description: Description,
     cover: CoverImages,
     categories: Set[Categories]
-  ): Reader[BookRepository, Try[Book]]
+  ): Reader[BookRepository, Try[Book]] =
+    Reader {
+      repository => {
+        newTitle = title
+        newAuthor = author
+        newISBN = isbn
+        newDescription = description
+        newCover = cover
+        newCategories = categories
+        Success(
+          Book.book(
+            title,
+            author,
+            isbn,
+            description,
+            cover,
+            categories
+          ).getOrElse(
+            null
+          )
+        )
+      }
+    }
 
   /**
     * Register action to perform when book is added to catalog
@@ -39,7 +70,8 @@ trait BookCatalog {
     */
   def onAdd(
     addAction: Book => Unit
-  ): Unit
+  ): Unit = {
+  }
 
   /**
     * Determine if book with given title and author already exists in book
@@ -52,5 +84,10 @@ trait BookCatalog {
   def existsInCatalog(
     title: Titles,
     author: Authors
-  ): Reader[BookRepository, Boolean]
+  ): Reader[BookRepository, Boolean] =
+    Reader {
+      repository =>
+      title == "Ruins" &&
+      author == "Kevin J. Anderson"
+    }
 }
