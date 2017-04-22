@@ -7,7 +7,6 @@ import scalafx.scene.control._
 import scalafx.scene.layout.AnchorPane
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model.Book
-import com.github.hobbitProg.dcm.client.books.Conversions._
 import com.github.hobbitProg.dcm.client.books.control.image._
 import com.github.hobbitProg.dcm.client.books.control.label._
 import com.github.hobbitProg.dcm.client.books.control.listView._
@@ -105,10 +104,14 @@ class SelectedBookControl
       isbnValue,
       selectedBook.isbn
     )
-    updateValue(
-      descriptionValue,
-      selectedBook.description
-    )
+    selectedBook.description match {
+      case Some(bookDescription) =>
+        updateValue(
+          descriptionValue,
+          bookDescription
+        )
+      case None =>
+    }
     selectedBook.coverImage match {
       case Some(imageLocation: URI) =>
         coverImageControl.image =

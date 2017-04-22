@@ -12,7 +12,6 @@ import org.scalatest.{FreeSpec, Matchers}
 
 import scala.collection.Set
 
-import com.github.hobbitProg.dcm.client.books.Categories
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.interpreter.DatabaseBookRepositoryInterpreter
 

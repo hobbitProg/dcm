@@ -17,7 +17,7 @@ import java.net.URI
 
 import scala.collection.Set
 
-import com.github.hobbitProg.dcm.client.books._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 
 /**
   * Stub database for verifing storage of catalog
@@ -37,8 +37,8 @@ class StubDatabase {
   var addedTitle: Titles = ""
   var addedAuthor: Authors = ""
   var addedISBN: ISBNs = ""
-  var addedDescription: Descriptions = None
-  var addedCover: CoverImageLocations = None
+  var addedDescription: Description = None
+  var addedCover: CoverImages = None
   var addedCategoryAssociations: Set[(ISBNs, Categories)] =
     Set[(ISBNs, Categories)]()
 

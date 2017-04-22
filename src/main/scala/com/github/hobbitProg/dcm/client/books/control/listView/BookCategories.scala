@@ -6,7 +6,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.ListView
 import scalafx.scene.layout.AnchorPane
 
-import com.github.hobbitProg.dcm.client.books.Categories
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model.Categories
 import com.github.hobbitProg.dcm.client.control.model.DisableSelectionModel
 
 /**

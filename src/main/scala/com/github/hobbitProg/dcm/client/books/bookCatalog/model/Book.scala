@@ -15,6 +15,25 @@ trait Book {
   def description: Description
   def coverImage: CoverImages
   def categories: Set[Categories]
+
+  override def equals(
+    obj: Any
+  ): Boolean = {
+    // Ensure other object is a book
+    if (!obj.isInstanceOf[Book]) {
+      return false
+    }
+
+    // Ensure all fields are the same
+    val otherBook: Book = obj.asInstanceOf[Book]
+
+    title == otherBook.title &&
+    author == otherBook.author &&
+    isbn == otherBook.isbn &&
+    description == otherBook.description &&
+    coverImage == otherBook.coverImage &&
+    categories == otherBook.categories
+  }
 }
 
 object Book {

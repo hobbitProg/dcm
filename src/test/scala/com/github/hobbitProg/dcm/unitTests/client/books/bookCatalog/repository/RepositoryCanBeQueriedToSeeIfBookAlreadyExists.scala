@@ -2,7 +2,7 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository
 
 import org.scalatest.{FreeSpec, Matchers}
 
-import com.github.hobbitProg.dcm.client.books._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.interpreter.DatabaseBookRepositoryInterpreter
 
 class RepositoryCanBeQueriedToSeeIfBookAlreadyExists
