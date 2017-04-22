@@ -1,4 +1,8 @@
+import cats.data.Validated._
+
 import doobie.imports._
+
+import fs2.Task
 
 import java.io.File
 import java.net.URI
@@ -27,17 +31,13 @@ import scalafx.scene.image.ImageView
 import scalafx.scene.layout.{AnchorPane, VBox}
 import scalafx.stage.{FileChooser, Window}
 
-//import scalaz._
-//import Scalaz._
-//import scalaz.concurrent.Task
-
 import org.scalamock.scalatest.MockFactory
 
 import com.github.hobbitProg.dcm.acceptanceTests.AcceptanceApplication
 import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
-import com.github.hobbitProg.dcm.client.books._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
-//import com.github.hobbitProg.dcm.client.books.bookCatalog.storage.Storage
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.service.interpreter.BookCatalog
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.interpreter.DatabaseBookRepositoryInterpreter
 import com.github.hobbitProg.dcm.client.books.control.SelectedBookControl
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
@@ -50,13 +50,22 @@ import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
 class BookCatalogClientSteps
   extends MockFactory {
   type BookRow = (Titles,Authors,ISBNs,String,String)
+  private class TestBook(
+    val title: Titles,
+    val author: Authors,
+    val isbn: ISBNs,
+    val description: Description,
+    val coverImage: CoverImages,
+    val categories: Set[Categories]
+  ) extends Book {
+  }
 
   // Performs transactions on book catalog
-//  private val bookTransactor =
-//    DriverManagerTransactor[Task](
-//      BookCatalogClientSteps.databaseClass,
-//      BookCatalogClientSteps.databaseURL
-//    )
+  private val bookTransactor =
+    DriverManagerTransactor[Task](
+      BookCatalogClientSteps.databaseClass,
+      BookCatalogClientSteps.databaseURL
+    )
 
   // Robot to perform steps
   private val bookClientRobot: FxRobotInterface =
@@ -82,7 +91,7 @@ class BookCatalogClientSteps
   private implicit def row2Book(
     bookRow: scala.collection.mutable.Map[String, String]
   ): Book = {
-    new Book(
+    new TestBook(
       bookRow.get("title") match {
         case Some(title) => title
         case None => ""
@@ -125,7 +134,7 @@ class BookCatalogClientSteps
   private implicit def sqlRow2Book(
     bookRow: BookRow
   ) : Book = {
-    var descriptionValue: Descriptions =
+    var descriptionValue: Description =
       bookRow._4 match {
         case "NULL" => None
         case actualDescription => Some(actualDescription)
@@ -135,24 +144,21 @@ class BookCatalogClientSteps
         case "NULL" => None
         case actualCover => Some(new URI(actualCover))
       }
-//    val associatedCategories: Set[Categories] =
-//      sql"SELECT Category FROM categoryMapping WHERE ISBN=${bookRow._3};"
-//      .query[Categories]
-//      .vector
-//      .transact(bookTransactor)
-//      .unsafePerformSync
-//      .toSet
-    new Book(
-//      bookRow._1,
-//      bookRow._2,
-//      bookRow._3,
-      "",
-      "",
-      "",
+    val associatedCategories: Set[Categories] =
+      sql"SELECT Category FROM categoryMapping WHERE ISBN=${bookRow._3};"
+      .query[Categories]
+      .vector
+      .transact(bookTransactor)
+      .unsafeRun
+      .toSet
+
+    new TestBook(
+      bookRow._1,
+      bookRow._2,
+      bookRow._3,
       descriptionValue,
       coverLocation,
-      //      associatedCategories
-      Set()
+      associatedCategories
     )
   }
 
@@ -204,9 +210,9 @@ class BookCatalogClientSteps
         bookCatalogCreation <- bookCatalogSchemaCreationStatement.update.run
         categoryMappingCreation <- categoryMappingSchemaCreationStatement.update.run
       } yield definedCategoriesCreation + bookCatalogCreation + categoryMappingCreation
-//    schemaCreation.transact(
-//      bookTransactor
-//    ).unsafePerformSync
+    schemaCreation.transact(
+      bookTransactor
+    ).unsafeRun
   }
 
   @org.jbehave.core.annotations.AfterScenario
@@ -233,12 +239,12 @@ class BookCatalogClientSteps
     for (definedCategoryRow <- existingCategories.getRows) {
       val definedCategory =
         definedCategoryRow.get("category")
-//.      sql"INSERT INTO definedCategories (Category) VALUES ($definedCategory);"
-//        .update
-//        .run
-//        .transact(
-//          bookTransactor
-//        ).unsafePerformSync
+      sql"INSERT INTO definedCategories (Category) VALUES ($definedCategory);"
+        .update
+        .run
+        .transact(
+          bookTransactor
+        ).unsafeRun
     }
   }
 
@@ -257,40 +263,38 @@ class BookCatalogClientSteps
         existingBook.get("description")
       val coverImage =
         existingBook.get("cover image")
-//      sql"INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES($title,$author,$isbn,$description,$coverImage);"
-//        .update
-//        .run
-//        .transact(
-//          bookTransactor
-//        ).unsafePerformSync
+      sql"INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES($title,$author,$isbn,$description,$coverImage);"
+        .update
+        .run
+        .transact(
+          bookTransactor
+        ).unsafeRun
 
       for (associatedCategory <- existingBook.get("categories").split(",")) {
-//        sql"INSERT INTO categoryMapping(ISBN,Category)VALUES($isbn,$associatedCategory)"
-//          .update
-//          .run
-//          .transact(
-//            bookTransactor
-//          ).unsafePerformSync
+        sql"INSERT INTO categoryMapping(ISBN,Category)VALUES($isbn,$associatedCategory)"
+          .update
+          .run
+          .transact(
+            bookTransactor
+          ).unsafeRun
       }
 
-      existingBooks =
-        existingBooks +
-        new Book(
-          title,
-          author,
-          isbn,
-          Some(
-            description
-          ),
-          Some(
-            new URI(
-              coverImage
-            )
-          ),
-          Set[Categories](
-            existingBook.get("categories").split(","): _*
+      new TestBook(
+        title,
+        author,
+        isbn,
+        Some(
+          description
+        ),
+        Some(
+          new URI(
+            coverImage
           )
+        ),
+        Set[Categories](
+          existingBook.get("categories").split(","): _*
         )
+      )
     }
 
     showMainApplication()
@@ -412,22 +416,22 @@ class BookCatalogClientSteps
 
   @org.jbehave.core.annotations.Then("the book is in the book catalogs")
   def bookExistsInCatalog(): Unit = {
-//    val newBooksInCatalog: Set[BookRow] =
-//      sql"SELECT Title,Author,ISBN,Description,Cover FROM bookCatalog WHERE ISBN = ${bookToEnter.isbn};"
-//      .query[BookRow]
-//      .vector
-//      .transact(
-//        bookTransactor
-//      )
-//      .unsafePerformSync
-//      .toSet
-//    val newBook: Book =
-//      newBooksInCatalog.head
-//    Assert.assertEquals(
-//      "New book not placed into catalog",
-//      bookToEnter,
-//      newBook
-//    )
+    val newBooksInCatalog: Set[BookRow] =
+      sql"SELECT Title,Author,ISBN,Description,Cover FROM bookCatalog WHERE ISBN = ${bookToEnter.isbn};"
+      .query[BookRow]
+      .vector
+      .transact(
+        bookTransactor
+      )
+      .unsafeRun
+      .toSet
+    val newBook: Book =
+      newBooksInCatalog.head
+    Assert.assertEquals(
+      "New book not placed into catalog",
+      bookToEnter,
+      newBook
+    )
   }
 
   @org.jbehave.core.annotations.Then("the book is displayed on the window displaying the book catalog")
@@ -539,13 +543,15 @@ class BookCatalogClientSteps
 
   private def showMainApplication(): Unit = {
     FxToolkit.registerPrimaryStage()
-//    desktop =
-//      new DCMDesktop(
-//        coverChooser,
-//        Storage(
-//          bookTransactor
-//        )
-//      )
+    DatabaseBookRepositoryInterpreter.setConnection(
+      bookTransactor
+    )
+    desktop =
+      new DCMDesktop(
+        coverChooser,
+        BookCatalog,
+        DatabaseBookRepositoryInterpreter
+      )
 
     dcmApplication =
       FxToolkit.setupApplication(

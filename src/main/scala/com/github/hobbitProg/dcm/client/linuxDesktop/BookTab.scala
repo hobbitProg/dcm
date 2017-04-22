@@ -8,8 +8,9 @@ import scalafx.scene.control.{Button, Tab}
 import scalafx.scene.layout.AnchorPane
 import scalafx.stage.{FileChooser ,Stage}
 
-import com.github.hobbitProg.dcm.client.books.Categories
-import com.github.hobbitProg.dcm.client.books.bookCatalog.Catalog
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model.Categories
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookRepository
+import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalog
 import com.github.hobbitProg.dcm.client.books.control._
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 
@@ -20,7 +21,8 @@ import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
   */
 class BookTab(
   private val coverChooser: FileChooser,
-  private val catalog: Catalog,
+  private val catalog: BookCatalog,
+  private val repository: BookRepository,
   private val definedCategories: Set[Categories]
 ) extends Tab {
   text = "Books"
@@ -31,9 +33,8 @@ class BookTab(
   // Add control to display books within catalog
   val catalogDisplay: BookCatalogControl =
     new BookCatalogControl(
-//      catalog,
-      null,
-      null
+      catalog,
+      repository
     )
   AnchorPane.setTopAnchor(
     catalogDisplay,
@@ -74,8 +75,8 @@ class BookTab(
         BookTab.addBookTitle
       dialogStage.scene =
         new BookEntryDialog(
-          null,
-          null,
+          catalog,
+          repository,
           coverChooser,
           definedCategories
         )
