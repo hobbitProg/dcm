@@ -31,7 +31,9 @@ class BookTab(
   // Add control to display books within catalog
   val catalogDisplay: BookCatalogControl =
     new BookCatalogControl(
-      catalog
+//      catalog,
+      null,
+      null
     )
   AnchorPane.setTopAnchor(
     catalogDisplay,

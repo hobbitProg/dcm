@@ -3,8 +3,7 @@ package com.github.hobbitProg.dcm.client.books.bookCatalog.repository
 import scala.collection.Set
 import scala.util.Either
 
-import com.github.hobbitProg.dcm.client.books._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.model.Book
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 
 /**
   * Algebra for book catalog repostiory

@@ -8,7 +8,10 @@ import scalafx.collections.ObservableBuffer
 import scalafx.collections.transformation.SortedBuffer
 import scalafx.scene.control.{ListCell, ListView}
 
-import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model.Book
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookRepository
+import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalog
+
 
 /**
   * Control to display books in catalog
@@ -16,9 +19,12 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.{Book, Catalog}
   * @since 0.1
   */
 class BookCatalogControl(
-  private val source: Catalog
+  private val source: BookCatalog,
+  private val repository: BookRepository
 ) extends ListView[Book]
-  with StringOrdering {
+    with StringOrdering {
+
+  import source._
 
   // Only display title of book in control
   cellFactory = {
@@ -47,7 +53,7 @@ class BookCatalogControl(
     new ObservableBuffer[Book]
 
   // Display books that are initially in catalog
-  for (initialBook <- source) {
+  for (initialBook <- repository.contents) {
     items.value += initialBook
   }
   items.value sort {
@@ -57,17 +63,15 @@ class BookCatalogControl(
       )
   }
 
-  //noinspection ScalaUnusedSymbol
   // Display all books that are added to catalog
-  private val additionSubscription =
-    source onAdd {
-      newBook =>
-        items.value += newBook
-        items.value sort {
-          (left: Book, right: Book) =>
-            compare(
-              left.title, right.title
-            )
-        }
-    }
+  onAdd {
+    newBook =>
+      items.value += newBook
+      items.value sort {
+        (left: Book, right: Book) =>
+          compare(
+            left.title, right.title
+          )
+      }
+  }
 }
