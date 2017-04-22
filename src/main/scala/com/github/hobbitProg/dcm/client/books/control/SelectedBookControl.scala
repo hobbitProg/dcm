@@ -2,12 +2,11 @@ package com.github.hobbitProg.dcm.client.books.control
 
 import java.net.URI
 
-import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
-
 import scalafx.scene.Group
 import scalafx.scene.control._
 import scalafx.scene.layout.AnchorPane
 
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model.Book
 import com.github.hobbitProg.dcm.client.books.Conversions._
 import com.github.hobbitProg.dcm.client.books.control.image._
 import com.github.hobbitProg.dcm.client.books.control.label._

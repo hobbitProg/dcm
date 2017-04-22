@@ -15,9 +15,7 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.control.{ListView, TextInputControl}
 import scalafx.Includes._
 
-import com.github.hobbitProg.dcm.client.books.Categories
-import com.github.hobbitProg.dcm.client.books.bookCatalog.Book
-import com.github.hobbitProg.dcm.client.books.bookCatalog.Implicits._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.control.SelectedBookControl
 import com.github.hobbitProg.dcm.client.books.control.image.CoverImage
 
@@ -28,13 +26,23 @@ import com.github.hobbitProg.dcm.client.books.control.image.CoverImage
 class SelectedBookControlIsClearedWhenRequested
   extends FreeSpec
     with Matchers {
+  private class TestBook(
+    val title: Titles,
+    val author: Authors,
+    val isbn: ISBNs,
+    val description: Description,
+    val coverImage: CoverImages,
+    val categories: Set[Categories]
+  ) extends Book {
+  }
+
   "Given a selected book control" - {
     val selectedBookScene =
       createSelectedBookControlScene
 
     "and a selected book" - {
       val selectedBook: Book =
-        (
+        new TestBook(
           "Ruins",
           "Kevin J. Anderson",
           "0061052477",
