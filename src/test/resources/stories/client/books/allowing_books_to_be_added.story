@@ -96,3 +96,20 @@ And the following book to add to the catalog:
 |Ruins|Kevin J. Anderson|006105223X|Description for Ruins|Ruins.jpg|sci-fi,conspiracy|
 When I enter this book into the book catalog
 Then I cannot accept the information on the book
+
+Scenario: A book that has an ISBN that already exists within the book catalog cannot be added to the catalog
+Given the following defined categories:
+|category|
+|sci-fi|
+|conspiracy|
+|fantasy|
+|thriller|
+And the following books that are already in the catalog:
+|title|author|isbn|description|cover image|categories|
+|Ruins|Kevin J. Anderson|0061052477|Description for Ruins|Ruins.jpg|sci-fi,conspiracy|
+|Goblins|Charles Grant|0061054143|Description for Goblins|Goblins.jpg|sci-fi,conspiracy|
+And the following book to add to the catalog:
+|title|author|isbn|description|cover image|categories|
+|Ground Zero|Kevin J. Anderson|0061054143|Description for Ground Zero|GroundZero.jpg|sci-fi,conspiracy|
+When I enter this book into the book catalog
+Then I cannot accept the information on the book

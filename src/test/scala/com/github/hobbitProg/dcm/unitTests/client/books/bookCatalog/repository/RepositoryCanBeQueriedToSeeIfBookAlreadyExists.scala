@@ -17,40 +17,58 @@ class RepositoryCanBeQueriedToSeeIfBookAlreadyExists
 
 
     "and a title and author of a book that does not exist within the " +
-    "storage" - {
+    "repository" - {
       val title: Titles = "Ground Zero"
       val author: Authors = "Kevin J. Anderson"
 
-      "when the storage is queried to see if the associated book is already " +
-      "in storage" - {
+      "when the reposistory is queried to see if the associated book is " +
+      "already in the repository" - {
         val bookAlreadyExistsInStorage: Boolean =
           DatabaseBookRepositoryInterpreter.alreadyContains (
             title,
             author
           )
 
-        "then storage indicates the associated book is not in storage" in {
+        "then the repository indicates the associated book is not in the " +
+        "repository" in {
           bookAlreadyExistsInStorage shouldEqual false
         }
       }
     }
 
-    "and a title and author of a book that already exists within storage" - {
+    "and a title and author of a book that already exists within the " +
+    "repository" - {
       val title: Titles = "Ruins"
       val author: Authors = "Kevin J. Anderson"
 
-      "when the storage is queried to see if the associated book already " +
-      "exists in storage" - {
+      "when the repository is queried to see if the associated book already " +
+      "exists in the repository" - {
         val bookExistsInStorage: Boolean =
           DatabaseBookRepositoryInterpreter.alreadyContains (
             title,
             author
           )
 
-        "then storage indicates the associated book already exists in " +
-        "storage" in {
+        "then the repository indicates the associated book already exists in " +
+        "the repository" in {
           bookExistsInStorage shouldEqual true
         }
+      }
+    }
+
+    "and an ISBN of a book that does not exist within the repository" - {
+      "when the repository is queried to see if the associated book is " +
+      "already in the repository" - {
+        "then the repository indicates the associated book is not in the " +
+        "repository" in pending
+      }
+    }
+
+    "and an ISBN of a book that already exists within the repository" - {
+      "when the repository is queried to see if the associated book already " +
+      "exists in the repository" - {
+        "then the repository indicates the associated book already exists in " +
+        "the repository" in pending
       }
     }
   }

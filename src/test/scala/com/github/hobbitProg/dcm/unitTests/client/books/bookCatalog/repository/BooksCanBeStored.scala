@@ -38,14 +38,14 @@ class BooksCanBeStored
       Set()
     )
 
-  "Given storage to place books into" - {
+  "Given a repository to place books into" - {
     val database =
       new StubDatabase
     DatabaseBookRepositoryInterpreter.setConnection(
       database.connectionTransactor
     )
 
-    "and a book containing all required information to place into storage" - {
+    "and a book containing all required information to place into the repository" - {
       val bookToStore =
         Book.book(
           "Ground Zero",
@@ -65,17 +65,17 @@ class BooksCanBeStored
           )
         )
 
-      "when the book is placed into storage" - {
+      "when the book is placed into the repository" - {
         val saveResult =
           DatabaseBookRepositoryInterpreter.save(
             bookToStore getOrElse emptyBook
           )
 
-        "then storage is updated" in {
+        "then the repository is updated" in {
           saveResult shouldBe ('right)
         }
 
-        "and the book is placed into storage" in {
+        "and the book is placed into the repository" in {
           val enteredBook =
             Book.book(
               database.addedTitle,
@@ -100,14 +100,14 @@ class BooksCanBeStored
     }
   }
 
-  "Given storage to place books into" - {
+  "Given a repository to place books into" - {
     val database =
       new StubDatabase
     DatabaseBookRepositoryInterpreter.setConnection(
       database.connectionTransactor
     )
 
-    "and a book without a title to place into storage" - {
+    "and a book without a title to place into the repository" - {
       val bookToStore: Book =
         TestBook(
           "",
@@ -127,27 +127,27 @@ class BooksCanBeStored
           )
         )
 
-      "when the book is placed into storage" - {
+      "when the book is placed into the repository" - {
         val saveResult =
           DatabaseBookRepositoryInterpreter.save(
             bookToStore
           )
 
-        "then the book is not placed into storage" in {
+        "then the book is not placed into the repository" in {
           saveResult shouldBe ('left)
         }
       }
     }
   }
 
-  "Given storage to place books into" - {
+  "Given a repository to place books into" - {
     val database =
       new StubDatabase
     DatabaseBookRepositoryInterpreter.setConnection(
       database.connectionTransactor
     )
 
-    "and a book without an author to place into storage" - {
+    "and a book without an author to place into the repository" - {
       val bookToStore: Book =
         TestBook(
           "Ground Zero",
@@ -167,27 +167,27 @@ class BooksCanBeStored
           )
         )
 
-      "when the book is placed into storage" - {
+      "when the book is placed into the repository" - {
         val saveResult =
           DatabaseBookRepositoryInterpreter.save(
             bookToStore
           )
 
-        "then the book is not placed into storage" in {
+        "then the book is not placed into the repository" in {
           saveResult shouldBe ('left)
         }
       }
     }
   }
 
-  "Given storage to place books into" - {
+  "Given a repository to place books into" - {
     val database =
       new StubDatabase
     DatabaseBookRepositoryInterpreter.setConnection(
       database.connectionTransactor
     )
 
-    "and a book without an ISBN to place into storage" - {
+    "and a book without an ISBN to place into the repository" - {
       val bookToStore: Book =
         TestBook(
           "Ground Zero",
@@ -207,20 +207,20 @@ class BooksCanBeStored
           )
         )
 
-      "when the book is placed into storage" - {
+      "when the book is placed into the repository" - {
         val saveResult =
           DatabaseBookRepositoryInterpreter.save(
             bookToStore
           )
 
-        "then the book is not placed into storage" in {
+        "then the book is not placed into the repository" in {
           saveResult shouldBe ('left)
         }
       }
     }
   }
 
-  "Given storage to place books into (with books already in storage)" - {
+  "Given a repository to place books into (with books already in the repository)" - {
     val database =
       new StubDatabase
     DatabaseBookRepositoryInterpreter.setConnection(
@@ -228,7 +228,7 @@ class BooksCanBeStored
     )
 
     "and a book containing the same name and author as a book that is " +
-    "already in storage" - {
+    "already in the repository" - {
       val bookToStore: Book =
         TestBook(
           "Ruins",
@@ -248,15 +248,25 @@ class BooksCanBeStored
           )
         )
 
-      "when the book is placed into storage" - {
+      "when the book is placed into the repository" - {
         val saveResult =
           DatabaseBookRepositoryInterpreter.save(
             bookToStore
           )
 
-        "then the book is not placed into storage" in {
+        "then the book is not placed into the repository" in {
           saveResult shouldBe ('left)
         }
+      }
+    }
+  }
+
+  "Given a repository to place books into (with books already in the " +
+  "repository)" - {
+    "and a book containing the same ISBN as a book that is alreeady in the " +
+    "repository" - {
+      "when the book is placed into the repository" - {
+        "then the book is not placed into the repository" in pending
       }
     }
   }

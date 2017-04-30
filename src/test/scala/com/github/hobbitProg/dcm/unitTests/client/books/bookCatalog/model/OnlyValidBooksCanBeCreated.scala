@@ -203,6 +203,6 @@ class OnlyValidBooksCanBeCreated
       "then no book is created" in {
         newBook shouldBe invalid
       }
-      }
     }
+  }
 }
