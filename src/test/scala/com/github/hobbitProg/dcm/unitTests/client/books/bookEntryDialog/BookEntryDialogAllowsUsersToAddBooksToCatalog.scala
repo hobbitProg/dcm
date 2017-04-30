@@ -85,6 +85,20 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalog
         "sci-fi",
         "conspiracy"
       ))
+  private val bookWithDuplicateISBN: BookData =
+    new BookData(
+      "Ground Zero",
+      "Kevin J. Anderson",
+      "0061052477",
+      Some("Description for Ground Zero"),
+      Some[URI](
+        bookImageLocation
+      ),
+      Set[String](
+        "sci-fi",
+        "conspiracy"
+      )
+    )
 
   "Given a book catalog" - {
     val catalog =
