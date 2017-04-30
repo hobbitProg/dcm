@@ -264,24 +264,86 @@ class BookEntryDialog(
     * @return True if book cannot be saved and false otherwise
     */
   private def bookUnableToBeSaved: Boolean = {
-    titleControl.text.value == "" ||
-    authorControl.text.value == "" ||
-    isbnControl.text.value == "" ||
-    (titleControl.text.value != "" &&
-      authorControl.text.value != "" &&
-      existsInCatalog(
-        titleControl.text.value,
-        authorControl.text.value
-      )(
-        repository
-      )) ||
-    (isbnControl.text.value != "" &&
-      existsInCatalog(
-        isbnControl.text.value
-      )(
-        repository
-      ))
+    titleIsUndefined ||
+    authorIsUndefined ||
+    isbnIsUndefined ||
+    userChoseTitleAndAuthorThatExistsInCatalog ||
+    userChoseISBNThatExistsInCatalog
   }
+
+  /**
+    * Indication if user has not defined title of book
+    */
+  private def titleIsUndefined: Boolean =
+    titleControl.text.value == ""
+
+  /**
+    * Indication if user has defined title of book
+    */
+  private def titleIsDefined: Boolean =
+    titleControl.text.value != ""
+
+  /**
+    * Indication if user has not defined author of book
+    */
+  private def authorIsUndefined: Boolean =
+    authorControl.text.value == ""
+
+  /**
+    * Indication if user has defined author for book
+    */
+  private def authorIsDefined: Boolean =
+    authorControl.text.value != ""
+
+  /**
+    * Indication if user has not defined ISBN for book
+    */
+  private def isbnIsUndefined: Boolean =
+    isbnControl.text.value == ""
+
+  /**
+    * Indication if user has defined ISBN for book
+    */
+  private def isbnIsDefined: Boolean =
+    isbnControl.text.value != ""
+
+  /**
+    * Indication that book with user-defined title by user-defined author
+    * already exists in catalog
+    */
+  private def titleAuthorPairExistsInCatalog: Boolean =
+    existsInCatalog(
+      titleControl.text.value,
+      authorControl.text.value
+    )(
+      repository
+    )
+
+  /**
+    * Indication that book with user-defined ISBN already exists in catalog
+    */
+  private def isbnExistsInCatalog: Boolean =
+    existsInCatalog(
+      isbnControl.text.value
+    )(
+      repository
+    )
+
+  /**
+    * Indication that user defined title and author that already exists in
+    * catalog
+    */
+  private def userChoseTitleAndAuthorThatExistsInCatalog: Boolean =
+    titleIsDefined &&
+  authorIsDefined &&
+  titleAuthorPairExistsInCatalog
+
+  /**
+    * Indication that user defined isbn that already exists in catalog
+    */
+  private def userChoseISBNThatExistsInCatalog: Boolean =
+    isbnIsDefined &&
+  isbnExistsInCatalog
 }
 
 object BookEntryDialog {
