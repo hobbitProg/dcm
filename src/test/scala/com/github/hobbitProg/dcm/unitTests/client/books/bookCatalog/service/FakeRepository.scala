@@ -62,5 +62,7 @@ class FakeRepository
     */
   def alreadyContains(
     isbn: ISBNs
-  ): Boolean = false
+  ): Boolean = {
+    isbn == "0061052477"
+  }
 }

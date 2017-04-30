@@ -126,6 +126,21 @@ class BookCatalogInterpreter extends BookCatalog {
         author
       )
     }
+
+  /**
+    * Determine if book with given ISBN already exists in book catalog
+    * @param isbn ISBN of book being examined
+    * @return True if book with given ISBN already exists in book catalog and
+    * false otherwise
+    */
+  def existsInCatalog(
+    isbn: ISBNs
+  ): Reader[BookRepository, Boolean] = {
+    Reader {
+      repository: BookRepository =>
+      repository alreadyContains isbn
+    }
+  }
 }
 
 object BookCatalog extends BookCatalogInterpreter

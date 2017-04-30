@@ -73,24 +73,62 @@ class BookCatalogCanDetermineIfABookAlreadyExists
   }
 
   "Given a book catalog" - {
+    val testCatalog: BookCatalogInterpreter =
+      new BookCatalogInterpreter
+    import testCatalog._
+
     "and a repository that contains books" - {
-      "and theISBN of a book that does not exist in the catalog" - {
+      val bookRepository: BookRepository =
+        new FakeRepository()
+
+      "and the ISBN of a book that does not exist in the catalog" - {
+        val isbn =
+          "006105223X"
+
         "when the catalog is queried to see if a book already exists with " +
         "the given ISBN" - {
-          "then the catalog indicates there is no book in the catalog that " -
-          "has the given ISBN" is pending
+          val bookExistsInCatalog: Boolean =
+            existsInCatalog(
+              isbn
+            )(
+              bookRepository
+            )
+
+          "then the catalog indicates there is no book in the catalog that " +
+          "has the given ISBN" in {
+            bookExistsInCatalog should be (false)
+          }
         }
       }
     }
   }
 
   "Given a book catalog" - {
+    val testCatalog: BookCatalogInterpreter =
+      new BookCatalogInterpreter
+    import testCatalog._
+
     "and a repository that contains books" - {
+      val bookRepository: BookRepository =
+        new FakeRepository()
+ 
       "and the ISBN of a book that already exists in the catalog" - {
-        "when the catalog is queried to see if a book already exists with " +
+        val isbn =
+          "0061052477"
+
+       "when the catalog is queried to see if a book already exists with " +
         "the given ISBN" - {
+          val bookExistsInCatalog: Boolean =
+            existsInCatalog(
+              isbn
+            )(
+              bookRepository
+            )
+
           "then the catalog indicates there is a book in the catalog that " +
-          "has the given ISBN" in pending
+          "has the given ISBN" in  {
+            bookExistsInCatalog should be (true)
+          }
         }
       }
     }
