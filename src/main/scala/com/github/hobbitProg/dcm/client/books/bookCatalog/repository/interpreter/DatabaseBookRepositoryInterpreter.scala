@@ -72,7 +72,15 @@ object DatabaseBookRepositoryInterpreter extends BookRepository {
             bookToSave.title +
             " by " +
             bookToSave.author +
-            " already exist in catalog"
+            " already exists in catalog"
+        )
+      case isbnAlreadyExists if alreadyContains(
+        bookToSave.isbn
+      ) =>
+        Left(
+          "The book with isbn " +
+            bookToSave.isbn +
+            " already exists in catalog"
         )
       case _ =>
         val descriptionSQL =

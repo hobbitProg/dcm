@@ -263,10 +263,42 @@ class BooksCanBeStored
 
   "Given a repository to place books into (with books already in the " +
   "repository)" - {
+    val database =
+      new StubDatabase
+    DatabaseBookRepositoryInterpreter.setConnection(
+      database.connectionTransactor
+    )
+
     "and a book containing the same ISBN as a book that is alreeady in the " +
     "repository" - {
+      val bookToStore =
+        TestBook(
+          "Ground Zero",
+          "Kevin J. Anderson",
+          "0061052477",
+          Some(
+            "Description for Ground Zero"
+          ),
+          Some(
+            getClass.getResource(
+              "/GroundZero.jpg"
+            ).toURI
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+
       "when the book is placed into the repository" - {
-        "then the book is not placed into the repository" in pending
+        val saveResult =
+          DatabaseBookRepositoryInterpreter.save(
+            bookToStore
+          )
+
+        "then the book is not placed into the repository" in {
+          saveResult shouldBe ('left)
+        }
       }
     }
   }
