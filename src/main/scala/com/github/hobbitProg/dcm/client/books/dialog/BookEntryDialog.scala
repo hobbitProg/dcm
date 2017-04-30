@@ -274,6 +274,12 @@ class BookEntryDialog(
         authorControl.text.value
       )(
         repository
+      )) ||
+    (isbnControl.text.value != "" &&
+      existsInCatalog(
+        isbnControl.text.value
+      )(
+        repository
       ))
   }
 }
