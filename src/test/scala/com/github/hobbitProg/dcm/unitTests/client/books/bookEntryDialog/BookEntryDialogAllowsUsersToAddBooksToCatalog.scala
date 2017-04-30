@@ -691,7 +691,7 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalog
               "exists within the catalog)" - {
                 "and the user enters the description of the new book" - {
                   "and the user selects the cover image for the new book" - {
-                    "and the user requests to associate categories with the " -
+                    "and the user requests to associate categories with the " +
                     "new book" - {
                       "and the user selects the first category associated " +
                       "with the new book" - {

@@ -199,4 +199,21 @@ object DatabaseBookRepositoryInterpreter extends BookRepository {
       .unsafeRun
       .isEmpty
   }
+
+  /**
+    * Determine if book with given ISBN already exists in storage
+    * @param isbn ISBN of book that is to be placed into storage
+    * @return True if book with given ISBN already exists in storage and false
+    * otherwise
+    */
+  def alreadyContains(
+    isbn: ISBNs
+  ): Boolean = {
+    !sql"SELECT ISBN from bookCatalog where ISBN=${isbn};"
+      .query[Titles]
+      .list
+      .transact(databaseConnection)
+      .unsafeRun
+      .isEmpty
+  }
 }

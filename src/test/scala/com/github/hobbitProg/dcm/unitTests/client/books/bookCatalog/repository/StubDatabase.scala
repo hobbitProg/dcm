@@ -33,6 +33,7 @@ class StubDatabase {
   // Information on book that already exists within storage
   private val existingTitle : Titles = "Ruins"
   private val existingAuthor: Authors = "Kevin J. Anderson"
+  private val existingISBN: ISBNs = "0061052477"
 
   var addedTitle: Titles = ""
   var addedAuthor: Authors = ""
@@ -44,6 +45,7 @@ class StubDatabase {
 
   private var queriedTitle: Titles = ""
   private var queriedAuthor: Authors = ""
+  private var queriedISBN: ISBNs = ""
 
   AcolyteDriver.register(
     databaseId,
@@ -105,6 +107,19 @@ class StubDatabase {
             queriedAuthor == existingAuthor) {
             RowLists.stringList(
               existingTitle
+            )
+          }
+          else {
+            QueryResult.Nil
+          }
+        case "SELECT ISBN from bookCatalog where ISBN=?;" =>
+          val parameters =
+            query.parameters
+          queriedISBN =
+            parameters.head.value.asInstanceOf[ISBNs]
+          if (queriedISBN == existingISBN) {
+            RowLists.stringList(
+              existingISBN
             )
           }
           else {

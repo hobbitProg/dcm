@@ -57,18 +57,32 @@ class RepositoryCanBeQueriedToSeeIfBookAlreadyExists
     }
 
     "and an ISBN of a book that does not exist within the repository" - {
+      val isbn: ISBNs = "006105223X"
+
       "when the repository is queried to see if the associated book is " +
       "already in the repository" - {
+        val bookExistsInStorage: Boolean =
+          DatabaseBookRepositoryInterpreter alreadyContains isbn
+
         "then the repository indicates the associated book is not in the " +
-        "repository" in pending
+        "repository" in {
+          bookExistsInStorage shouldEqual false
+        }
       }
     }
 
     "and an ISBN of a book that already exists within the repository" - {
+      val isbn: ISBNs = "0061052477"
+
       "when the repository is queried to see if the associated book already " +
       "exists in the repository" - {
+        val bookExistsInStorage: Boolean =
+          DatabaseBookRepositoryInterpreter alreadyContains isbn
+
         "then the repository indicates the associated book already exists in " +
-        "the repository" in pending
+        "the repository" in {
+          bookExistsInStorage shouldEqual true
+        }
       }
     }
   }
