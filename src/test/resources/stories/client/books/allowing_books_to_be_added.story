@@ -4,7 +4,7 @@ Meta:
 
 Narrative:
 As someone who wants to keep track of books he owns
-I want to add books to the catalog catalog
+I want to add books to the catalog
 So that I can know what books I own
 
 Scenario: A book with all required fields can be added to the book catalog.
