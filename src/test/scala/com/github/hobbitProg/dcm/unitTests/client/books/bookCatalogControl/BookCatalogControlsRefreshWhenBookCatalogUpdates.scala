@@ -76,7 +76,7 @@ class BookCatalogControlsRefreshWhenBookCatalogUpdates
                 populatedRepository
               )
 
-            "then the new book is displayed on the book catalog window" in {
+            "then the new book is displayed on the book catalog control" in {
               val newBooks =
                 testScene.catalogControl.items.value.toSeq.filter {
                   definedBook =>
@@ -93,9 +93,25 @@ class BookCatalogControlsRefreshWhenBookCatalogUpdates
             }
 
             "and the books originally in the book catalog are still displayed " +
-            "on the book catalog" in {
+            "on the book catalog control" in {
               testScene.catalogControl.items.value.toSet should contain
               populatedRepository.contents
+            }
+          }
+        }
+      }
+    }
+  }
+
+  "Given a book catalog" - {
+    "and a populated book repository" - {
+      "and a book catalog window" - {
+        "and the information on a book within the repository" - {
+          "and the information on the book with its title changed" - {
+            "when the book is updated within the repository" - {
+              "then the new title is displayed in the book catalog control" in pending
+              "and the original title is not displayed in the book catalog control" in pending
+              "and the other books in the repository are still displaned on the book catalog control" in pending
             }
           }
         }
