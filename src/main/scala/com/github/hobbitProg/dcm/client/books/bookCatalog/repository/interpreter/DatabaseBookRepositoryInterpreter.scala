@@ -124,12 +124,44 @@ object DatabaseBookRepositoryInterpreter extends BookRepository {
             )
           } yield mainBookInsert + categoryUpdate
         val insertedBook =
-          insertStatement.transact (
+          insertStatement.transact(
             databaseConnection
           ).unsafeRunSync
 
         Right(bookToSave)
     }
+  }
+
+  /**
+    * Replace given book with updated copy of book
+    * @param originalBook Book that is being updated
+    * @param updatedBook Book containing updated information
+    * @return A disjoint union of either an error or book with updated
+    * information
+    */
+  override def update(
+    originalBook: Book,
+    updatedBook: Book
+  ) = {
+    // Remove original book from repository
+    val bookRemovalStatement =
+      sql"DELETE FROM bookCatalog WHERE ISBN=${originalBook.isbn};"
+    val categoryRemovalStatement =
+      sql"DELETE FROM categoryMapping WHERE ISBN=${originalBook.isbn};"
+    val removalStatement =
+      for {
+        mainTableRemoval <- bookRemovalStatement.update.run
+        categoryTableRemoval <- categoryRemovalStatement.update.run
+      } yield mainTableRemoval + categoryTableRemoval
+    val removedBook =
+      removalStatement.transact(
+        databaseConnection
+      ).unsafeRunSync
+
+    // Place updated book into repository
+    save(
+      updatedBook
+    )
   }
 
   /**

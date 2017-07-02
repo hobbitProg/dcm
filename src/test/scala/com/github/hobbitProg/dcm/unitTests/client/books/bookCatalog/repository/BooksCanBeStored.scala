@@ -8,7 +8,8 @@ import scala.collection.Set
 import scala.math.Ordering._
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.interpreter.DatabaseBookRepositoryInterpreter
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  interpreter.DatabaseBookRepositoryInterpreter
 
 /**
   * Verifies books can be stored into repository

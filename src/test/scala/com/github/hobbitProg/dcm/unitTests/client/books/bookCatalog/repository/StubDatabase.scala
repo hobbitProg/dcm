@@ -43,6 +43,9 @@ class StubDatabase {
   var addedCategoryAssociations: Set[(ISBNs, Categories)] =
     Set[(ISBNs, Categories)]()
 
+  var removedISBN: ISBNs = ""
+  var removedCategoryAssociationISBN: ISBNs = ""
+
   private var queriedTitle: Titles = ""
   private var queriedAuthor: Authors = ""
   private var queriedISBN: ISBNs = ""
@@ -91,6 +94,18 @@ class StubDatabase {
               parameters(1).value.asInstanceOf[Categories]
             addedCategoryAssociations =
               addedCategoryAssociations + ((newISBN, newCategory))
+
+          case "DELETE FROM bookCatalog WHERE ISBN=?;"=>
+            val parameters =
+              execution.parameters
+            removedISBN =
+              parameters.head.value.asInstanceOf[ISBNs]
+
+          case "DELETE FROM categoryMapping WHERE ISBN=?;" =>
+            val parameters =
+              execution.parameters
+            removedCategoryAssociationISBN =
+              parameters.head.value.asInstanceOf[ISBNs]
         }
         1
     } withQueryHandler {

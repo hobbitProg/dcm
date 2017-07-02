@@ -14,11 +14,23 @@ trait BookRepository {
   /**
     * Save book into repository
     * @param bookToSave Book to place into repository
-    * @return A disjoint union of either an error or the book that was added to
-    * the repository
+    * @return A disjoint union of either an error or book that was added to
+    * repository
     */
   def save(
     bookToSave: Book
+  ): Either[String, Book]
+
+  /**
+    * Replace given book with updated copy of book
+    * @param originalBook Book that is being updated
+    * @param updatedBook Book containing updated information
+    * @return A disjoint union of either an error or book with updated
+    * information
+    */
+  def update(
+    originalBook: Book,
+    updatedBook: Book
   ): Either[String, Book]
 
   /**

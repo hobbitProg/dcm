@@ -30,6 +30,20 @@ class FakeRepository
   }
 
   /**
+    * Replace given book with updated copy of book
+    * @param originalBook Book that is being updated
+    * @param updatedBook Book containing updated information
+    * @return A disjoint union of either an error or book with updated
+    * information
+    */
+  def update(
+    originalBook: Book,
+    updatedBook: Book
+  ): Either[String, Book] = {
+    Left("Placeholder")
+  }
+
+  /**
     * Categories available for books
     */
   def definedCategories: Set[Categories] = Set()
