@@ -3,7 +3,7 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogControl
 import cats.data.Reader
 
 import scala.collection.Set
-import scala.util.{Success, Try}
+import scala.util.{Success, Failure, Try}
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalog
 
@@ -72,6 +72,33 @@ class TestCatalog
   }
 
   /**
+    * Replace original version of book with updated version
+    * @param originalBook Book that is being modified
+    * @param updatedTitle New title of book
+    * @param updatedAuthor New author of book
+    * @param updatedISBN New ISBN of book
+    * @param updatedDescription New description of book
+    * @param updatedCover New cover of book
+    * @param updatedCategories New categories associated wityh book
+    */
+  def update(
+    originalBook: Book,
+    updatedTitle: Titles,
+    updatedAuthor: Authors,
+    updatedISBN: ISBNs,
+    updatedDescription: Description,
+    updatedCover: CoverImages,
+    updatedCategories: Set[Categories]
+  ): Reader[BookRepository, Try[Book]] = {
+    Reader {
+      repository =>
+      Failure(
+        new scala.Exception
+      )
+    }
+  }
+
+  /**
     * Register action to perform when book is added to catalog
     * @param addAction Action to perform
     */
@@ -80,6 +107,15 @@ class TestCatalog
   ): Unit = {
     addSubscribers =
       addSubscribers + addAction
+  }
+
+  /**
+    * Register action to perform when book is added to catalog
+    * @param modifyAction Action to perform
+    */
+  def onModify(
+    modifyAction: (Book, Book) => Unit
+  ): Unit = {
   }
 
   /**

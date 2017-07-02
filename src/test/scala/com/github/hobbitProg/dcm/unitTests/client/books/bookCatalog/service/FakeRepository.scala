@@ -16,6 +16,9 @@ class FakeRepository
   // Book that was placed into repository
   var savedBook: Book = _
 
+  // Book that was removed from repository
+  var removedBook: Book = _
+
   /**
     * Save book into repository
     * @param bookToSave Book to place into repository
@@ -40,7 +43,9 @@ class FakeRepository
     originalBook: Book,
     updatedBook: Book
   ): Either[String, Book] = {
-    Left("Placeholder")
+    removedBook = originalBook
+    savedBook = updatedBook
+    Right(updatedBook)
   }
 
   /**

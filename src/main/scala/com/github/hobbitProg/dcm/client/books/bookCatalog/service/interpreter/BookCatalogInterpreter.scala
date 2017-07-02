@@ -20,26 +20,47 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalog
   * @since 0.1
   */
 class BookCatalogInterpreter extends BookCatalog {
+  // Common variables for creating reactive streams
   implicit val actorFactory =
     ActorSystem()
   implicit val materializer =
     ActorMaterializer()
-  val publisher =
+
+  // Stream containing new book events
+  val newBookPublisher =
     new NewBookPublisher
-  val producer =
+  val newBookProducer =
     Source.fromPublisher(
-      publisher
+      newBookPublisher
     )
-  val runnableGraph =
-    producer.toMat(
+  val newBookGraph =
+    newBookProducer.toMat(
       BroadcastHub.sink(
         bufferSize = 512
       )
     )(
       Keep.right
     )
-  val fromProducer =
-    runnableGraph.run()
+  val newBookFlow =
+    newBookGraph.run()
+
+  // Stream containing modify book events
+  val modifiedBookPublisher =
+    new ModifiedBookPublisher
+  val modifiedBookProducer =
+    Source.fromPublisher(
+      modifiedBookPublisher
+    )
+  val modifiedBookGraph =
+    modifiedBookProducer.toMat(
+      BroadcastHub.sink(
+        bufferSize = 512
+      )
+    )(
+      Keep.right
+    )
+  val modifiedBookFlow =
+    modifiedBookGraph.run()
 
   /**
     * Place new book into catalog
@@ -80,7 +101,7 @@ class BookCatalogInterpreter extends BookCatalog {
                 )
               )
             case Right(savedBook) =>
-              publisher publish savedBook
+              newBookPublisher publish savedBook
               Success(
                 savedBook
               )
@@ -93,16 +114,97 @@ class BookCatalogInterpreter extends BookCatalog {
     }
 
   /**
+    * Replace original version of book with updated version
+    * @param originalBook Book that is being modified
+    * @param updatedTitle New title of book
+    * @param updatedAuthor New author of book
+    * @param updatedISBN New ISBN of book
+    * @param updatedDescription New description of book
+    * @param updatedCover New cover of book
+    * @param updatedCategories New categories associated wityh book
+    */
+  def update(
+    originalBook: Book,
+    updatedTitle: Titles,
+    updatedAuthor: Authors,
+    updatedISBN: ISBNs,
+    updatedDescription: Description,
+    updatedCover: CoverImages,
+    updatedCategories: Set[Categories]
+  ): Reader[BookRepository, Try[Book]] = {
+    Reader {
+      repository: BookRepository =>
+      // Create book with modified data
+      Book.book(
+        updatedTitle,
+        updatedAuthor,
+        updatedISBN,
+        updatedDescription,
+        updatedCover,
+        updatedCategories
+      ) match {
+        case Valid(modifiedBook) =>
+          // Book was created successfully, so replace original book with
+          // modified book
+          repository.update(
+            originalBook,
+            modifiedBook
+          ) match {
+            case Left(error) =>
+              // Original book was not replaced with modified book, so indicate
+              // book was not updated
+              Failure(
+                new StoreException(
+                  error
+                )
+              )
+            case Right(updatedBook) =>
+              // Orignal book was replaced with modified book, so alert all
+              // subscribers book was modified
+              modifiedBookPublisher publish (
+                originalBook,
+                modifiedBook
+              )
+              Success(
+                updatedBook
+              )
+          }
+        case Invalid(_) =>
+          // Modified book could not be created
+          Failure(
+            new InvalidBookException()
+          )
+      }
+    }
+  }
+
+  /**
     * Register action to perform when book is added to catalog
     * @param addAction Action to perform
     */
   def onAdd(
     addAction: Book => Unit
   ): Unit = {
-    fromProducer runForeach {
+    newBookFlow runForeach {
       newBook =>
       addAction(
         newBook
+      )
+    }
+  }
+
+  /**
+    * Register action to perform when book is added to catalog
+    * @param modifyAction Action to perform
+    */
+  def onModify(
+    modifyAction: (Book, Book) => Unit
+  ): Unit = {
+    modifiedBookFlow runForeach {
+      modifiedBookData: Tuple2[Book, Book] =>
+      modifyAction(
+        modifiedBookData._1,
+        modifiedBookData._2
       )
     }
   }
