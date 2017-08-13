@@ -1,6 +1,5 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogControl
 
-import java.net.URI
 import java.util.function.{Consumer, Supplier}
 
 import javafx.application.Application
@@ -52,7 +51,7 @@ class BookCatalogControlsRefreshWhenBookCatalogUpdates
               "Description for Ground Zero"
             )
           val newCover: CoverImages =
-            Some[URI](
+            Some(
               getClass.getResource(
                 "/GroundZero.jpg"
               ).toURI
@@ -104,16 +103,87 @@ class BookCatalogControlsRefreshWhenBookCatalogUpdates
   }
 
   "Given a book catalog" - {
+    val populatedCatalog: BookCatalog =
+      new TestCatalog()
+
     "and a populated book repository" - {
+      val populatedRepository: BookRepository =
+        new TestRepository()
+
       "and a book catalog window" - {
+        val testScene: BookCatalogScene =
+          createBookCatalogControlScene(
+            populatedCatalog,
+            populatedRepository
+          )
+
         "and the information on a book within the repository" - {
-          "and the information on the book with its title changed" - {
-            "when the book is updated within the repository" - {
-              "then the new title is displayed in the book catalog control" in pending
-              "and the original title is not displayed in the book catalog control" in pending
-              "and the other books in the repository are still displaned on the book catalog control" in pending
-            }
-          }
+          val originalBook =
+            Book.book(
+              "Runs",
+              "Kevin J. Anderson",
+              "0061052477",
+              Some(
+                "Description for Ruins"
+              ),
+              Some(
+                getClass.getResource(
+                  "/Ruins.jpg"
+                ).toURI
+              ),
+              Set[Categories](
+                "sci-fi",
+                "conspiracy"
+              )
+            )
+
+//          "and the information on the book with its title changed" - {
+//            val updatedTitle: Titles =
+//              "Ruins"
+
+//            "when the book is updated within the repository" - {
+//              populatedCatalog.update(
+//                originalBook,
+//                updatedTitle,
+//                originalBook.author,
+//                originalBook.isbn,
+//                originalBook.description,
+//                originalBook.coverImage,
+//                originalBook.categories
+//              )
+
+//              "then the new title is displayed in the book catalog control" in {
+//                val updatedBooks =
+//                  testScene.catalogControl.items.value.toSeq.filter {
+//                    definedBook =>
+//                    definedBook.title == updatedTitle
+//                  }
+//                updatedBooks.length should be (1)
+//                val updatedBook =
+//                  updatedBooks(0)
+//                updatedBook.author should be (originalBook.author)
+//                updatedBook.isbn should be (originalBook.isbn)
+//                updatedBook.description should be (originalBook.description)
+//                updatedBook.coverImage should be (originalBook.coverImage)
+//                updatedBook.categories should be (originalBook.categories)
+//              }
+
+//              "and the original title is not displayed in the book catalog control" in {
+//                val originalBooks =
+//                  testScene.catalogControl.items.value.toSeq.filter {
+//                    definedBook =>
+//                    definedBook.title == originalBook.title
+//                  }
+//                originalBooks.length should be (0)
+//              }
+
+//              "and the other books in the repository are still displaned on the book catalog control" in {
+//                testScene.catalogControl.items.value.toSet should contain
+//                (populatedRepository.contents &~
+//                  Set(originalBook))
+//              }
+//            }
+//          }
         }
       }
     }

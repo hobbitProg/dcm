@@ -14,7 +14,7 @@ import scalafx.scene.control.Button
 import scalafx.scene.layout.AnchorPane
 import scalafx.stage.{FileChooser, Stage}
 
-import com.github.hobbitProg.dcm.client.books.bookCatalog.model.Book
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalog
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookRepository
 import com.github.hobbitProg.dcm.client.books.control.image._
@@ -33,11 +33,11 @@ import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
   * @since 0.1
   */
 
-class BookEntryDialog(
+abstract class BookEntryDialog(
   private val catalog: BookCatalog,
   private val repository: BookRepository,
   private val coverImageChooser: FileChooser,
-  private val definedCategories: Set[String]
+  private val definedCategories: Set[Categories]
 )
   extends Scene(
     BookEntryDialog.dialogWidth,
@@ -46,7 +46,7 @@ class BookEntryDialog(
   import catalog._
 
   // Book being edited
-  private val bookBeingEdited: BookModel =
+  protected val bookBeingEdited: BookModel =
     new BookModel
 
   // Defined categories that are not associated with book
@@ -68,7 +68,7 @@ class BookEntryDialog(
   // Create control for entering in title of book
   private val titleLabel =
     new TitleLabel
-  private val titleControl: TitleValue =
+  protected val titleControl: TitleValue =
     new TitleValue
   titleControl.id = BookEntryDialog.titleControlId
   titleControl.text.onChange {
@@ -78,7 +78,7 @@ class BookEntryDialog(
   // Create control for entering in author of book
   private val authorLabel: AuthorLabel =
     new AuthorLabel
-  private val authorControl: AuthorValue =
+  protected val authorControl: AuthorValue =
     new AuthorValue
   authorControl.id = BookEntryDialog.authorControlId
   authorControl.text.onChange {
@@ -88,7 +88,7 @@ class BookEntryDialog(
   // Create control for entering ISBN for book
   private val isbnLabel: ISBNLabel =
     new ISBNLabel
-  private val isbnControl: ISBNValue =
+  protected val isbnControl: ISBNValue =
     new ISBNValue
   isbnControl.text.onChange(
     bookBeingEdited.isbn = isbnControl.text.value
@@ -96,9 +96,9 @@ class BookEntryDialog(
   isbnControl.id = BookEntryDialog.isbnControlId
 
   // Create control for entering book description
-  val descriptionLabel: DescriptionLabel =
+  private val descriptionLabel: DescriptionLabel =
     new DescriptionLabel
-  val descriptionControl: DescriptionValue =
+  protected val descriptionControl: DescriptionValue =
     new DescriptionValue
   descriptionControl.id =
     BookEntryDialog.descriptionControlId
@@ -110,13 +110,13 @@ class BookEntryDialog(
   }
 
   // Create control to display cover image
-  val coverImageLabel: CoverImageLabel =
+  private val coverImageLabel: CoverImageLabel =
     new CoverImageLabel
-  val coverImageControl: CoverImage =
+  protected val coverImageControl: CoverImage =
     new CoverImage
 
   // Create button to change cover image
-  val coverImageSelectionButton: Button =
+  private val coverImageSelectionButton: Button =
     new Button(
       "Change Cover Image"
     )
@@ -148,7 +148,7 @@ class BookEntryDialog(
   // Create control to display categories associated with book
   private val categoryLabel: CategoryLabel =
     new CategoryLabel
-  private val categoryControl: BookCategories =
+  protected val categoryControl: BookCategories =
     new BookCategories
 
   // Create button to update what categories are associated with book
@@ -204,28 +204,6 @@ class BookEntryDialog(
     saveButton.disable = bookUnableToBeSaved
   }
 
-  //noinspection ScalaUnusedSymbol
-  saveButton.onAction =
-    (event: ActionEvent) => {
-      val addResult =
-        add(
-          bookBeingEdited.title,
-          bookBeingEdited.author,
-          bookBeingEdited.isbn,
-          bookBeingEdited.description,
-          bookBeingEdited.coverImage,
-          bookBeingEdited.categories
-        )(
-          repository
-        )
-      addResult match {
-        case Success(_) =>
-          val parentStage: Stage =
-            window.value.asInstanceOf[javafx.stage.Stage]
-          parentStage.close
-        case Failure(_) =>
-      }
-    }
   AnchorPane.setTopAnchor(
     saveButton,
     BookEntryDialog.saveButtonTopBorder
@@ -263,55 +241,49 @@ class BookEntryDialog(
     *
     * @return True if book cannot be saved and false otherwise
     */
-  private def bookUnableToBeSaved: Boolean = {
-    titleIsUndefined ||
-    authorIsUndefined ||
-    isbnIsUndefined ||
-    userChoseTitleAndAuthorThatExistsInCatalog ||
-    userChoseISBNThatExistsInCatalog
-  }
+  protected def bookUnableToBeSaved: Boolean
 
   /**
     * Indication if user has not defined title of book
     */
-  private def titleIsUndefined: Boolean =
+  protected def titleIsUndefined: Boolean =
     titleControl.text.value == ""
 
   /**
     * Indication if user has defined title of book
     */
-  private def titleIsDefined: Boolean =
+  protected def titleIsDefined: Boolean =
     titleControl.text.value != ""
 
   /**
     * Indication if user has not defined author of book
     */
-  private def authorIsUndefined: Boolean =
+  protected def authorIsUndefined: Boolean =
     authorControl.text.value == ""
 
   /**
     * Indication if user has defined author for book
     */
-  private def authorIsDefined: Boolean =
+  protected def authorIsDefined: Boolean =
     authorControl.text.value != ""
 
   /**
     * Indication if user has not defined ISBN for book
     */
-  private def isbnIsUndefined: Boolean =
+  protected def isbnIsUndefined: Boolean =
     isbnControl.text.value == ""
 
   /**
     * Indication if user has defined ISBN for book
     */
-  private def isbnIsDefined: Boolean =
+  protected def isbnIsDefined: Boolean =
     isbnControl.text.value != ""
 
   /**
     * Indication that book with user-defined title by user-defined author
     * already exists in catalog
     */
-  private def titleAuthorPairExistsInCatalog: Boolean =
+  protected def titleAuthorPairExistsInCatalog: Boolean =
     existsInCatalog(
       titleControl.text.value,
       authorControl.text.value
@@ -322,7 +294,7 @@ class BookEntryDialog(
   /**
     * Indication that book with user-defined ISBN already exists in catalog
     */
-  private def isbnExistsInCatalog: Boolean =
+  protected def isbnExistsInCatalog: Boolean =
     existsInCatalog(
       isbnControl.text.value
     )(
@@ -333,7 +305,7 @@ class BookEntryDialog(
     * Indication that user defined title and author that already exists in
     * catalog
     */
-  private def userChoseTitleAndAuthorThatExistsInCatalog: Boolean =
+  protected def userChoseTitleAndAuthorThatExistsInCatalog: Boolean =
     titleIsDefined &&
   authorIsDefined &&
   titleAuthorPairExistsInCatalog
@@ -341,7 +313,7 @@ class BookEntryDialog(
   /**
     * Indication that user defined isbn that already exists in catalog
     */
-  private def userChoseISBNThatExistsInCatalog: Boolean =
+  protected def userChoseISBNThatExistsInCatalog: Boolean =
     isbnIsDefined &&
   isbnExistsInCatalog
 }

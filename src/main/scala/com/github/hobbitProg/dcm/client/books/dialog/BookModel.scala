@@ -4,7 +4,7 @@ import scala.collection.Set
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 
-private class BookModel(
+class BookModel(
   var title: Titles = "",
   var author: Authors = "",
   var isbn: ISBNs = "",

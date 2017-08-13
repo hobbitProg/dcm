@@ -12,7 +12,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.model.Categories
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookRepository
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalog
 import com.github.hobbitProg.dcm.client.books.control._
-import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
+import com.github.hobbitProg.dcm.client.books.dialog.AddBookDialog
 
 /**
   * Tab containing books in catalog
@@ -74,7 +74,7 @@ class BookTab(
       dialogStage.title =
         BookTab.addBookTitle
       dialogStage.scene =
-        new BookEntryDialog(
+        new AddBookDialog(
           catalog,
           repository,
           coverChooser,

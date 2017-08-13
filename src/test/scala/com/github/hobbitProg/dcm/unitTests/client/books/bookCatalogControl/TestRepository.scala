@@ -63,7 +63,7 @@ class TestRepository
   def contents: Set[Book] =
     Set(
       new TestBook(
-        "Ruins",
+        "Runs",
         "Kevin J. Anderson",
         "0061052477",
         Some("Description for Ruins"),

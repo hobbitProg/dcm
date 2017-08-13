@@ -16,12 +16,16 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalog
   */
 class TestCatalog
     extends BookCatalog {
+  // Information on book added to catalog
   var newTitle: Titles = _
   var newAuthor: Authors = _
   var newISBN: ISBNs = _
   var newDescription: Description = _
   var newCover: CoverImages = _
   var newCategories: Set[Categories] = _
+
+  // Information on book removed from catalog
+  var removedISBN: ISBNs = _
 
   /**
     * Place new book into catalog
@@ -84,8 +88,27 @@ class TestCatalog
     updatedCategories: Set[Categories]
   ): Reader[BookRepository, Try[Book]] = {
     Reader {
-      repository =>
-      Failure(new scala.Exception)
+      repository => {
+        newTitle = updatedTitle
+        newAuthor = updatedAuthor
+        newISBN = updatedISBN
+        newDescription = updatedDescription
+        newCover = updatedCover
+        newCategories = updatedCategories
+        removedISBN = originalBook.isbn
+        Success(
+          Book.book(
+            updatedTitle,
+            updatedAuthor,
+            updatedISBN,
+            updatedDescription,
+            updatedCover,
+            updatedCategories
+          ).getOrElse(
+            null
+          )
+        )
+      }
     }
   }
 

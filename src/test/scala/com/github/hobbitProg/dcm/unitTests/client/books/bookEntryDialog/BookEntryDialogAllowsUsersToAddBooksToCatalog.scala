@@ -26,7 +26,7 @@ import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookRepository
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalog
-import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
+import com.github.hobbitProg.dcm.client.books.dialog.{AddBookDialog, BookEntryDialog}
 
 import scalafx.scene.layout.AnchorPane
 
@@ -905,7 +905,7 @@ class BookEntryDialogAllowsUsersToAddBooksToCatalog
 
     // Create dialog to add book to catalog
     val bookEntryDialog =
-      new BookEntryDialog(
+      new AddBookDialog(
         catalog,
         repository,
         coverImageChooser,
