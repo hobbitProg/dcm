@@ -424,12 +424,20 @@ class BookCatalogClientSteps
     )
   }
 
-//  @org.jbehave.core.annotations.When("change the title from $originalTitle to $newTitle")
-//  def changeTitle(
-//    originalTitle: String,
-//    newTitle: String
-//  ): Unit = {
-//  }
+  @org.jbehave.core.annotations.When("change the title from $originalTitle to $newTitle")
+  def changeTitle(
+    originalTitle: String,
+    newTitle: String
+  ): Unit = {
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId BookEntryDialog.titleControlId,
+      MouseButton.PRIMARY
+    )
+    bookClientRobot eraseText originalTitle.length
+    enterDataIntoControl(
+      newTitle
+    )
+  }
 
   @org.jbehave.core.annotations.When("I accept the information on the book")
   def acceptEnteredBook(): Unit = {

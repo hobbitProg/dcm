@@ -146,8 +146,8 @@ object BookTab {
   private val catalogDisplayLeft: Double = 4.0
   private val addButtonTop: Double = 175.0
   private val addButtonLeft: Double = 255.0
-  private val modifyButtonTop: Double = 210.0 // 205.0 // 195.0 // 225.0
+  private val modifyButtonTop: Double = 210.0
   private val modifyButtonLeft: Double = 255.0
   private val selectedBookTop: Double = 4.0
-  private val selectedBookLeft: Double = 330.0 // 350.0 // 310.0
+  private val selectedBookLeft: Double = 330.0
 }
