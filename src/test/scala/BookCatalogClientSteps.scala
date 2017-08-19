@@ -117,7 +117,7 @@ class BookCatalogClientSteps
           else {
             val coverLocation =
               getClass.getResource(
-                cover
+                "/" + cover
               ).toURI
             Some(coverLocation)
           }
@@ -262,7 +262,9 @@ class BookCatalogClientSteps
       val description =
         existingBook.get("description")
       val coverImage =
-        existingBook.get("cover image")
+        getClass.getResource(
+          "/" + existingBook.get("cover image")
+        ).toURI.toString
       sql"INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES($title,$author,$isbn,$description,$coverImage);"
         .update
         .run
@@ -405,6 +407,30 @@ class BookCatalogClientSteps
       MouseButton.PRIMARY
     )
   }
+
+  @org.jbehave.core.annotations.When("I select the $title book")
+  def selectBook(title: String): Unit = {
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasText title,
+      MouseButton.PRIMARY
+    )
+  }
+
+  @org.jbehave.core.annotations.When("request to modify the book")
+  def requestToModifyBook(): Unit = {
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId BookTab.modifyButtonId,
+      MouseButton.PRIMARY
+    )
+  }
+
+//  @org.jbehave.core.annotations.When("change the title from $originalTitle to $newTitle")
+//  def changeTitle(
+//    originalTitle: String,
+//    newTitle: String
+//  ): Unit = {
+//  }
+
   @org.jbehave.core.annotations.When("I accept the information on the book")
   def acceptEnteredBook(): Unit = {
     bookClientRobot.clickOn(

@@ -12,7 +12,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.model.Categories
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookRepository
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalog
 import com.github.hobbitProg.dcm.client.books.control._
-import com.github.hobbitProg.dcm.client.books.dialog.AddBookDialog
+import com.github.hobbitProg.dcm.client.books.dialog.{AddBookDialog, ModifyBookDialog}
 
 /**
   * Tab containing books in catalog
@@ -48,7 +48,7 @@ class BookTab(
   // Add button to add book to catalog
   val addButton: Button =
     new Button(
-      "+"
+      "Add"
     )
   addButton.id =
     BookTab.addButtonId
@@ -62,10 +62,9 @@ class BookTab(
     BookTab.addButtonLeft
   )
 
-  // Add control to display currently added book
+  // Add control to display currently selected book
   val selectedBookControl: SelectedBookControl =
     new SelectedBookControl
-  //noinspection ScalaUnusedSymbol
   addButton.onAction =
     (event: ActionEvent) => {
       selectedBookControl.clear()
@@ -91,12 +90,46 @@ class BookTab(
     BookTab.selectedBookLeft
   )
 
+  // Add control to modify current book
+  val modifyButton: Button =
+    new Button(
+      "Modify"
+    )
+  modifyButton.id =
+    BookTab.modifyButtonId
+  AnchorPane.setTopAnchor(
+    modifyButton,
+    BookTab.modifyButtonTop
+  )
+  AnchorPane.setLeftAnchor(
+    modifyButton,
+    BookTab.addButtonLeft
+  )
+  modifyButton.onAction =
+    (event: ActionEvent) => {
+      selectedBookControl.clear()
+      val dialogStage: Stage =
+        new Stage
+      dialogStage.title =
+        BookTab.modifyBookTitle
+      dialogStage.scene =
+        new ModifyBookDialog(
+          catalog,
+          repository,
+          coverChooser,
+          definedCategories,
+          catalogDisplay.selectionModel.value.getSelectedItem
+        )
+      dialogStage.showAndWait()
+    }
+
   content =
     new AnchorPane {
       children =
         List(
           catalogDisplay,
           addButton,
+          modifyButton,
           selectedBookControl
         )
     }
@@ -104,13 +137,17 @@ class BookTab(
 
 object BookTab {
   val addButtonId = "AddBookButton"
+  val modifyButtonId = "ModifyBookButton"
 
   val addBookTitle = "Add Book To Catalog"
+  val modifyBookTitle = "Modify Book"
 
   private val catalogDisplayTop: Double = 4.0
   private val catalogDisplayLeft: Double = 4.0
   private val addButtonTop: Double = 175.0
   private val addButtonLeft: Double = 255.0
+  private val modifyButtonTop: Double = 210.0 // 205.0 // 195.0 // 225.0
+  private val modifyButtonLeft: Double = 255.0
   private val selectedBookTop: Double = 4.0
-  private val selectedBookLeft: Double = 310.0
+  private val selectedBookLeft: Double = 330.0 // 350.0 // 310.0
 }

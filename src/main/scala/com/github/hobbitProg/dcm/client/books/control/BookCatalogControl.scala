@@ -1,5 +1,7 @@
 package com.github.hobbitProg.dcm.client.books.control
 
+import javafx.scene.control.SelectionMode
+
 import scala.math.Ordering.StringOrdering
 
 import scalafx.Includes._
@@ -51,6 +53,11 @@ class BookCatalogControl(
   // Have books be sorted by title
   items =
     new ObservableBuffer[Book]
+
+  // Only allow one book to be selected
+  selectionModel.value.setSelectionMode(
+    SelectionMode.SINGLE
+  )
 
   // Display books that are initially in catalog
   for (initialBook <- repository.contents) {
