@@ -159,7 +159,8 @@ class TestCatalog
   ): Reader[BookRepository, Boolean] = {
     Reader {
       repository: BookRepository =>
-        isbn == "0061052477"
+        isbn == "0061052477" ||
+      isbn == "0061054143"
     }
   }
 }

@@ -81,9 +81,6 @@ class ModifyBookDialog(
         ) (
           repository
         )
-      // DEBUG
-      Console println updateResult.toString
-      // DEBUG
       updateResult match {
         case Success(_) =>
           val parentStage: Stage =
@@ -103,6 +100,7 @@ class ModifyBookDialog(
     authorIsUndefined ||
     isbnIsUndefined ||
     userChoseTitleAndAuthorThatExistsInCatalog ||
-    userChoseISBNThatExistsInCatalog
+    (isbnControl.text.value != originalBook.isbn &&
+      userChoseISBNThatExistsInCatalog)
   }
 }

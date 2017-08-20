@@ -124,9 +124,6 @@ class BooksCanBeAddedToCatalog
           var sentBook: Book = null
           testCatalog.onAdd(
             addedBook => {
-              Console.println(
-                "Book added"
-              )
               sentBook = addedBook
             }
           )

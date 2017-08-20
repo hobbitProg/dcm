@@ -43,12 +43,6 @@ public class BookCatalogClientStories extends JUnitStories {
    */
   @Override
   protected List<String> storyPaths() {
-    System.out.println(
-        CodeLocations.codeLocationFromClass(
-            this.getClass()
-        ).toString()
-    );
-
     return
       new StoryFinder().findPaths(
         CodeLocations.codeLocationFromClass(

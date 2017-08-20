@@ -437,6 +437,11 @@ class BookCatalogClientSteps
     enterDataIntoControl(
       newTitle
     )
+    //    bookClientRobot push KeyCode.ENTER
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId BookEntryDialog.saveButtonId,
+      MouseButton.PRIMARY
+    )
   }
 
   @org.jbehave.core.annotations.When("I accept the information on the book")
