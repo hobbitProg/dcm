@@ -30,6 +30,10 @@ class TestCatalog
   var addSubscribers =
     Set[Book => Unit]()
 
+  // Subscribers for modifying books within catalog
+  var modifySubscribers =
+    Set[(Book, Book) => Unit]()
+
   /**
     * Place new book into catalog
     * @param title Title of new book
@@ -92,8 +96,24 @@ class TestCatalog
   ): Reader[BookRepository, Try[Book]] = {
     Reader {
       repository =>
-      Failure(
-        new scala.Exception
+        val modifiedBook =
+          new TestBook(
+            updatedTitle,
+            updatedAuthor,
+            updatedISBN,
+            updatedDescription,
+            updatedCover,
+            updatedCategories
+          )
+        modifySubscribers.foreach {
+          action =>
+          action(
+            originalBook,
+            modifiedBook
+          )
+        }
+      Success(
+        modifiedBook
       )
     }
   }
@@ -116,6 +136,8 @@ class TestCatalog
   def onModify(
     modifyAction: (Book, Book) => Unit
   ): Unit = {
+    modifySubscribers =
+      modifySubscribers + modifyAction
   }
 
   /**

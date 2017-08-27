@@ -74,6 +74,9 @@ class BookCatalogClientSteps
   // Book to place into catalog
   private var bookToEnter: Book = _
 
+  // Book to modify
+  private var bookToModify: Book = _
+
   // Chooses cover of book
   private val coverChooser: FileChooser = mock[FileChooser]
 
@@ -213,6 +216,9 @@ class BookCatalogClientSteps
     schemaCreation.transact(
       bookTransactor
     ).unsafeRun
+
+    existingBooks =
+      Set[Book]()
   }
 
   @org.jbehave.core.annotations.AfterScenario
@@ -265,6 +271,12 @@ class BookCatalogClientSteps
         getClass.getResource(
           "/" + existingBook.get("cover image")
         ).toURI.toString
+      val bookData: scala.collection.mutable.Map[String, String] =
+        existingBook
+      val bookToAdd: Book =
+        bookData
+      existingBooks =
+        existingBooks + bookToAdd
       sql"INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES($title,$author,$isbn,$description,$coverImage);"
         .update
         .run
@@ -409,7 +421,14 @@ class BookCatalogClientSteps
   }
 
   @org.jbehave.core.annotations.When("I select the $title book")
-  def selectBook(title: String): Unit = {
+  def selectBook(
+    title: String
+  ): Unit = {
+    bookToModify =
+      (existingBooks find {
+        existingBook =>
+        existingBook.title == title
+       }).get
     bookClientRobot.clickOn(
       NodeQueryUtils hasText title,
       MouseButton.PRIMARY
@@ -470,6 +489,34 @@ class BookCatalogClientSteps
       "New book not placed into catalog",
       bookToEnter,
       newBook
+    )
+  }
+
+  @org.jbehave.core.annotations.Then("the $originalBook book is no longer displayed on the window displaying the book catalog")
+  def originalBookIsNotDisplayedWithinBookCatalog(
+    originalBook: String
+  ): Unit = {
+    bookCatalogControlVerification(
+      "Original book is still displayed",
+      catalogControl =>
+      catalogControl.items.value.toSet forall {
+        displayedBook =>
+        displayedBook.title != originalBook
+      }
+    )
+  }
+
+  @org.jbehave.core.annotations.Then("the $updatedBook book is displayed on the window displaying the book catalog")
+  def updatedBookIsDisplayedWithinBookCatalog(
+    updatedBook: String
+  ) {
+    bookCatalogControlVerification(
+      "Updated book is not displayed",
+      catalogControl =>
+      catalogControl.items.value.toSet exists {
+        displayedBook =>
+        displayedBook.title == updatedBook
+      }
     )
   }
 

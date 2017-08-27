@@ -52,7 +52,6 @@ class BookTab(
     )
   addButton.id =
     BookTab.addButtonId
-  //noinspection ScalaUnusedSymbol
   AnchorPane.setTopAnchor(
     addButton,
     BookTab.addButtonTop

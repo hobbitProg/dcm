@@ -81,4 +81,21 @@ class BookCatalogControl(
           )
       }
   }
+
+  // Replace original book with modified book
+  onModify {
+    (originalBook, updatedBook) => {
+      items.value += updatedBook
+      items.value -= originalBook
+      items.value sort {
+        (left: Book, right: Book) =>
+          compare(
+            left.title, right.title
+          )
+      }
+
+      // Clear selected book
+      selectionModel.value.clearSelection()
+    }
+  }
 }
