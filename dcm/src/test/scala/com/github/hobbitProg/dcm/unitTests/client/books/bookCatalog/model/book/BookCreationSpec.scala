@@ -48,7 +48,16 @@ class BookCreationSpec
       categories <- Gen.listOf(arbitrary[String])
     } yield ((title, author, isbn, description, cover, categories.toSet))
 
-  "When given valid book information is given to create a book" >> {
+  private val noTitleDataGenerator =
+    for {
+      author <- arbitrary[String].suchThat(_.length > 0)
+      isbn <- arbitrary[String].suchThat(_.length > 0)
+      description <- Gen.option(arbitrary[String])
+      cover <- Gen.oneOf(availableCovers)
+      categories <- Gen.listOf(arbitrary[String])
+    } yield (("", author, isbn, description, cover, categories.toSet))
+
+  "Given valid book information is given to create a book" >> {
     "a book is created" >> {
       Prop.forAllNoShrink(validDataGenerator) {
         (bookData: BookDataType) => {
@@ -107,6 +116,29 @@ class BookCreationSpec
                 newBook,
                 categories
               )
+          }
+        }
+      }
+    }
+  }
+
+  "Given book information with no title" >> {
+    "no book is created" >> {
+      Prop.forAllNoShrink(noTitleDataGenerator) {
+        (bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, cover, categories) =>
+              val newBook =
+                Book.book(
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  cover,
+                  categories
+                )
+
+              newBook.isInstanceOf[Invalid[_]]
           }
         }
       }
