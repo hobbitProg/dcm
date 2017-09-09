@@ -53,6 +53,14 @@ class AddingBookSpec
     categories <- Gen.listOf(arbitrary[String])
   } yield (("", author, isbn, description, coverImage, categories.toSet))
 
+  val emptyAuthorDataGenerator = for {
+    title <- arbitrary[String].suchThat(_.length > 0)
+    isbn <- arbitrary[String].suchThat(_.length > 0)
+    description <- Gen.option(arbitrary[String])
+    coverImage <- Gen.oneOf(availableCovers)
+    categories <- Gen.listOf(arbitrary[String])
+  } yield((title, "", isbn, description, coverImage, categories.toSet))
+
   "Adding new books to the catalog" >> {
     "indicates the books have been added to the catalog" >> {
       forAllNoShrink(catalogGenerator, dataGenerator) {
@@ -213,67 +221,54 @@ class AddingBookSpec
     }
   }
 
-//  "Given a book catalog" - {
-//    val testCatalog: BookCatalogInterpreter =
-//      new BookCatalogInterpreter
+  "Attempting to add books with no author to the catalog" >> {
+    "no book is added to the catalog" >> {
+      forAllNoShrink(catalogGenerator, emptyAuthorDataGenerator) {
+        (catalog: BookCatalogInterpreter, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              val resultingCatalog =
+                catalog.add(
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )
+              resultingCatalog.isInstanceOf[Failure[_]]
+          }
+        }
+      }
+    }
+    "no book is given to the listener" >> {
+      forAllNoShrink(catalogGenerator, emptyAuthorDataGenerator) {
+        (catalog: BookCatalogInterpreter, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              var sentBook: Book = null
+              val updatedCatalog =
+                catalog.onAdd(
+                  addedBook =>
+                  sentBook = addedBook
+                )
 
-//    "and a repository that contains the catalog" - {
-//      val testRepository =
-//        new FakeRepository
+              val resultingCatalog =
+                catalog.add(
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )
 
-//      "and information on a book with no author" - {
-//        val newTitle =
-//          "Ground Zero"
-//        val newAuthor =
-//          ""
-//        val newISBN =
-//          "006105223X"
-//        val newDescription =
-//          Some(
-//            "Description for Ground Zero"
-//          )
-//        val newCover =
-//          Some(
-//            getClass().
-//              getResource(
-//                "/GroundZero.jpg"
-//              ).toURI
-//          )
-//        val newCategories =
-//          Set(
-//            "sci-fi",
-//            "conspiracy"
-//          )
-
-//        "and a listener for book addition events" - {
-//          var sentBook: Book = null
-//          testCatalog.onAdd(
-//            addedBook => sentBook = addedBook
-//          )
-
-//          "when the book information is attempted to be added to the catalog" - {
-//            val resultingBook =
-//              testCatalog.add(
-//                newTitle,
-//                newAuthor,
-//                newISBN,
-//                newDescription,
-//                newCover,
-//                newCategories
-//              )
-
-//            "then the book is not placed into the catalog" in {
-//              resultingBook should be (a[Failure[_]])
-//            }
-
-//            "and the book is not given to the listener" in {
-//              sentBook should be (null)
-//            }
-//          }
-//        }
-//      }
-//    }
-//  }
+              sentBook == null
+          }
+        }
+      }
+    }
+  }
 
 //  "Given a book catalog" - {
 //    val testCatalog: BookCatalogInterpreter =
