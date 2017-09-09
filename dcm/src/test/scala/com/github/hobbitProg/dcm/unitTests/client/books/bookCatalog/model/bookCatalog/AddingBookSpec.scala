@@ -15,7 +15,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model.interpreter.BookCatalogInterpreter
 
 class AddingBookSpec
-    extends Specification
+     extends Specification
     with ScalaCheck{
   private type BookDataType = (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories])
   private val availableCovers =
@@ -32,10 +32,11 @@ class AddingBookSpec
           ).toURI
       )
     )
-  implicit val catalogGenerator = for {
+  val catalogGenerator = for {
     catalog <- new BookCatalogInterpreter
   } yield catalog
-  implicit val dataGenerator = for {
+
+  val dataGenerator = for {
     title <- arbitrary[String].suchThat(_.length > 0)
     author <- arbitrary[String].suchThat(_.length > 0)
     isbn <- arbitrary[String].suchThat(_.length > 0)
@@ -43,6 +44,14 @@ class AddingBookSpec
     coverImage <- Gen.oneOf(availableCovers)
     categories <- Gen.listOf(arbitrary[String])
   } yield ((title, author, isbn, description, coverImage, categories.toSet))
+
+  val emptyTitleDataGenerator = for {
+    author <- arbitrary[String].suchThat(_.length > 0)
+    isbn <- arbitrary[String].suchThat(_.length > 0)
+    description <- Gen.option(arbitrary[String])
+    coverImage <- Gen.oneOf(availableCovers)
+    categories <- Gen.listOf(arbitrary[String])
+  } yield (("", author, isbn, description, coverImage, categories.toSet))
 
   "Adding new books to the catalog" >> {
     "indicates the books have been added to the catalog" >> {
@@ -154,144 +163,55 @@ class AddingBookSpec
     }
   }
 
-//  "Given a book catalog" - {
-//    val testCatalog: BookCatalogInterpreter =
-//      new BookCatalogInterpreter
+  "Attempting to add books with no title to the catalog" >> {
+    "no book is placed into the catalog" >> {
+      forAllNoShrink(catalogGenerator, emptyTitleDataGenerator) {
+        (catalog: BookCatalogInterpreter, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              val resultingCatalog =
+                catalog.add(
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )
+              resultingCatalog.isInstanceOf[Failure[_]]
+          }
+        }
+      }
+    }
 
-//    "and a repository that contains the catalog" - {
-//      val testRepository =
-//        new FakeRepository
+    "no book is given to the listener" >> {
+      forAllNoShrink(catalogGenerator, emptyTitleDataGenerator) {
+        (catalog: BookCatalogInterpreter, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              var sentBook: Book = null
+              val updatedCatalog =
+                catalog.onAdd(
+                  addedBook =>
+                  sentBook = addedBook
+                )
 
-//      "and all of the information on a book to add to the catalog" - {
-//        val newTitle =
-//          "Ground Zero"
-//        val newAuthor =
-//          "Kevin J. Anderson"
-//        val newISBN =
-//          "006105223X"
-//        val newDescription =
-//          Some(
-//            "Description for Ground Zero"
-//          )
-//        val newCover =
-//          Some(
-//            getClass().
-//              getResource(
-//                "/GroundZero.jpg"
-//              ).toURI
-//          )
-//        val newCategories =
-//          Set(
-//            "sci-fi",
-//            "conspiracy"
-//          )
+              val resultingCatalog =
+                catalog.add(
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )
 
-//        "and a listener for book addition events" - {
-//          var sentBook: Book = null
-//          testCatalog.onAdd(
-//            addedBook => sentBook = addedBook
-//          )
-
-//          "when the book is added to the catalog" - {
-//            val resultingBook =
-//              testCatalog.add(
-//                newTitle,
-//                newAuthor,
-//                newISBN,
-//                newDescription,
-//                newCover,
-//                newCategories
-//              )
-
-//            "then the book is added to the catalog" in {
-//              resultingBook should be (an[Try[_]])
-//              resultingBook.get.title should be (newTitle)
-//              resultingBook.get.author should be (newAuthor)
-//              resultingBook.get.isbn should be (newISBN)
-//              resultingBook.get.description should be (newDescription)
-//              resultingBook.get.coverImage should be (newCover)
-//              resultingBook.get.categories should be (newCategories)
-//              testRepository.savedBook should be (resultingBook.get)
-//            }
-
-//            "and the book is given to the listener" in {
-//              sentBook should not be (null)
-//              sentBook.title should be (newTitle)
-//              sentBook.author should be (newAuthor)
-//              sentBook.isbn should be (newISBN)
-//              sentBook.description should be (newDescription)
-//              sentBook.coverImage should be (newCover)
-//              sentBook.categories should be (newCategories)
-//            }
-//          }
-//        }
-//      }
-//    }
-//  }
-
-//  "Given a book catalog" - {
-//    val testCatalog: BookCatalogInterpreter =
-//      new BookCatalogInterpreter
-
-//    "and a repository that contains the catalog" - {
-//      val testRepository =
-//        new FakeRepository
-
-//      "and the information on a book with no title" - {
-//        val newTitle =
-//          ""
-//        val newAuthor =
-//          "Kevin J. Anderson"
-//        val newISBN =
-//          "006105223X"
-//        val newDescription =
-//          Some(
-//            "Description for Ground Zero"
-//          )
-//        val newCover =
-//          Some(
-//            getClass().
-//              getResource(
-//                "/GroundZero.jpg"
-//              ).toURI
-//          )
-//        val newCategories =
-//          Set(
-//            "sci-fi",
-//            "conspiracy"
-//          )
-
-//        "and a listener for book addition events" - {
-//          var sentBook: Book = null
-//          testCatalog.onAdd(
-//            addedBook => {
-//              sentBook = addedBook
-//            }
-//          )
-
-//          "when the book information is attempted to be added to the catalog" - {
-//            val resultingBook =
-//              testCatalog.add(
-//                newTitle,
-//                newAuthor,
-//                newISBN,
-//                newDescription,
-//                newCover,
-//                newCategories
-//              )
-
-//            "then the book is not placed into the catalog" in {
-//              resultingBook should be (a[Failure[_]])
-//            }
-
-//            "and the book is not given to the listener" in {
-//              sentBook should be (null)
-//            }
-//          }
-//        }
-//      }
-//    }
-//  }
+              sentBook == null
+          }
+        }
+      }
+    }
+  }
 
 //  "Given a book catalog" - {
 //    val testCatalog: BookCatalogInterpreter =
