@@ -20,28 +20,6 @@ class BookCatalog(
   private val modifySubscribers: Seq[(Book, Book) => Unit] =
     Seq[(Book, Book) => Unit]()
 ) {
-  /**
-    * Determine if book with given title and author already exists in book
-    * catalog
-    * @param title Title of book being examined
-    * @param author Author of book being examined
-    * @return True if book with given title and author already exists in book
-    * catalog and false otherwise
-    */
-//  def existsInCatalog(
-//    title: Titles,
-//    author: Authors
-//  ): Reader[BookRepository, Boolean]
-
-  /**
-    * Determine if book with given ISBN already exists in book catalog
-    * @param isbn ISBN of book being examined
-    * @return True if book with given ISBN already exists in book catalog and
-    * false otherwise
-    */
-//  def existsInCatalog(
-//    isbn: ISBNs
-//  ): Reader[BookRepository, Boolean]
 }
 
 object BookCatalog {
