@@ -12,8 +12,13 @@ import scala.collection.{Seq, Set}
 import scala.util.{Try, Failure, Success}
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.model.interpreter.BookCatalogInterpreter
+import BookCatalog._
 
+/**
+  * Verifies books can be added to catalog
+  * @author Kyle Cranmer
+  * @since 0.2
+  */
 class AddingBookSpec
      extends Specification
     with ScalaCheck{
@@ -33,7 +38,7 @@ class AddingBookSpec
       )
     )
   val catalogGenerator = for {
-    catalog <- new BookCatalogInterpreter
+    catalog <- new BookCatalog
   } yield catalog
 
   val dataGenerator = for {
@@ -72,11 +77,12 @@ class AddingBookSpec
   "Adding new books to the catalog" >> {
     "indicates the books have been added to the catalog" >> {
       forAllNoShrink(catalogGenerator, dataGenerator) {
-        (catalog: BookCatalogInterpreter, bookData: BookDataType) => {
+        (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
               val resultingCatalog =
-                catalog.add(
+                addBook(
+                  catalog,    
                   title,
                   author,
                   isbn,
@@ -92,11 +98,12 @@ class AddingBookSpec
 
     "places the books into the catalog" >> {
       forAllNoShrink(catalogGenerator, dataGenerator) {
-        (catalog: BookCatalogInterpreter, bookData: BookDataType) => {
+        (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
               val resultingCatalog =
-                catalog.add(
+                addBook(
+                  catalog,
                   title,
                   author,
                   isbn,
@@ -107,7 +114,10 @@ class AddingBookSpec
               resultingCatalog match {
                 case Success(updatedCatalog) =>
                   val addedBook =
-                    updatedCatalog getByISBN isbn
+                    getByISBN(
+                      updatedCatalog,
+                      isbn
+                    )
                   addedBook.isInstanceOf[Success[Book]] &&
                   bookHasTitle(
                     addedBook,
@@ -143,17 +153,19 @@ class AddingBookSpec
 
     "gives new books to all listeners" >> {
       forAllNoShrink(catalogGenerator, dataGenerator) {
-        (catalog: BookCatalogInterpreter, bookData: BookDataType) => {
+        (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
               var sentBook: Book = null
               val updatedCatalog =
-                catalog onAdd(
+                onAdd(
+                  catalog,
                   addedBook =>
                   sentBook = addedBook
                 )
               val resultingCatalog =
-                updatedCatalog.add(
+                addBook(
+                  updatedCatalog,
                   title,
                   author,
                   isbn,
@@ -182,11 +194,12 @@ class AddingBookSpec
   "Attempting to add books with no title to the catalog" >> {
     "no book is placed into the catalog" >> {
       forAllNoShrink(catalogGenerator, emptyTitleDataGenerator) {
-        (catalog: BookCatalogInterpreter, bookData: BookDataType) => {
+        (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
               val resultingCatalog =
-                catalog.add(
+                addBook(
+                  catalog,
                   title,
                   author,
                   isbn,
@@ -202,18 +215,20 @@ class AddingBookSpec
 
     "no book is given to the listener" >> {
       forAllNoShrink(catalogGenerator, emptyTitleDataGenerator) {
-        (catalog: BookCatalogInterpreter, bookData: BookDataType) => {
+        (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
               var sentBook: Book = null
               val updatedCatalog =
-                catalog.onAdd(
+                onAdd(
+                  catalog,
                   addedBook =>
                   sentBook = addedBook
                 )
 
               val resultingCatalog =
-                catalog.add(
+                addBook(
+                  catalog,
                   title,
                   author,
                   isbn,
@@ -232,11 +247,12 @@ class AddingBookSpec
   "Attempting to add books with no author to the catalog" >> {
     "no book is added to the catalog" >> {
       forAllNoShrink(catalogGenerator, emptyAuthorDataGenerator) {
-        (catalog: BookCatalogInterpreter, bookData: BookDataType) => {
+        (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
               val resultingCatalog =
-                catalog.add(
+                addBook(
+                  catalog,
                   title,
                   author,
                   isbn,
@@ -251,18 +267,20 @@ class AddingBookSpec
     }
     "no book is given to the listener" >> {
       forAllNoShrink(catalogGenerator, emptyAuthorDataGenerator) {
-        (catalog: BookCatalogInterpreter, bookData: BookDataType) => {
+        (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
               var sentBook: Book = null
               val updatedCatalog =
-                catalog.onAdd(
+                onAdd(
+                  catalog,
                   addedBook =>
                   sentBook = addedBook
                 )
 
               val resultingCatalog =
-                catalog.add(
+                addBook(
+                  catalog,
                   title,
                   author,
                   isbn,
@@ -281,11 +299,12 @@ class AddingBookSpec
   "Attempting to add books with no ISBN to the catalog" >> {
     "no book is added to the catalog" >> {
       forAllNoShrink(catalogGenerator, emptyISBNDataGenerator) {
-        (catalog: BookCatalogInterpreter, bookData: BookDataType) => {
+        (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
               val resultingCatalog =
-                catalog.add(
+                addBook(
+                  catalog,
                   title,
                   author,
                   isbn,
@@ -302,18 +321,20 @@ class AddingBookSpec
 
     "no book is given to the listener" >> {
       forAllNoShrink(catalogGenerator, emptyISBNDataGenerator) {
-        (catalog: BookCatalogInterpreter, bookData: BookDataType) => {
+        (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
               var sentBook: Book = null
               val updatedCatalog =
-                catalog onAdd(
+                onAdd(
+                  catalog,
                   addedBook =>
                   sentBook = addedBook
                 )
 
               val resultingCatalog =
-                catalog.add(
+                addBook(
+                  catalog,
                   title,
                   author,
                   isbn,

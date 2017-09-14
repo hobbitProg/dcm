@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.client.books.bookCatalog.model.interpreter
+package com.github.hobbitProg.dcm.client.books.bookCatalog.model
 
 /**
   * Exception indicating book could not be created when placing book into catalog
