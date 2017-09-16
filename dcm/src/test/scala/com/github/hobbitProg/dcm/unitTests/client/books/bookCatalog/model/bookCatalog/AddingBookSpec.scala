@@ -80,9 +80,16 @@ class AddingBookSpec
         (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
+              var sentBook: Book = null
+              val updatedCatalog =
+                onAdd(
+                  catalog,
+                  addedBook =>
+                  sentBook = addedBook
+                )
               val resultingCatalog =
                 addBook(
-                  catalog,    
+                  updatedCatalog,
                   title,
                   author,
                   isbn,
@@ -101,9 +108,16 @@ class AddingBookSpec
         (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
+              var sentBook: Book = null
+              val updatedCatalog =
+                onAdd(
+                  catalog,
+                  addedBook =>
+                  sentBook = addedBook
+                )
               val resultingCatalog =
                 addBook(
-                  catalog,
+                  updatedCatalog,
                   title,
                   author,
                   isbn,
@@ -151,6 +165,7 @@ class AddingBookSpec
       }
     }
 
+
     "gives new books to all listeners" >> {
       forAllNoShrink(catalogGenerator, dataGenerator) {
         (catalog: BookCatalog, bookData: BookDataType) => {
@@ -173,18 +188,13 @@ class AddingBookSpec
                   coverImage,
                   categories
                 )
-              resultingCatalog match {
-                case Success(updatedCatalog) =>
-                  sentBook != null &&
-                  sentBook.title == title &&
-                  sentBook.author == author &&
-                  sentBook.isbn == isbn &&
-                  sentBook.description == description &&
-                  sentBook.coverImage == coverImage  &&
-                  sentBook.categories == categories
-                case Failure(_) =>
-                  false
-              }
+              sentBook != null &&
+              sentBook.title == title &&
+              sentBook.author == author &&
+              sentBook.isbn == isbn &&
+              sentBook.description == description &&
+              sentBook.coverImage == coverImage  &&
+              sentBook.categories == categories
           }
         }
       }
@@ -197,9 +207,16 @@ class AddingBookSpec
         (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
+              var sentBook: Book = null
+              val updatedCatalog =
+                onAdd(
+                  catalog,
+                  addedBook =>
+                  sentBook = addedBook
+                )
               val resultingCatalog =
                 addBook(
-                  catalog,
+                  updatedCatalog,
                   title,
                   author,
                   isbn,
@@ -212,7 +229,6 @@ class AddingBookSpec
         }
       }
     }
-
     "no book is given to the listener" >> {
       forAllNoShrink(catalogGenerator, emptyTitleDataGenerator) {
         (catalog: BookCatalog, bookData: BookDataType) => {
@@ -225,10 +241,9 @@ class AddingBookSpec
                   addedBook =>
                   sentBook = addedBook
                 )
-
               val resultingCatalog =
                 addBook(
-                  catalog,
+                  updatedCatalog,
                   title,
                   author,
                   isbn,
@@ -236,7 +251,6 @@ class AddingBookSpec
                   coverImage,
                   categories
                 )
-
               sentBook == null
           }
         }
@@ -244,15 +258,23 @@ class AddingBookSpec
     }
   }
 
+
   "Attempting to add books with no author to the catalog" >> {
     "no book is added to the catalog" >> {
       forAllNoShrink(catalogGenerator, emptyAuthorDataGenerator) {
         (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
+              var sentBook: Book = null
+              val updatedCatalog =
+                onAdd(
+                  catalog,
+                  addedBook =>
+                  sentBook = addedBook
+                )
               val resultingCatalog =
                 addBook(
-                  catalog,
+                  updatedCatalog,
                   title,
                   author,
                   isbn,
@@ -277,10 +299,9 @@ class AddingBookSpec
                   addedBook =>
                   sentBook = addedBook
                 )
-
               val resultingCatalog =
                 addBook(
-                  catalog,
+                  updatedCatalog,
                   title,
                   author,
                   isbn,
@@ -288,9 +309,8 @@ class AddingBookSpec
                   coverImage,
                   categories
                 )
-
               sentBook == null
-          }
+            }
         }
       }
     }
@@ -302,6 +322,13 @@ class AddingBookSpec
         (catalog: BookCatalog, bookData: BookDataType) => {
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
+              var sentBook: Book = null
+              val updatedCatalog =
+                onAdd(
+                  catalog,
+                  addedBook =>
+                  sentBook = addedBook
+                )
               val resultingCatalog =
                 addBook(
                   catalog,
@@ -312,7 +339,6 @@ class AddingBookSpec
                   coverImage,
                   categories
                 )
-
               resultingCatalog.isInstanceOf[Failure[_]]
           }
         }
@@ -331,7 +357,6 @@ class AddingBookSpec
                   addedBook =>
                   sentBook = addedBook
                 )
-
               val resultingCatalog =
                 addBook(
                   catalog,
@@ -342,9 +367,8 @@ class AddingBookSpec
                   coverImage,
                   categories
                 )
-
               sentBook == null
-          }
+            }
         }
       }
     }

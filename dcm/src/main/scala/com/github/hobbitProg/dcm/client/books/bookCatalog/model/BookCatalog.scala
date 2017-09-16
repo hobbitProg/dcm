@@ -184,4 +184,16 @@ object BookCatalog {
         )
     }
   }
+
+  def exists(
+    catalog: BookCatalog,
+    requestedTitle: Titles,
+    requestedAuthor: Authors
+  ): Boolean = {
+    catalog.catalog exists {
+      currentBook =>
+      currentBook.title == requestedTitle &&
+      currentBook.author == requestedAuthor
+    }
+  }
 }
