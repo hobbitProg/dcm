@@ -17,7 +17,7 @@ class QueryingSpec
     extends Specification
     with ScalaCheck {
   private type BookDataType = (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories])
-  private type SuccessfulQueryDataType = (List[BookDataType], Titles, Authors)
+  private type QueryDataType = (List[BookDataType], Titles, Authors)
   private val availableCovers =
     Seq(
       "/Goblins.jpg",
@@ -51,10 +51,15 @@ class QueryingSpec
     dataToQuery <- Gen.oneOf(existingBookData)
   } yield (existingBookData, dataToQuery._1, dataToQuery._2)
 
+  val unsuccessfulTitleAuthorMatchGenerator = for {
+    existingBookData <- Gen.listOf(dataGenerator).suchThat(_.length > 0)
+    dataToQuery <- dataGenerator.suchThat(!existingBookData.toSet.contains(_))
+  } yield (existingBookData, dataToQuery._1, dataToQuery._2)
+
   "Searching for a book using the book's title and author" >> {
     "indicates when a book in the catalog has the given title and author" >> {
       Prop.forAllNoShrink(catalogGenerator, successfulTitleAuthorMatchGenerator) {
-        (catalog: BookCatalog, queryData: SuccessfulQueryDataType) => {
+        (catalog: BookCatalog, queryData: QueryDataType) => {
           queryData match {
             case (availableBooks, matchingTitle, matchingAuthor) =>
               val populatedCatalog =
@@ -85,7 +90,38 @@ class QueryingSpec
       }
     }
 
-    "indicates when no book in the catalog has the given title and author" >> pending
+    "indicates when no book in the catalog has the given title and author" >> {
+      Prop.forAllNoShrink(catalogGenerator, unsuccessfulTitleAuthorMatchGenerator) {
+        (catalog: BookCatalog, queryData: QueryDataType) => {
+          queryData match {
+            case (availableBooks, differentTitle, differentAuthor) =>
+              val populatedCatalog =
+                availableBooks.foldLeft(
+                  catalog
+                ){
+                  (catalogBeingPopulated, currentBookData) =>
+                  currentBookData match {
+                    case (title, author, isbn, description, coverImage, categories) =>
+                    addBook(
+                      catalogBeingPopulated,
+                      title,
+                      author,
+                      isbn,
+                      description,
+                      coverImage,
+                      categories
+                    ).get
+                  }
+                }
+              !exists(
+                populatedCatalog,
+                differentTitle,
+                differentAuthor
+              )
+          }
+        }
+      }
+    }
   }
 
   "Searching for a book using the book's ISBN" >> {
