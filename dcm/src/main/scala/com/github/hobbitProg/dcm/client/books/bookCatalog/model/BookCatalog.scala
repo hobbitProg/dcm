@@ -185,6 +185,14 @@ object BookCatalog {
     }
   }
 
+  /**
+    * Determine if book exists within catalog with given title and author
+    * @param catalog Catalog being queried
+    * @param requestedTitle Title of book being queried
+    * @param requestedAuthor Author of book being queried
+    * @return True if book exists with given title and author and false
+    * otherwise
+    */
   def exists(
     catalog: BookCatalog,
     requestedTitle: Titles,
@@ -194,6 +202,22 @@ object BookCatalog {
       currentBook =>
       currentBook.title == requestedTitle &&
       currentBook.author == requestedAuthor
+    }
+  }
+
+  /**
+    * Determine if book exists within given ISBN
+    * @param catalog Catalog being queried
+    * @param requestedISBN ISBN of book being searched for
+    * @return True if book exists with given ISBN and false otherwise
+    */
+  def exists(
+    catalog: BookCatalog,
+    requestedISBN: ISBNs
+  ): Boolean = {
+    catalog.catalog exists {
+      currentBook =>
+      currentBook.isbn == requestedISBN
     }
   }
 }
