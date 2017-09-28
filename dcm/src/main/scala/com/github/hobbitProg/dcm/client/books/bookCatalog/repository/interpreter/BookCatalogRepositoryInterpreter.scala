@@ -14,7 +14,7 @@ import scala.util.{Either, Left, Right}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookCatalogRepository
 
-object BookCatalogRepositoryInterpreter
+class BookCatalogRepositoryInterpreter
     extends BookCatalogRepository {
   private type CategoryMappingType = (ISBNs,Categories)
 
@@ -85,3 +85,6 @@ object BookCatalogRepositoryInterpreter
     Right(newBook)
   }
 }
+
+object BookCatalogRepositoryInterpreter
+    extends BookCatalogRepositoryInterpreter

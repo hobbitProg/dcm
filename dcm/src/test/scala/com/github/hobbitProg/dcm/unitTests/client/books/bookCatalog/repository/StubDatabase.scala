@@ -19,7 +19,7 @@ import scala.collection.Set
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 
-class StubDatabase {
+class StubDatabase{
   // ID for acolyte mock database
   private val databaseID: String = "BookCatalogRepositoryTest"
 
@@ -51,15 +51,25 @@ class StubDatabase {
           addedISBN =
             parameters(2).value.asInstanceOf[ISBNs]
           addedDescription =
-            Some(
-              parameters(3).value.asInstanceOf[String]
-            )
-          addedCover =
-            Some(
-              new URI(
-                parameters(4).value.asInstanceOf[String]
+            if (parameters(3).value.asInstanceOf[String] == "NULL") {
+              None
+            }
+            else {
+              Some(
+                parameters(3).value.asInstanceOf[String]
               )
-            )
+            }
+          addedCover =
+            if (parameters(4).value.asInstanceOf[String] == "NULL") {
+              None
+            }
+            else {
+              Some(
+                new URI(
+                  parameters(4).value.asInstanceOf[String]
+                )
+              )
+            }
         case "INSERT INTO categoryMapping(ISBN,Category)VALUES(?,?);" =>
           val parameters =
             execution.parameters
