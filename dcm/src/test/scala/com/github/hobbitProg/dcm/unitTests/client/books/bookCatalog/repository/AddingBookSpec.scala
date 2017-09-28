@@ -82,6 +82,14 @@ class AddingBookSpec
     categories <- Gen.listOf(arbitrary[String])
   } yield ("", author, isbn, description, coverImage, categories.toSet)
 
+  val noAuthorDataGenerator = for {
+    title <- arbitrary[String].suchThat(_.length > 0)
+    isbn <- arbitrary[String].suchThat(_.length > 0)
+    description <- Gen.option(arbitrary[String])
+    coverImage <- Gen.oneOf(availableCovers)
+    categories <- Gen.listOf(arbitrary[String])
+  } yield (title, "", isbn, description, coverImage, categories.toSet)
+
   "Adding valid books to the repository" >> {
     "updates the repository" >> {
       Prop.forAll(databaseGenerator, repositoryGenerator, dataGenerator) {
@@ -175,7 +183,30 @@ class AddingBookSpec
   }
 
   "Trying to add books with no author to the repository" >> {
-    "indicates the repository was not updated" >> pending
+    "indicates the repository was not updated" >> {
+      Prop.forAll(databaseGenerator, repositoryGenerator, noAuthorDataGenerator) {
+        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              val bookToStore =
+                new TestBook(
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )
+              repository.setConnection(
+                database.connectionTransactor
+              )
+              val saveResult =
+                repository add bookToStore
+              saveResult must beLeft
+          }
+        }
+      }
+    }
   }
 
   "Trying to add books with the same title and author as a book in the repository" >> {

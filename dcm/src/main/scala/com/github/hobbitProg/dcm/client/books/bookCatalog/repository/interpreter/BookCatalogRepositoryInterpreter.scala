@@ -43,6 +43,8 @@ class BookCatalogRepositoryInterpreter
     newBook match {
       case noTitleDefined if newBook.title == "" =>
         Left("Given book does not have a title")
+      case noAuthorDefined if newBook.author == "" =>
+        Left("Given book does hot have an author")
       case _ =>
         val descriptionToSave =
           newBook.description match {
