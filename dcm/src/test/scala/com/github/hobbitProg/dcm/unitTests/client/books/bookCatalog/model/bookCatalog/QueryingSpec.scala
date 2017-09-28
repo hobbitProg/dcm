@@ -48,24 +48,22 @@ class QueryingSpec
   } yield ((title, author, isbn, description, coverImage, categories.toSet))
 
   val successfulTitleAuthorMatchGenerator = for {
-    existingBookData <- Gen.listOf(dataGenerator).suchThat(_.length > 0)
+    existingBookData <- Gen.listOfN(25, dataGenerator)
     dataToQuery <- Gen.oneOf(existingBookData)
   } yield (existingBookData, dataToQuery._1, dataToQuery._2)
 
   val successfulISBNMatchGenerator = for {
-    existingBookData <- Gen.listOf(dataGenerator).suchThat(_.length > 0)
+    existingBookData <- Gen.listOfN(25, dataGenerator)
     dataToQuery <- Gen.oneOf(existingBookData)
   } yield (existingBookData, dataToQuery._3)
 
   val unsuccessfulTitleAuthorMatchGenerator = for {
-    existingBookData <- Gen.listOf(dataGenerator).suchThat(_.length > 0)
-    dataToQuery <- dataGenerator.suchThat(!existingBookData.toSet.contains(_))
-  } yield (existingBookData, dataToQuery._1, dataToQuery._2)
+    existingBookData <- Gen.listOfN(26, dataGenerator)
+  } yield (existingBookData.drop(1), existingBookData.head._1, existingBookData.head._2)
 
   val unsuccessfulISBNMatchGenerator = for {
-    existingBookData <- Gen.listOf(dataGenerator).suchThat(_.length > 0)
-    dataToQuery <- dataGenerator.suchThat(!existingBookData.toSet.contains(_))
-  } yield (existingBookData, dataToQuery._3)
+    existingBookData <- Gen.listOfN(26, dataGenerator)
+  } yield (existingBookData.drop(1), existingBookData.head._3)
 
   "Searching for a book using the book's title and author" >> {
     "indicates when a book in the catalog has the given title and author" >> {
