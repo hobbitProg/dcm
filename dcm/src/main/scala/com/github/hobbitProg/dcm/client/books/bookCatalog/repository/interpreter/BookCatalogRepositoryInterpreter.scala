@@ -45,6 +45,8 @@ class BookCatalogRepositoryInterpreter
         Left("Given book does not have a title")
       case noAuthorDefined if newBook.author == "" =>
         Left("Given book does hot have an author")
+      case noISBNDefined if newBook.isbn == "" =>
+        Left("Given book does not have an ISBN")
       case titleAuthorPairAlreadyExists if alreadyContains(
         newBook.title,
         newBook.author
