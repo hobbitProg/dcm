@@ -45,6 +45,17 @@ class BookCatalogRepositoryInterpreter
         Left("Given book does not have a title")
       case noAuthorDefined if newBook.author == "" =>
         Left("Given book does hot have an author")
+      case titleAuthorPairAlreadyExists if alreadyContains(
+        newBook.title,
+        newBook.author
+      ) =>
+        Left(
+          "The book " +
+            newBook.title +
+            " by " +
+            newBook.author +
+            " already exists in catalog"
+        )
       case _ =>
         val descriptionToSave =
           newBook.description match {
@@ -90,6 +101,25 @@ class BookCatalogRepositoryInterpreter
           ).unsafeRunSync
         Right(newBook)
     }
+  }
+
+  /**
+    * Determine if book with given title and author already exists in storage
+    * @param title Title of book that is to be placed into storage
+    * @param author Author of book that is to be placed into storage
+    * @return True if book with given title and author already exists in
+    * storage and false otherwise
+    */
+  private def alreadyContains(
+    title: Titles,
+    author: Authors
+  ): Boolean = {
+    !sql"SELECT Title FROM bookCatalog WHERE Title=${title} AND Author=${author};"
+      .query[Titles]
+      .list
+      .transact(databaseConnection)
+      .unsafeRun
+      .isEmpty
   }
 }
 

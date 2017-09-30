@@ -1,7 +1,7 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository
 
 import acolyte.jdbc.{AcolyteDSL, StatementHandler, UpdateExecution,
-  UpdateResult, Driver => AcolyteDriver}
+  UpdateResult, QueryExecution, QueryResult, RowLists, Driver => AcolyteDriver}
 import acolyte.jdbc.Implicits._
 
 import cats._
@@ -34,6 +34,12 @@ class StubDatabase{
   var addedCover: CoverImages = None
   var addedCategoryAssociations: Set[(ISBNs, Categories)] =
     Set[(ISBNs, Categories)]()
+
+  var existingTitle: Titles = _
+  var existingAuthor: Authors = _
+
+  private var queriedTitle: Titles = ""
+  private var queriedAuthor: Authors = ""
 
   private def bookStorageHandler: StatementHandler =
     AcolyteDSL.handleStatement.withQueryDetection(
@@ -81,7 +87,27 @@ class StubDatabase{
             addedCategoryAssociations + ((newISBN, newCategory))
       }
       1
-    }
+    } withQueryHandler {
+      query: QueryExecution =>
+        query.sql match {
+        case "SELECT Title FROM bookCatalog WHERE Title=? AND Author=?;" =>
+          val parameters =
+            query.parameters
+          queriedTitle =
+            parameters.head.value.asInstanceOf[Titles]
+          queriedAuthor =
+            parameters.last.value.asInstanceOf[Authors]
+          if (queriedTitle == existingTitle &&
+              queriedAuthor == existingAuthor) {
+            RowLists.stringList(
+              existingTitle
+            )
+          }
+          else {
+            QueryResult.Nil
+          }
+        }
+      }
 
   AcolyteDriver.register(
     databaseID,
