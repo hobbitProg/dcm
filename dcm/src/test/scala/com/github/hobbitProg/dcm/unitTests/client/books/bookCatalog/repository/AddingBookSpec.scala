@@ -16,6 +16,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
 
 /**
   * Verifies adding books to book catalog repository
+  * @author Kyle Cranmer
+  * @since 0.2
   */
 class AddingBookSpec
     extends Specification
