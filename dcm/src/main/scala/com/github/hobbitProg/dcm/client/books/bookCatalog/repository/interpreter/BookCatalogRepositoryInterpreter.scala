@@ -58,6 +58,14 @@ class BookCatalogRepositoryInterpreter
             newBook.author +
             " already exists in catalog"
         )
+      case isbnAlreadyExists if alreadyContains(
+        newBook.isbn
+      ) =>
+        Left(
+          "The book with isbn " +
+            newBook.isbn +
+            " already exists in catalog"
+        )
       case _ =>
         val descriptionToSave =
           newBook.description match {
@@ -117,6 +125,23 @@ class BookCatalogRepositoryInterpreter
     author: Authors
   ): Boolean = {
     !sql"SELECT Title FROM bookCatalog WHERE Title=${title} AND Author=${author};"
+      .query[Titles]
+      .list
+      .transact(databaseConnection)
+      .unsafeRun
+      .isEmpty
+  }
+
+  /**
+    * Determine if book with given ISBN already exists in storage
+    * @param isbn ISBN of book that is to be placed into storage
+    * @return True if book with given ISBN already exists in storage and false
+    * otherwise
+    */
+  def alreadyContains(
+    isbn: ISBNs
+  ): Boolean = {
+    !sql"SELECT ISBN from bookCatalog where ISBN=${isbn};"
       .query[Titles]
       .list
       .transact(databaseConnection)

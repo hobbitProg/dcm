@@ -37,9 +37,11 @@ class StubDatabase{
 
   var existingTitle: Titles = _
   var existingAuthor: Authors = _
+  var existingISBN: ISBNs = _
 
   private var queriedTitle: Titles = ""
   private var queriedAuthor: Authors = ""
+  private var queriedISBN: ISBNs = ""
 
   private def bookStorageHandler: StatementHandler =
     AcolyteDSL.handleStatement.withQueryDetection(
@@ -101,6 +103,19 @@ class StubDatabase{
               queriedAuthor == existingAuthor) {
             RowLists.stringList(
               existingTitle
+            )
+          }
+          else {
+            QueryResult.Nil
+          }
+        case "SELECT ISBN from bookCatalog where ISBN=?;" =>
+          val parameters =
+            query.parameters
+          queriedISBN =
+            parameters.head.value.asInstanceOf[ISBNs]
+          if (queriedISBN == existingISBN) {
+            RowLists.stringList(
+              existingISBN
             )
           }
           else {

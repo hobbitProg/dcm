@@ -276,6 +276,31 @@ class AddingBookSpec
   }
 
   "Trying to add books with the same ISBN as a book in the repository" >> {
-    "indicates the repository was not updated" >> pending
+    "indicates the repository was not updated" >> {
+      Prop.forAll(databaseGenerator, repositoryGenerator, dataGenerator) {
+        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              database.existingISBN =
+                isbn
+              val bookToStore =
+                new TestBook(
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )
+              repository.setConnection(
+                database.connectionTransactor
+              )
+              val saveResult =
+                repository add bookToStore
+              saveResult must beLeft
+          }
+        }
+      }
+    }
   }
 }
