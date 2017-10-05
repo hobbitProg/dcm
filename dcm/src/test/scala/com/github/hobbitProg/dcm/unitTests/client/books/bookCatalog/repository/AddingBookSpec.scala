@@ -35,15 +35,6 @@ class AddingBookSpec
   ) extends Book {
   }
 
-  private val emptyBook =
-    TestBook(
-      "",
-      "",
-      "",
-      None,
-      None,
-      Set()
-    )
   private val availableCovers =
     Seq(
       "/Goblins.jpg",

@@ -114,6 +114,37 @@ class BookCatalogRepositoryInterpreter
   }
 
   /**
+    * Modify given book in repository
+    * @param originalBook Book that is being modified
+    * @param updatedBook Book that has been updated
+    * @return Disjoint union of either description of error or updated book
+    */
+  override def update(
+    originalBook: Book,
+    updatedBook: Book
+  ): Either[String, Book] = {
+    // Remove original book from repository
+    val bookRemovalStatement =
+      sql"DELETE FROM bookCatalog WHERE ISBN=${originalBook.isbn};"
+    val categoryRemovalStatement =
+      sql"DELETE FROM categoryMapping WHERE ISBN=${originalBook.isbn};"
+    val removalStatement =
+      for {
+        mainTableRemoval <- bookRemovalStatement.update.run
+        categoryTableRemoval <- categoryRemovalStatement.update.run
+      } yield mainTableRemoval + categoryTableRemoval
+    val removedBook =
+      removalStatement.transact(
+        databaseConnection
+      ).unsafeRunSync
+
+    // Place updated book into repository
+    add(
+      updatedBook
+    )
+  }
+
+  /**
     * Determine if book with given title and author already exists in storage
     * @param title Title of book that is to be placed into storage
     * @param author Author of book that is to be placed into storage

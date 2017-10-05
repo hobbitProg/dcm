@@ -19,4 +19,15 @@ trait BookCatalogRepository {
   def add(
     newBook: Book
   ): Either[String, Book]
+
+  /**
+    * Modify given book in repository
+    * @param originalBook Book that is being modified
+    * @param updatedBook Book that has been updated
+    * @return Disjoint union of either description of error or updated book
+    */
+  def update(
+    originalBook: Book,
+    updatedBook: Book
+  ): Either[String, Book]
 }

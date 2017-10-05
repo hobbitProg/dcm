@@ -176,8 +176,84 @@ class ModifyBookSpec
       }
     }
 
-    "the original book was removed from the catalog" >> pending
-    "the original book is given to all listeners" >> pending
+    "the original book was removed from the catalog" >> {
+      Prop.forAllNoShrink(catalogGenerator, titleGenerator) {
+        (catalogData: Try[CatalogInfoType], newTitle: Titles) => {
+          catalogData match {
+            case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+            getByISBN(
+              catalog,
+                isbn
+              ) match {
+                case Success(originalBook) =>
+                  val updatedCatalog =
+                    updateBook(
+                      catalog,
+                      originalBook,
+                      newTitle,
+                      author,
+                      isbn,
+                      description,
+                      coverImage,
+                      categories
+                    )
+                !bookDataMatches(
+                    updatedCatalog,
+                    isbn,
+                    retrievedBook =>
+                    retrievedBook.title == title
+                )
+                case Failure(_) =>
+                  false 
+             }
+            case Failure(_) =>
+              false
+          }
+        }
+      }
+    }
+
+    "the original book is given to all listeners" >> {
+      Prop.forAllNoShrink(catalogGenerator, titleGenerator) {
+        (catalogData: Try[CatalogInfoType], newTitle: Titles) => {
+          catalogData match {
+            case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+              var givenOriginalBook: Book = null
+              val catalogWithSubscriber =
+                onModify(
+                  catalog,
+                  (originalBook, _) =>
+                  givenOriginalBook = originalBook
+                )
+              getByISBN(
+                catalogWithSubscriber,
+                isbn
+              ) match {
+                case Success(originalBook) =>
+                  updateBook(
+                    catalogWithSubscriber,
+                    originalBook,
+                    newTitle,
+                    author,
+                    isbn,
+                    description,
+                    coverImage,
+                    categories
+                  ) match {
+                    case Success(updatedCatalog) =>
+                      originalBook == givenOriginalBook
+                    case Failure(_) =>
+                      false
+                  }
+                case Failure(_) =>
+                  false
+              }
+            case Failure(_) =>
+              false
+          }
+        }
+      }
+    }
   }
 
   def bookDataMatches(
