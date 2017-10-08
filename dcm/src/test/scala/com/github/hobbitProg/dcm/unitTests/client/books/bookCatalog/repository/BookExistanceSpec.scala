@@ -1,7 +1,17 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository
 
+import org.scalacheck.{Gen, Arbitrary, Prop}
+import Arbitrary._
+import Gen.const
+
 import org.specs2.ScalaCheck
 import org.specs2.mutable.Specification
+
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository._
+import Conversions._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  interpreter.BookCatalogRepositoryInterpreter
 
 /**
   * Verifies repository can be queried to see if book exists in catalog
@@ -13,10 +23,90 @@ class BookExistanceSpec
     with ScalaCheck {
   sequential
 
+  private type BookDataType = (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories])
+  private type TitleAuthorQueryDataType = (List[BookDataType], Titles, Authors)
+  private case class TestBook(
+    title: Titles,
+    author: Authors,
+    isbn: ISBNs,
+    description: Description,
+    coverImage: CoverImages,
+    categories: Set[Categories]
+  ) extends Book {
+  }
+
+  private val availableCovers =
+    Seq(
+      "/Goblins.jpg",
+      "/GroundZero.jpg",
+      "/Ruins.jpg"
+    ).map(
+      image =>
+      Some(
+        getClass().
+          getResource(
+            image
+          ).toURI
+      )
+    )
+
+  val databaseGenerator = for {
+    database <- new QueryDatabase()
+  } yield database
+
+  val repositoryGenerator = for {
+    repository <- new BookCatalogRepositoryInterpreter
+  } yield repository
+
+  val dataGenerator = for {
+    title <- arbitrary[String].suchThat(_.length > 0)
+    author <- arbitrary[String].suchThat(_.length > 0)
+    isbn <- arbitrary[String].suchThat(_.length > 0)
+    description <- Gen.option(arbitrary[String])
+    coverImage <- Gen.oneOf(availableCovers)
+    categories <- Gen.listOf(arbitrary[String])
+  } yield ((title, author, isbn, description, coverImage, categories.toSet))
+
+  val successfulTitleAuthorMatchGenerator = for {
+    existingBookData <- Gen.listOfN(25, dataGenerator)
+    dataToQuery <- Gen.oneOf(existingBookData)
+  } yield (existingBookData, dataToQuery._1, dataToQuery._2)
+
   "Determining if a book exists in the repository with a given title and a " +
   "given author" >> {
     "the repository indicates when a book with a given title and a given " +
-    "author exists in the repository" >> pending
+    "author exists in the repository" >> {
+      Prop.forAllNoShrink(databaseGenerator, repositoryGenerator, successfulTitleAuthorMatchGenerator) {
+        (database: QueryDatabase, repository: BookCatalogRepositoryInterpreter, queryData: TitleAuthorQueryDataType) => {
+          repository setConnection database.connectionTransactor
+          queryData match {
+            case (availableBooks, matchingTitle, matchingAuthor) =>
+              val populatedCatalog =
+                availableBooks.foldLeft(
+                  repository
+                ){
+                  (reepositoryBeingPopulated, currentBookData) =>
+                  currentBookData match {
+                    case (title, author, isbn, description, coverImage, categories) =>
+                      val bookToStore =
+                        new TestBook(
+                          title,
+                          author,
+                          isbn,
+                          description,
+                          coverImage,
+                          categories
+                        )
+                      repository add bookToStore
+                      repository
+                  }
+                }
+              ((bookContaining(matchingTitle, matchingAuthor)) isContainedIn repository) must beTrue
+          }
+        }
+      }
+    }
+
     "the repository indicates when no book in the repository has the given " +
     "title and a given author" >> pending
   }
