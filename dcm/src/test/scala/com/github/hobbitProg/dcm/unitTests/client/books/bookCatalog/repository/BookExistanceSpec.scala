@@ -85,6 +85,11 @@ class BookExistanceSpec
     dataToQuery <- existingBookData.last
   } yield (existingBookData.init, dataToQuery._1, dataToQuery._2)
 
+  val unsuccessfulISBNMatchGenerator = for {
+    existingBookData <- Gen.listOfN(26, dataGenerator)
+    dataToQuery <- existingBookData.last
+  } yield (existingBookData.init, dataToQuery._3)
+
   "Determining if a book exists in the repository with a given title and a " +
   "given author" >> {
     "the repository indicates when a book with a given title and a given " +
@@ -147,7 +152,7 @@ class BookExistanceSpec
                       repositoryBeingPopulated
                   }
                 }
-              (bookContaining(differentTitle, differentAuthor) isContainedIn repository) must beFalse
+              (bookContaining(differentTitle, differentAuthor) isContainedIn populatedCatalog) must beFalse
           }
         }
       }
@@ -189,6 +194,36 @@ class BookExistanceSpec
     }
 
     "the repository indicates when no book in the repository has the given " +
-    "ISBN" >> pending
+    "ISBN" >> {
+      Prop.forAllNoShrink(databaseGenerator, repositoryGenerator, unsuccessfulISBNMatchGenerator) {
+        (database: QueryDatabase, repository: BookCatalogRepositoryInterpreter, queryData: ISBNQueryDataType) => {
+          repository setConnection database.connectionTransactor
+          queryData match {
+            case (availableBooks, differentISBN) =>
+              val populatedCatalog =
+                availableBooks.foldLeft(
+                  repository
+                ){
+                  (repositoryBeingPopulated, currentBookData) =>
+                  currentBookData match {
+                    case (title, author, isbn, description, coverImage, categories) =>
+                      val bookToStore =
+                        new TestBook(
+                          title,
+                          author,
+                          isbn,
+                          description,
+                          coverImage,
+                          categories
+                        )
+                      repositoryBeingPopulated add bookToStore
+                      repositoryBeingPopulated
+                  }
+                }
+              (bookContaining(differentISBN) isContainedIn populatedCatalog) must beFalse
+          }
+        }
+      }
+    }
   }
 }
