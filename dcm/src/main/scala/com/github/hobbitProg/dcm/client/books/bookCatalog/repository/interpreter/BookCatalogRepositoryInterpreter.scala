@@ -151,7 +151,7 @@ class BookCatalogRepositoryInterpreter
     * @return True if book with given title and author already exists in
     * storage and false otherwise
     */
-  def alreadyContains(
+  override def alreadyContains(
     title: Titles,
     author: Authors
   ): Boolean = {
@@ -169,7 +169,7 @@ class BookCatalogRepositoryInterpreter
     * @return True if book with given ISBN already exists in storage and false
     * otherwise
     */
-  def alreadyContains(
+  override def alreadyContains(
     isbn: ISBNs
   ): Boolean = {
     !sql"SELECT ISBN from bookCatalog where ISBN=${isbn};"

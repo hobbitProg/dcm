@@ -2,7 +2,7 @@ package com.github.hobbitProg.dcm.client.books.bookCatalog.repository
 
 import scala.util.Either
 
-import com.github.hobbitProg.dcm.client.books.bookCatalog.model.{Book, Titles, Authors}
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model.{Book, Titles, Authors, ISBNs}
 
 /**
   * Interface for repository for book catalog
@@ -41,5 +41,15 @@ trait BookCatalogRepository {
   def alreadyContains(
     title: Titles,
     author: Authors
+  ): Boolean
+
+  /**
+    * Determine if book with given ISBN already exists in storage
+    * @param isbn ISBN of book that is to be placed into storage
+    * @return True if book with given ISBN already exists in storage and false
+    * otherwise
+    */
+  def alreadyContains(
+    isbn: ISBNs
   ): Boolean
 }

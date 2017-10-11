@@ -1,5 +1,7 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository
 
+import scala.language.implicitConversions
+
 import org.scalacheck.{Gen, Arbitrary, Prop}
 import Arbitrary._
 import Gen.const
@@ -25,6 +27,7 @@ class BookExistanceSpec
 
   private type BookDataType = (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories])
   private type TitleAuthorQueryDataType = (List[BookDataType], Titles, Authors)
+  private type ISBNQueryDataType = (List[BookDataType], ISBNs)
   private case class TestBook(
     title: Titles,
     author: Authors,
@@ -72,6 +75,11 @@ class BookExistanceSpec
     dataToQuery <- Gen.oneOf(existingBookData)
   } yield (existingBookData, dataToQuery._1, dataToQuery._2)
 
+  val successfulISBNMatchGenerator = for {
+    existingBookData <- Gen.listOfN(25, dataGenerator)
+    dataToQuery <- Gen.oneOf(existingBookData)
+  } yield (existingBookData, dataToQuery._3)
+
   val unsucessfulTitleAuthorMatchGenerator = for {
     existingBookData <- Gen.listOfN(26, dataGenerator)
     dataToQuery <- existingBookData.last
@@ -106,7 +114,7 @@ class BookExistanceSpec
                       repositoryBeingPopulated
                   }
                 }
-              ((bookContaining(matchingTitle, matchingAuthor)) isContainedIn repository) must beTrue
+              (bookContaining(matchingTitle, matchingAuthor) isContainedIn populatedCatalog) must beTrue
           }
         }
       }
@@ -148,7 +156,38 @@ class BookExistanceSpec
 
   "Determining if a book exists in the repository with a given ISBN" >> {
     "the repository indicates when a book with a given ISBN exists in the " +
-    "repostory" >> pending
+    "repostory" >> {
+      Prop.forAllNoShrink(databaseGenerator, repositoryGenerator, successfulISBNMatchGenerator) {
+        (database: QueryDatabase, repository: BookCatalogRepositoryInterpreter, queryData: ISBNQueryDataType) => {
+          repository setConnection database.connectionTransactor
+          queryData match {
+            case (availableBooks, matchingISBN) =>
+              val populatedCatalog =
+                availableBooks.foldLeft(
+                  repository
+                ){
+                  (repositoryBeingPopulated, currentBookData) =>
+                  currentBookData match {
+                    case (title, author, isbn, description, coverImage, categories) =>
+                      val bookToStore =
+                        new TestBook(
+                          title,
+                          author,
+                          isbn,
+                          description,
+                          coverImage,
+                          categories
+                        )
+                      repositoryBeingPopulated add bookToStore
+                      repositoryBeingPopulated
+                  }
+                }
+              (bookContaining(matchingISBN) isContainedIn populatedCatalog) must beTrue
+          }
+        }
+      }
+    }
+
     "the repository indicates when no book in the repository has the given " +
     "ISBN" >> pending
   }
