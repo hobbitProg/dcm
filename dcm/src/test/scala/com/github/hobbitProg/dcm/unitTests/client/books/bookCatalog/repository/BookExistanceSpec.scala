@@ -72,6 +72,11 @@ class BookExistanceSpec
     dataToQuery <- Gen.oneOf(existingBookData)
   } yield (existingBookData, dataToQuery._1, dataToQuery._2)
 
+  val unsucessfulTitleAuthorMatchGenerator = for {
+    existingBookData <- Gen.listOfN(26, dataGenerator)
+    dataToQuery <- existingBookData.last
+  } yield (existingBookData.init, dataToQuery._1, dataToQuery._2)
+
   "Determining if a book exists in the repository with a given title and a " +
   "given author" >> {
     "the repository indicates when a book with a given title and a given " +
@@ -85,7 +90,7 @@ class BookExistanceSpec
                 availableBooks.foldLeft(
                   repository
                 ){
-                  (reepositoryBeingPopulated, currentBookData) =>
+                  (repositoryBeingPopulated, currentBookData) =>
                   currentBookData match {
                     case (title, author, isbn, description, coverImage, categories) =>
                       val bookToStore =
@@ -97,8 +102,8 @@ class BookExistanceSpec
                           coverImage,
                           categories
                         )
-                      repository add bookToStore
-                      repository
+                      repositoryBeingPopulated add bookToStore
+                      repositoryBeingPopulated
                   }
                 }
               ((bookContaining(matchingTitle, matchingAuthor)) isContainedIn repository) must beTrue
@@ -108,7 +113,37 @@ class BookExistanceSpec
     }
 
     "the repository indicates when no book in the repository has the given " +
-    "title and a given author" >> pending
+    "title and a given author" >> {
+      Prop.forAllNoShrink(databaseGenerator, repositoryGenerator, unsucessfulTitleAuthorMatchGenerator) {
+        (database: QueryDatabase, repository: BookCatalogRepositoryInterpreter, queryData: TitleAuthorQueryDataType) => {
+          repository setConnection database.connectionTransactor
+          queryData match {
+            case (availableBooks, differentTitle, differentAuthor) =>
+              val populatedCatalog =
+                availableBooks.foldLeft(
+                  repository
+                ){
+                  (repositoryBeingPopulated, currentBookData) =>
+                  currentBookData match {
+                    case (title, author, isbn, description, coverImage, categories) =>
+                      val bookToStore =
+                        new TestBook(
+                          title,
+                          author,
+                          isbn,
+                          description,
+                          coverImage,
+                          categories
+                        )
+                      repositoryBeingPopulated add bookToStore
+                      repositoryBeingPopulated
+                  }
+                }
+              (bookContaining(differentTitle, differentAuthor) isContainedIn repository) must beFalse
+          }
+        }
+      }
+    }
   }
 
   "Determining if a book exists in the repository with a given ISBN" >> {
