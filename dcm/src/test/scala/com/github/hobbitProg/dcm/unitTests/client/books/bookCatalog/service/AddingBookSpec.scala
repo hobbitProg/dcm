@@ -13,6 +13,8 @@ import org.specs2.ScalaCheck
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.Specification
 
+import com.github.hobbitProg.dcm.matchers.bookCatalog.Conversions._
+
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.interpreter.
   BookCatalogServiceInterpreter
@@ -27,6 +29,15 @@ class AddingBookSpec
     extends Specification
     with ScalaCheck {
   sequential
+
+  case class TestBook(
+    val title: Titles,
+    val author: Authors,
+    val isbn: ISBNs,
+    val description: Description,
+    val coverImage: CoverImages,
+    val categories: Set[Categories]
+  ) extends Book
 
   def isValid[InvalidType, ValidType](
     result: Validated[InvalidType, ValidType]
@@ -87,7 +98,7 @@ class AddingBookSpec
           bookData match {
             case (title, author, isbn, description, coverImage, categories) =>
               val resultingCatalog =
-                addBook(
+                insertBook(
                   catalog,
                   title,
                   author,
@@ -104,7 +115,29 @@ class AddingBookSpec
       }
     }
 
-    "places the book into the catalog" >> pending
+    "places the book into the catalog" >> {
+      Prop.forAll(catalogGenerator, repositoryGenerator, dataGenerator) {
+        (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              val resultingCatalog =
+                insertBook(
+                  catalog,
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )(
+                  repository
+                )
+              resultingCatalog must containBook(TestBook(title, author, isbn, description, coverImage, categories))
+          }
+        }
+      }
+    }
+
     "places the book into the repository" >> pending
   }
 

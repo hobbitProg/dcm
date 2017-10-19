@@ -27,7 +27,7 @@ trait BookCatalogService[Catalog] {
     * @param categories Categories of new book
     * @return Routine to add book to catalog and repository
     */
-  def addBook(
+  def insertBook(
     catalog: Catalog,
     title: Titles,
     author: Authors,

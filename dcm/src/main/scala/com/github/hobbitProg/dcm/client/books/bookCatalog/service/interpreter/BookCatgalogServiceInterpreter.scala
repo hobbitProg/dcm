@@ -2,11 +2,13 @@ package com.github.hobbitProg.dcm.client.books.bookCatalog.service
 package interpreter
 
 import scala.collection.Set
+import scala.util.{Success, Failure}
 
 import cats.data.Kleisli
-import cats.data.Validated.Valid
+import cats.data.Validated.{Valid, Invalid}
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
+import BookCatalog._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookCatalogRepository
 
 /**
@@ -27,7 +29,7 @@ object BookCatalogServiceInterpreter
     * @param categories Categories of new book
     * @return Routine to add book to catalog and repository
     */
-  def addBook(
+  def insertBook(
     catalog: BookCatalog,
     title: Titles,
     author: Authors,
@@ -37,6 +39,23 @@ object BookCatalogServiceInterpreter
     categories: Set[Categories]
   ): BookCatalogOperation[BookCatalog] = Kleisli {
     repository: BookCatalogRepository =>
-    Valid(catalog)
+    addBook(
+      catalog,
+      title,
+      author,
+      isbn,
+      description,
+      cover,
+      categories
+    ) match {
+      case Success(updatedCatalog) =>
+        Valid(
+          updatedCatalog
+        )
+      case Failure(_) =>
+        Invalid(
+          BookNotAddedToCatalog()
+        )
+    }
   }
 }
