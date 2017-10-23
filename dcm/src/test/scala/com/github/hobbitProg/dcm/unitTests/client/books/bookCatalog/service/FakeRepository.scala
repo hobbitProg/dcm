@@ -13,17 +13,24 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookCatalog
 class FakeRepository
     extends BookCatalogRepository {
   /**
+    * Book that was placed into repository
+    */
+  private var bookPlacedIntoRepository: Book = _
+
+  /**
     * Add given book to repository
     * @param newBook Book to add to repository
     * @return Disjoint union of either description of error or book that was
     * added to repository
     */
-  def add(
+  override def add(
     newBook: Book
-  ): Either[String, Book] =
-    Left(
-      "Unimplemented"
+  ): Either[String, Book] = {
+    bookPlacedIntoRepository = newBook
+    Right(
+      newBook
     )
+  }
 
   /**
     * Modify given book in repository
@@ -31,7 +38,7 @@ class FakeRepository
     * @param updatedBook Book that has been updated
     * @return Disjoint union of either description of error or updated book
     */
-  def update(
+  override def update(
     originalBook: Book,
     updatedBook: Book
   ): Either[String, Book] =
@@ -40,13 +47,34 @@ class FakeRepository
     )
 
   /**
+    * Retrieve book with given ISBN
+    * @param isbn ISBN of book to retrieve
+    * @return Disjoint union of either description of error or book with given
+    * ISBN
+    */
+  override def retrieve(
+    isbn: ISBNs
+  ): Either[String, Book] =
+    if (bookPlacedIntoRepository == null) {
+      Left("No book was placed into the repository")
+    }
+    else {
+      if (bookPlacedIntoRepository.isbn == isbn) {
+        Right(bookPlacedIntoRepository)
+      }
+      else {
+        Left("No book with the ISBN " + isbn + " exists in the repoistory")
+      }
+    }
+
+  /**
     * Determine if book with given title and author already exists in storage
     * @param title Title of book that is to be placed into storage
     * @param author Author of book that is to be placed into storage
     * @return True if book with given title and author already exists in
     * storage and false otherwise
     */
-  def alreadyContains(
+  override def alreadyContains(
     title: Titles,
     author: Authors
   ): Boolean = true
@@ -57,7 +85,7 @@ class FakeRepository
     * @return True if book with given ISBN already exists in storage and false
     * otherwise
     */
-  def alreadyContains(
+  override def alreadyContains(
     isbn: ISBNs
   ): Boolean = true
 }

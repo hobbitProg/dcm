@@ -9,3 +9,8 @@ sealed abstract class BookCatalogError
   * Indication that book cannot be added to catalog
   */
 case class BookNotAddedToCatalog() extends BookCatalogError
+
+/**
+  * Indication that book cannot be added to repository
+  */
+case class BookNotAddedToRepository() extends BookCatalogError

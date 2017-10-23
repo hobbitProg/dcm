@@ -20,4 +20,17 @@ object Conversions {
     CatalogContainsBookMatcher(
       expectedBook
     )
+
+  /**
+    * Convert given book to matcher that determines if book exists within
+    * repository
+    * @param expectedBook Book expected to be in repository
+    * @return Matcher to see if book exists in repository
+    */
+  def haveBook(
+    expectedBook: Book
+  ): RepositoryContainsBookMatcher =
+    RepositoryContainsBookMatcher(
+      expectedBook
+    )
 }

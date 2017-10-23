@@ -32,7 +32,7 @@ object BookCatalog {
     * @param description Description of new book
     * @param cover Cover image of new book
     * @param categories Categories of new book
-    * @return Function that places book into catalog
+    * @return Indication if book was added to repository
     */
   def addBook(
     catalog: BookCatalog,
@@ -42,7 +42,7 @@ object BookCatalog {
     description: Description,
     cover: CoverImages,
     categories: Set[Categories]
-  ): Try[BookCatalog] = {
+  ): Try[BookCatalog] =
     Book.book(
       title,
       author,
@@ -71,7 +71,6 @@ object BookCatalog {
           )
         )
     }
-  }
 
   /**
     * Replace original version of book with updated version
@@ -124,7 +123,6 @@ object BookCatalog {
       )
     }
   }
-
 
   /**
     * Register action to perform when book is added to catalog

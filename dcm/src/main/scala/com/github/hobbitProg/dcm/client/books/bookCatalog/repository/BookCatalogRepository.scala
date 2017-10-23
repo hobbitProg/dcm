@@ -32,6 +32,16 @@ trait BookCatalogRepository {
   ): Either[String, Book]
 
   /**
+    * Retrieve book with given ISBN
+    * @param isbn ISBN of book to retrieve
+    * @return Disjoint union of either description of error or book with given
+    * ISBN
+    */
+  def retrieve(
+    isbn: ISBNs
+  ): Either[String, Book]
+
+  /**
     * Determine if book with given title and author already exists in storage
     * @param title Title of book that is to be placed into storage
     * @param author Author of book that is to be placed into storage
