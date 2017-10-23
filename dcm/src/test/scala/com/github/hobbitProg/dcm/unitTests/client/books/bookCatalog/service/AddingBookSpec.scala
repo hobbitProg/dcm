@@ -39,14 +39,23 @@ class AddingBookSpec
     val categories: Set[Categories]
   ) extends Book
 
+  // Determine if result is valid
   def isValid[InvalidType, ValidType](
     result: Validated[InvalidType, ValidType]
-  ) = {
+  ) =
     result match {
       case Valid(_) => true
       case Invalid(_) => false
     }
-  }
+
+  // Determine if result is invalid
+  def isInvalid[InvalidType, ValidType](
+    result: Validated[InvalidType, ValidType]
+  ) =
+    result match {
+      case Valid(_) => false
+      case Invalid(_) => true
+    }
 
   // Matcher to determine if a result is valid
   def beValid[InvalidType, ValidType]: Matcher[Validated[InvalidType, ValidType]] = {
@@ -55,6 +64,16 @@ class AddingBookSpec
       isValid(result),
       "Result is valid",
       "Result is invalid"
+    )
+  }
+
+  // Matcher to determine if a result is invalid
+  def beInvalid[InvalidType, ValidType]: Matcher[Validated[InvalidType, ValidType]] = {
+    result: Validated[InvalidType, ValidType] =>
+    (
+      isInvalid(result),
+      "Result is invalid",
+      "Result is valid"
     )
   }
 
@@ -90,6 +109,14 @@ class AddingBookSpec
     coverImage <- Gen.oneOf(availableCovers)
     categories <- Gen.listOf(arbitrary[String])
   } yield (title, author, isbn, description, coverImage, categories.toSet)
+
+  val noTitleGenerator = for {
+    author <- arbitrary[String].suchThat(_.length > 0)
+    isbn <- arbitrary[String].suchThat(_.length > 0)
+    description <- Gen.option(arbitrary[String])
+    coverImage <- Gen.oneOf(availableCovers)
+    categories <- Gen.listOf(arbitrary[String])
+  } yield ("", author, isbn, description, coverImage, categories.toSet)
 
   "Given a valid book information to add to the catalog" >> {
     "indicates the book was added to the catalog" >> {
@@ -164,7 +191,29 @@ class AddingBookSpec
   }
 
   "Given book information without a title" >> {
-    "indicates the book was not added to the catalog" >> pending
+    "indicates the book was not added to the catalog" >> {
+      Prop.forAll(catalogGenerator, repositoryGenerator, noTitleGenerator) {
+        (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              val resultingCatalog =
+                insertBook(
+                  catalog,
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )(
+                  repository
+                )
+              resultingCatalog must beInvalid
+          }
+        }
+      }
+    }
+
     "does not place the book into the catalog" >> pending
     "does not place the book into the repository" >> pending
   }

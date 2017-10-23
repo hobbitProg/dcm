@@ -1,6 +1,7 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository
 
 import scala.language.implicitConversions
+import scala.collection.immutable.List
 
 import org.scalacheck.{Gen, Arbitrary, Prop}
 import Arbitrary._
@@ -53,6 +54,22 @@ class BookExistanceSpec
       )
     )
 
+  private val isbnGenerator: Gen[ISBNs] = for {
+    digit1 <- Gen.choose('0','9')
+    digit2 <- Gen.choose('0','9')
+    digit3 <- Gen.choose('0','9')
+    digit4 <- Gen.choose('0','9')
+    digit5 <- Gen.choose('0','9')
+    digit6 <- Gen.choose('0','9')
+    digit7 <- Gen.choose('0','9')
+    digit8 <- Gen.choose('0','9')
+    digit9 <- Gen.choose('0','9')
+    digit10 <- Gen.choose('0','9')
+  } yield List(digit1, digit2, digit3, digit4, digit5, digit6, digit7, digit8, digit9, digit10).mkString
+
+  private val arbitraryISBN: Arbitrary[ISBNs] =
+    Arbitrary(isbnGenerator)
+
   val databaseGenerator = for {
     database <- new QueryDatabase()
   } yield database
@@ -64,7 +81,7 @@ class BookExistanceSpec
   val dataGenerator = for {
     title <- arbitrary[String].suchThat(_.length > 0)
     author <- arbitrary[String].suchThat(_.length > 0)
-    isbn <- arbitrary[String].suchThat(_.length > 0)
+    isbn <- arbitraryISBN.arbitrary
     description <- Gen.option(arbitrary[String])
     coverImage <- Gen.oneOf(availableCovers)
     categories <- Gen.listOf(arbitrary[String])
