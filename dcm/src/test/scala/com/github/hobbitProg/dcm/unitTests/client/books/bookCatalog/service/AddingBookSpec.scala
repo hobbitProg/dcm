@@ -118,6 +118,14 @@ class AddingBookSpec
     categories <- Gen.listOf(arbitrary[String])
   } yield ("", author, isbn, description, coverImage, categories.toSet)
 
+  val noAuthorGenerator = for {
+    title <- arbitrary[String].suchThat(_.length > 0)
+    isbn <- arbitrary[String].suchThat(_.length > 0)
+    description <- Gen.option(arbitrary[String])
+    coverImage <- Gen.oneOf(availableCovers)
+    categories <- Gen.listOf(arbitrary[String])
+  } yield (title, "", isbn, description, coverImage, categories.toSet)
+
   "Given a valid book information to add to the catalog" >> {
     "indicates the book was added to the catalog" >> {
       Prop.forAll(catalogGenerator, repositoryGenerator, dataGenerator) {
@@ -239,7 +247,29 @@ class AddingBookSpec
   }
 
   "Given book information without an author" >> {
-    "indicates the book was not added to the catalog" >> pending
+    "indicates the book was not added to the catalog" >> {
+      Prop.forAll(catalogGenerator, repositoryGenerator, noAuthorGenerator) {
+        (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              val resultingCatalog =
+                insertBook(
+                  catalog,
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )(
+                  repository
+                )
+              resultingCatalog must beInvalid
+          }
+        }
+      }
+    }
+
     "does not place the book into the repository" >> pending
   }
 
