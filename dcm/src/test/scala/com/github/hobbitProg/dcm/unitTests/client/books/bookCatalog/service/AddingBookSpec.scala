@@ -214,33 +214,49 @@ class AddingBookSpec
       }
     }
 
-    "does not place the book into the catalog" >> pending
-    "does not place the book into the repository" >> pending
+    "does not place the book into the repository" >> {
+      Prop.forAll(catalogGenerator, repositoryGenerator, noTitleGenerator) {
+        (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              val resultingCatalog =
+                insertBook(
+                  catalog,
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )(
+                  repository
+                )
+              repository must notHaveBook(TestBook(title, author, isbn, description, coverImage, categories))
+          }
+        }
+      }
+    }
   }
 
   "Given book information without an author" >> {
     "indicates the book was not added to the catalog" >> pending
-    "does not place the book into the catalog" >> pending
     "does not place the book into the repository" >> pending
   }
 
   "Given book information without an ISBN" >> {
     "indicates the book was not added to the catalog" >> pending
-    "does not place the book into the catalog" >> pending
     "does not place the book into the repository" >> pending
   }
 
   "Given book information with a title and author of a book that already " +
   "exists in the catalog" >> {
     "indicates the book was not added to the catalog" >> pending
-    "does not place the book into the catalog" >> pending
     "does not place the book into the repository" >> pending
   }
 
   "Given book information with an ISBN of a book that already exists in the " +
   "catalog" >> {
     "indicates the book was not added to the catalog" >> pending
-    "does not place the book into the catalog" >> pending
     "does not place the book into the repository" >> pending
   }
 }

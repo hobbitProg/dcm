@@ -33,4 +33,17 @@ object Conversions {
     RepositoryContainsBookMatcher(
       expectedBook
     )
+
+  /**
+    * Convert given book to matcher that determines if book does not exist
+    * within repository
+    * @param expectedBook Book expected not to be in repository
+    * @return Matcher to see if book does not exist in repository
+    */
+  def notHaveBook(
+    expectedBook: Book
+  ): RepositoryDoesNotContainBookMatcher =
+    RepositoryDoesNotContainBookMatcher(
+      expectedBook
+    )
 }
