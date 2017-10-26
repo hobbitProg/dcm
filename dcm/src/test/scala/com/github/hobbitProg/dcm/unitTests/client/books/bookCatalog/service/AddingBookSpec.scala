@@ -326,7 +326,28 @@ class AddingBookSpec
       }
     }
 
-    "does not place the book into the repository" >> pending
+    "does not place the book into the repository" >> {
+      Prop.forAll(catalogGenerator, repositoryGenerator, noISBNGenerator) {
+        (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              val resultingCatalog =
+                insertBook(
+                  catalog,
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )(
+                  repository
+                )
+              repository must notHaveBook(TestBook(title, author, isbn, description, coverImage, categories))
+          }
+        }
+      }
+    }
   }
 
   "Given book information with a title and author of a book that already " +
