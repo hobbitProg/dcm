@@ -184,7 +184,7 @@ class BookCatalogRepositoryInterpreter
     isbn: ISBNs
   ): Boolean = {
     !sql"SELECT ISBN from bookCatalog where ISBN=${isbn};"
-      .query[Titles]
+      .query[ISBNs]
       .list
       .transact(databaseConnection)
       .unsafeRun

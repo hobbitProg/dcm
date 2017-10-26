@@ -39,7 +39,7 @@ class QueryDatabase {
     Set[TitlesAuthors]()
 
   // Books with given ISBN within database
-  private var availableISBNs: Set[ISBNs] =
+  var availableISBNs: Set[ISBNs] =
     Set[ISBNs]()
 
   private def bookStorageHandler: StatementHandler =
@@ -55,13 +55,11 @@ class QueryDatabase {
             availableTitlesAuthors +
           Tuple2(parameters.head.value.asInstanceOf[Titles],
             parameters(1).value.asInstanceOf[Authors])
+          availableISBNs =
+            availableISBNs + parameters(2).value.asInstanceOf[ISBNs]
         case "INSERT INTO categoryMapping(ISBN,Category)VALUES(?,?);" =>
           val parameters =
             execution.parameters
-          val newISBN =
-            parameters.head.value.asInstanceOf[ISBNs]
-          availableISBNs =
-            availableISBNs + newISBN
       }
       1
     } withQueryHandler {
@@ -87,6 +85,7 @@ class QueryDatabase {
             query.parameters
           val queriedISBN: ISBNs =
             parameters.head.value.asInstanceOf[ISBNs]
+
           if (availableISBNs contains queriedISBN) {
             RowLists.stringList(
               queriedISBN

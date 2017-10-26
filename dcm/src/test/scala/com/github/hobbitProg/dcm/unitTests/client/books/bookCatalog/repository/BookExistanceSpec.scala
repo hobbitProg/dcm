@@ -2,6 +2,7 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository
 
 import scala.language.implicitConversions
 import scala.collection.immutable.List
+import scala.util.Random
 
 import org.scalacheck.{Gen, Arbitrary, Prop}
 import Arbitrary._
@@ -94,8 +95,7 @@ class BookExistanceSpec
 
   val successfulISBNMatchGenerator = for {
     existingBookData <- Gen.listOfN(25, dataGenerator)
-    dataToQuery <- Gen.oneOf(existingBookData)
-  } yield (existingBookData, dataToQuery._3)
+  } yield existingBookData
 
   val unsucessfulTitleAuthorMatchGenerator = for {
     existingBookData <- Gen.listOfN(26, dataGenerator)
@@ -180,32 +180,26 @@ class BookExistanceSpec
     "the repository indicates when a book with a given ISBN exists in the " +
     "repostory" >> {
       Prop.forAllNoShrink(databaseGenerator, repositoryGenerator, successfulISBNMatchGenerator) {
-        (database: QueryDatabase, repository: BookCatalogRepositoryInterpreter, queryData: ISBNQueryDataType) => {
+        (database: QueryDatabase, repository: BookCatalogRepositoryInterpreter, queryData: List[BookDataType]) => {
           repository setConnection database.connectionTransactor
-          queryData match {
-            case (availableBooks, matchingISBN) =>
-              val populatedCatalog =
-                availableBooks.foldLeft(
-                  repository
-                ){
-                  (repositoryBeingPopulated, currentBookData) =>
-                  currentBookData match {
-                    case (title, author, isbn, description, coverImage, categories) =>
-                      val bookToStore =
-                        new TestBook(
-                          title,
-                          author,
-                          isbn,
-                          description,
-                          coverImage,
-                          categories
-                        )
-                      repositoryBeingPopulated add bookToStore
-                      repositoryBeingPopulated
-                  }
-                }
-              (bookContaining(matchingISBN) isContainedIn populatedCatalog) must beTrue
+          for (currentBookData <- queryData) {
+            currentBookData match {
+              case (title, author, isbn, description, coverImage, categories) =>
+                val bookToStore =
+                  new TestBook(
+                    title,
+                    author,
+                    isbn,
+                    description,
+                    coverImage,
+                    categories
+                  )
+                repository add bookToStore
+            }
           }
+          val matchingISBN =
+            Random.shuffle(queryData).head._3
+          (bookContaining(matchingISBN) isContainedIn repository) must beTrue
         }
       }
     }
