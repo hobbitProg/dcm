@@ -40,7 +40,9 @@ object BookCatalogServiceInterpreter
   ): BookCatalogOperation[BookCatalog] = Kleisli {
     repository: BookCatalogRepository =>
     if (exists(catalog, title, author) ||
-      repository.alreadyContains(title, author)) {
+      repository.alreadyContains(title, author) ||
+      exists(catalog, isbn) ||
+      repository.alreadyContains(isbn)) {
       Invalid(
         BookNotAddedToCatalog()
       )

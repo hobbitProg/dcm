@@ -28,6 +28,11 @@ class FakeRepository
   var existingAuthor: Authors = _
 
   /**
+    * ISBN of book already in repository
+    */
+  var existingISBN: ISBNs = _
+
+  /**
     * Add given book to repository
     * @param newBook Book to add to repository
     * @return Disjoint union of either description of error or book that was
@@ -99,5 +104,6 @@ class FakeRepository
     */
   override def alreadyContains(
     isbn: ISBNs
-  ): Boolean = true
+  ): Boolean =
+    isbn == existingISBN
 }
