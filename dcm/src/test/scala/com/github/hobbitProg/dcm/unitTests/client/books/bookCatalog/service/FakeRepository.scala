@@ -18,6 +18,16 @@ class FakeRepository
   private var bookPlacedIntoRepository: Book = _
 
   /**
+    * Title of book already in repository
+    */
+  var existingTitle: Titles = _
+
+  /**
+    * Author of book already in repository
+    */
+  var existingAuthor: Authors = _
+
+  /**
     * Add given book to repository
     * @param newBook Book to add to repository
     * @return Disjoint union of either description of error or book that was
@@ -77,7 +87,9 @@ class FakeRepository
   override def alreadyContains(
     title: Titles,
     author: Authors
-  ): Boolean = true
+  ): Boolean =
+    title == existingTitle &&
+  author == existingAuthor
 
   /**
     * Determine if book with given ISBN already exists in storage

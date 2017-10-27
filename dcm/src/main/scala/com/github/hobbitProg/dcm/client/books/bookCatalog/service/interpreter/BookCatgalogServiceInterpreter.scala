@@ -39,47 +39,55 @@ object BookCatalogServiceInterpreter
     categories: Set[Categories]
   ): BookCatalogOperation[BookCatalog] = Kleisli {
     repository: BookCatalogRepository =>
-    addBook(
-      catalog,
-      title,
-      author,
-      isbn,
-      description,
-      cover,
-      categories
-    ) match {
-      case Success(updatedCatalog) =>
-        getByISBN(
-          updatedCatalog,
-          isbn
-        ) match {
-          case Success(
-            newBook
-          ) =>
-            repository.add(
+    if (exists(catalog, title, author) ||
+      repository.alreadyContains(title, author)) {
+      Invalid(
+        BookNotAddedToCatalog()
+      )
+    }
+    else {
+      addBook(
+        catalog,
+        title,
+        author,
+        isbn,
+        description,
+        cover,
+        categories
+      ) match {
+        case Success(updatedCatalog) =>
+          getByISBN(
+            updatedCatalog,
+            isbn
+          ) match {
+            case Success(
               newBook
-            ) match {
-              case Right(_) =>
-                Valid(
-                  updatedCatalog
-                )
-              case Left(_) =>
-                Invalid(
-                  BookNotAddedToRepository()
-                )
-            }
-          case Failure(_) =>
-            Invalid(
-              BookNotAddedToRepository()
-            )
-        }
-        Valid(
-          updatedCatalog
-        )
-      case Failure(_) =>
-        Invalid(
-          BookNotAddedToCatalog()
-        )
+            ) =>
+              repository.add(
+                newBook
+              ) match {
+                case Right(_) =>
+                  Valid(
+                    updatedCatalog
+                  )
+                case Left(_) =>
+                  Invalid(
+                    BookNotAddedToRepository()
+                  )
+              }
+            case Failure(_) =>
+              Invalid(
+                BookNotAddedToRepository()
+              )
+          }
+          Valid(
+            updatedCatalog
+          )
+        case Failure(_) =>
+          Invalid(
+            BookNotAddedToCatalog()
+          )
+      }
     }
   }
 }

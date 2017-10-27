@@ -352,8 +352,59 @@ class AddingBookSpec
 
   "Given book information with a title and author of a book that already " +
   "exists in the catalog" >> {
-    "indicates the book was not added to the catalog" >> pending
-    "does not place the book into the repository" >> pending
+    "indicates the book was not added to the catalog" >> {
+      Prop.forAll(catalogGenerator, repositoryGenerator, dataGenerator) {
+        (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              repository.existingTitle =
+                title
+              repository.existingAuthor =
+                author
+              val resultingCatalog =
+                insertBook(
+                  catalog,
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )(
+                  repository
+                )
+              resultingCatalog must beInvalid
+          }
+        }
+      }
+    }
+
+    "does not place the book into the repository" >> {
+      Prop.forAll(catalogGenerator, repositoryGenerator, dataGenerator) {
+        (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              repository.existingTitle =
+                title
+              repository.existingAuthor =
+                author
+              val resultingCatalog =
+                insertBook(
+                  catalog,
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )(
+                  repository
+                )
+              repository must notHaveBook(TestBook(title, author, isbn, description, coverImage, categories))
+          }
+        }
+      }
+    }
   }
 
   "Given book information with an ISBN of a book that already exists in the " +
