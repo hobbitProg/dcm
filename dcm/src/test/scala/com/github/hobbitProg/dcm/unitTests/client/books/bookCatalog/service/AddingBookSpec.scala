@@ -134,7 +134,7 @@ class AddingBookSpec
     categories <- Gen.listOf(arbitrary[String])
   } yield (title, author, "", description, coverImage, categories.toSet)
 
-  "Given a valid book information to add to the catalog" >> {
+  "Adding a book with valid information to the catalog" >> {
     "indicates the book was added to the catalog" >> {
       Prop.forAll(catalogGenerator, repositoryGenerator, dataGenerator) {
         (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
@@ -206,7 +206,7 @@ class AddingBookSpec
     }
   }
 
-  "Given book information without a title" >> {
+  "Adding a book with no title to the catalog" >> {
     "indicates the book was not added to the catalog" >> {
       Prop.forAll(catalogGenerator, repositoryGenerator, noTitleGenerator) {
         (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
@@ -254,7 +254,7 @@ class AddingBookSpec
     }
   }
 
-  "Given book information without an author" >> {
+  "Adding a book with no author to the catalog " >> {
     "indicates the book was not added to the catalog" >> {
       Prop.forAll(catalogGenerator, repositoryGenerator, noAuthorGenerator) {
         (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
@@ -302,7 +302,7 @@ class AddingBookSpec
     }
   }
 
-  "Given book information without an ISBN" >> {
+  "Adding a book with no ISBN to the catalog" >> {
     "indicates the book was not added to the catalog" >> {
       Prop.forAll(catalogGenerator, repositoryGenerator, noISBNGenerator) {
         (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
@@ -350,8 +350,8 @@ class AddingBookSpec
     }
   }
 
-  "Given book information with a title and author of a book that already " +
-  "exists in the catalog" >> {
+  "Adding a book with the same title and author as a book in the catalog to " +
+  "the catalog" >> {
     "indicates the book was not added to the catalog" >> {
       Prop.forAll(catalogGenerator, repositoryGenerator, dataGenerator) {
         (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
@@ -407,8 +407,7 @@ class AddingBookSpec
     }
   }
 
-  "Given book information with an ISBN of a book that already exists in the " +
-  "catalog" >> {
+  "Adding a book with the same ISBN as a book in the catalog to the catalog" >> {
     "indicates the book was not added to the catalog" >> {
       Prop.forAll(catalogGenerator, repositoryGenerator, dataGenerator) {
         (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
