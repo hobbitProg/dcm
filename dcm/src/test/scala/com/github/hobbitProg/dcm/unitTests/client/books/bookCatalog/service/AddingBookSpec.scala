@@ -78,6 +78,7 @@ class AddingBookSpec
   }
 
   private type BookDataType = (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories])
+
   private val availableCovers =
     Seq(
       "/Goblins.jpg",

@@ -36,4 +36,26 @@ trait BookCatalogService[Catalog] {
     cover: CoverImages,
     categories: Set[Categories]
   ): BookCatalogOperation[Catalog]
+
+  /**
+    * Modify a book within the given book catalog
+    * @param catalog Catalog being modified
+    * @param originalBook Book that already exists in catalog
+    * @param newTitle New title of book
+    * @param newAuthor New author of book
+    * @param newISBN New ISBN of book
+    * @param newDescription New description of book
+    * @param newCover New cover of book
+    * @param newCategories New categories of book
+    */
+  def modifyBook(
+    catalog: Catalog,
+    originalBook: Book,
+    newTitle: Titles,
+    newAuthor: Authors,
+    newISBN: ISBNs,
+    newDescription: Description,
+    newCover: CoverImages,
+    newCategories: Set[Categories]
+  ): BookCatalogOperation[Catalog]
 }
