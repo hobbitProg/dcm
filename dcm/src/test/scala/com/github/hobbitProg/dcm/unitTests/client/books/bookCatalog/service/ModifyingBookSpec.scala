@@ -127,7 +127,76 @@ class ModifyingBookSpec
       }
     }
 
-    "places the updated book in the catalog" >> pending
+    "places the updated book in the catalog" >> {
+      Prop.forAll(catalogGenerator, repositoryGenerator, titleModificationGenerator) {
+        (catalog: BookCatalog, repository: FakeRepository, bookData: TitleModificationType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories, newTitle) =>
+              val resultingCatalog =
+                insertBook(
+                  catalog,
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )(
+                  repository
+                )
+              resultingCatalog match {
+                case Valid(populatedCatalog) =>
+                  val queryResult =
+                    getByISBN(
+                      populatedCatalog,
+                      isbn
+                    )
+                  queryResult match {
+                    case Success(originalBook) =>
+                      val updatedCatalog =
+                        modifyBook(
+                          populatedCatalog,
+                          originalBook,
+                          newTitle,
+                          author,
+                          isbn,
+                          description,
+                          coverImage,
+                          categories
+                        )(
+                          repository
+                        )
+                      updatedCatalog match {
+                        case Valid(modifiedCatalog) =>
+                          val updatedResult =
+                            getByISBN(
+                              modifiedCatalog,
+                              isbn
+                            )
+                          updatedResult match {
+                            case Success(updatedBook) =>
+                              updatedBook ==
+                              TestBook(
+                                newTitle,
+                                author,
+                                isbn,
+                                description,
+                                coverImage,
+                                categories
+                              )
+                            case Failure(_) => false
+                          }
+                        case Invalid(_) => false
+                      }
+                    case Failure(_) => false
+                  }
+                case Invalid(_) => false
+              }
+          }
+        }
+      }
+    }
+
     "places the updated book in the repository" >> pending
     "gives the updated book to the listener" >> pending
     "removes the original book from the catalog" >> pending

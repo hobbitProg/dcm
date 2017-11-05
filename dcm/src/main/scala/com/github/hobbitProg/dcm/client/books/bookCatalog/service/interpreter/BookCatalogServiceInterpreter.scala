@@ -115,6 +115,22 @@ object BookCatalogServiceInterpreter
     newCategories: Set[Categories]
   ): BookCatalogOperation[BookCatalog] = Kleisli {
     repository: BookCatalogRepository =>
-    Valid(catalog)
+    updateBook(
+      catalog,
+      originalBook,
+      newTitle,
+      newAuthor,
+      newISBN,
+      newDescription,
+      newCover,
+      newCategories
+    ) match {
+      case Success(updatedCatalog) =>
+        Valid(updatedCatalog)
+      case Failure(_) =>
+        Invalid(
+          BookNotUpdatedWithinCatalog()
+        )
+    }
   }
 }

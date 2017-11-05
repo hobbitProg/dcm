@@ -14,3 +14,8 @@ case class BookNotAddedToCatalog() extends BookCatalogError
   * Indication that book cannot be added to repository
   */
 case class BookNotAddedToRepository() extends BookCatalogError
+
+/**
+  * Indicating that book was not updated within catalog
+  */
+case class BookNotUpdatedWithinCatalog() extends BookCatalogError
