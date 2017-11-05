@@ -56,10 +56,12 @@ class FakeRepository
   override def update(
     originalBook: Book,
     updatedBook: Book
-  ): Either[String, Book] =
-    Left(
-      "Unimplemented"
+  ): Either[String, Book] = {
+    bookPlacedIntoRepository = updatedBook
+    Right(
+      updatedBook
     )
+  }
 
   /**
     * Retrieve book with given ISBN

@@ -126,7 +126,27 @@ object BookCatalogServiceInterpreter
       newCategories
     ) match {
       case Success(updatedCatalog) =>
-        Valid(updatedCatalog)
+        getByISBN(
+          updatedCatalog,
+          newISBN
+        ) match {
+          case Success(newBook) =>
+            repository.update(
+              originalBook,
+              newBook
+            ) match {
+              case Right(_) =>
+                Valid(updatedCatalog)
+              case Left(_) =>
+                Invalid(
+                  BookNotUpdatedWithinCatalog()
+                )
+            }
+          case Failure(_) =>
+            Invalid(
+              BookNotUpdatedWithinCatalog()
+            )
+        }
       case Failure(_) =>
         Invalid(
           BookNotUpdatedWithinCatalog()
