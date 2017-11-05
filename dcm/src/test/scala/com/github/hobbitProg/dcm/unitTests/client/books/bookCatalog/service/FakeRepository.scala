@@ -18,6 +18,11 @@ class FakeRepository
   private var bookPlacedIntoRepository: Book = _
 
   /**
+    * Book that was removed from repository
+    */
+  var bookRemovedFromRepository: Book = _
+
+  /**
     * Title of book already in repository
     */
   var existingTitle: Titles = _
@@ -58,6 +63,7 @@ class FakeRepository
     updatedBook: Book
   ): Either[String, Book] = {
     bookPlacedIntoRepository = updatedBook
+    bookRemovedFromRepository = originalBook
     Right(
       updatedBook
     )

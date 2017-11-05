@@ -393,7 +393,60 @@ class ModifyingBookSpec
       }
     }
 
-    "removes the original book from the repository" >> pending
+    "removes the original book from the repository" >> {
+      Prop.forAll(catalogGenerator, repositoryGenerator, titleModificationGenerator) {
+        (catalog: BookCatalog, repository: FakeRepository, bookData: TitleModificationType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories, newTitle) =>
+              val resultingCatalog =
+                insertBook(
+                  catalog,
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )(
+                  repository
+                )
+              resultingCatalog match {
+                case Valid(populatedCatalog) =>
+                  val queryResult =
+                    getByISBN(
+                      populatedCatalog,
+                      isbn
+                    )
+                  queryResult match {
+                    case Success(originalBook) =>
+                      val updatedCatalog =
+                        modifyBook(
+                          populatedCatalog,
+                          originalBook,
+                          newTitle,
+                          author,
+                          isbn,
+                          description,
+                          coverImage,
+                          categories
+                        )(
+                          repository
+                        )
+                      updatedCatalog match {
+                        case Valid(_) =>
+                          repository.bookRemovedFromRepository ==
+                          originalBook
+                        case Invalid(_) => false
+                      }
+                    case Failure(_) => false
+                  }
+                case Invalid(_) => false
+              }
+          }
+        }
+      }
+    }
+
     "gives the original book to the listener" >> pending
   }
 }
