@@ -447,6 +447,65 @@ class ModifyingBookSpec
       }
     }
 
-    "gives the original book to the listener" >> pending
+    "gives the original book to the listener" >> {
+      Prop.forAll(catalogGenerator, repositoryGenerator, titleModificationGenerator) {
+        (catalog: BookCatalog, repository: FakeRepository, bookData: TitleModificationType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories, newTitle) =>
+              val resultingCatalog =
+                insertBook(
+                  catalog,
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )(
+                  repository
+                )
+              resultingCatalog match {
+                case Valid(populatedCatalog) =>
+                  val queryResult =
+                    getByISBN(
+                      populatedCatalog,
+                      isbn
+                    )
+                  queryResult match {
+                    case Success(originalBook) =>
+                      var givenOriginalBook: Book = null
+                      val catalogWithSubscriber =
+                        onModify(
+                          populatedCatalog,
+                          (originalBook, _) =>
+                          givenOriginalBook = originalBook
+                        )
+                      val updatedCatalog =
+                        modifyBook(
+                          catalogWithSubscriber,
+                          originalBook,
+                          newTitle,
+                          author,
+                          isbn,
+                          description,
+                          coverImage,
+                          categories
+                        )(
+                          repository
+                        )
+                      updatedCatalog match {
+                        case Valid(_) =>
+                          givenOriginalBook ==
+                          originalBook
+                        case Invalid(_) => false
+                      }
+                    case Failure(_) => false
+                  }
+                case Invalid(_) => false
+              }
+          }
+        }
+      }
+    }
   }
 }
