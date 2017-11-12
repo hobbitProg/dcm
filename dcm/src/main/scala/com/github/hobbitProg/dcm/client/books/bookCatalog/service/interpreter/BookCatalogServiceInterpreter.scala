@@ -192,6 +192,12 @@ object BookCatalogServiceInterpreter
     isbn: ISBNs
   ): BookCatalogQuery[Boolean] = Kleisli[Id, BookCatalogRepository, Boolean] {
     repository: BookCatalogRepository =>
-    true
+    exists(
+      catalog,
+      isbn
+    ) ||
+    repository.alreadyContains(
+      isbn
+    )
   }
 }
