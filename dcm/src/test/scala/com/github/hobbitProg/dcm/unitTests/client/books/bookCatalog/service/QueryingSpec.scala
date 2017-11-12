@@ -134,4 +134,14 @@ class QueryingSpec
       }
     }
   }
+
+  "When the book service is queried to see if a book exists with a given " +
+  "ISBN" >> {
+    "indicates a book exists when a book exists in the catalog with the " +
+    "given ISBN" >> pending
+    "indicates a book exists when a book exists in the repository with the " +
+    "given ISBN" >> pending
+    "indicates no book exists when no book eists in the catalog nor the " +
+    "repository with the given ISBN" >> pending
+  }
 }
