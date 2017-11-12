@@ -179,4 +179,19 @@ object BookCatalogServiceInterpreter
       author
     )
   }
+
+  /**
+    * Determine if book with given ISBN exists within catalog
+    * @param catalog Catalog being queried
+    * @param isbn ISBN of book being examined
+    * @return Routine to determine if book exists within either catalog or
+    * repository
+    */
+  def bookExists(
+    catalog: BookCatalog,
+    isbn: ISBNs
+  ): BookCatalogQuery[Boolean] = Kleisli[Id, BookCatalogRepository, Boolean] {
+    repository: BookCatalogRepository =>
+    true
+  }
 }

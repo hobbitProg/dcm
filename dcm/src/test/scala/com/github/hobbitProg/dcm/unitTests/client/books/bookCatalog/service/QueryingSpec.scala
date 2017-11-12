@@ -138,7 +138,38 @@ class QueryingSpec
   "When the book service is queried to see if a book exists with a given " +
   "ISBN" >> {
     "indicates a book exists when a book exists in the catalog with the " +
-    "given ISBN" >> pending
+    "given ISBN" >> {
+      Prop.forAll(catalogGenerator, repositoryGenerator, dataGenerator) {
+        (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              val resultingCatalog =
+                insertBook(
+                  catalog,
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )(
+                  repository
+                )
+              resultingCatalog match {
+                case Valid(populatedCatalog) =>
+                  bookExists(
+                    populatedCatalog,
+                    isbn
+                  )(
+                    repository
+                  )
+                case Invalid(_) => false
+              }
+          }
+        }
+      }
+    }
+
     "indicates a book exists when a book exists in the repository with the " +
     "given ISBN" >> pending
     "indicates no book exists when no book eists in the catalog nor the " +

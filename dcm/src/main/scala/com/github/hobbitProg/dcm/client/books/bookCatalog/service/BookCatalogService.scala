@@ -75,4 +75,16 @@ trait BookCatalogService[Catalog] {
     title: Titles,
     author: Authors
   ): BookCatalogQuery[Boolean]
+
+  /**
+    * Determine if book with given ISBN exists within catalog
+    * @param catalog Catalog being queried
+    * @param isbn ISBN of book being examined
+    * @return Routine to determine if book exists within either catalog or
+    * repository
+    */
+  def bookExists(
+    catalog: Catalog,
+    isbn: ISBNs
+  ): BookCatalogQuery[Boolean]
 }
