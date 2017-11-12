@@ -117,6 +117,21 @@ class QueryingSpec
     }
 
     "indicates no book exists when no book exists in the catalog nor the " +
-    "repository with the given title and author" >> pending
+    "repository with the given title and author" >> {
+      Prop.forAll(catalogGenerator, repositoryGenerator, dataGenerator) {
+        (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              !bookExists(
+                catalog,
+                title,
+                author
+              )(
+                repository
+              )
+          }
+        }
+      }
+    }
   }
 }
