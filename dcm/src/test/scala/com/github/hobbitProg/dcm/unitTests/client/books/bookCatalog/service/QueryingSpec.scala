@@ -171,7 +171,23 @@ class QueryingSpec
     }
 
     "indicates a book exists when a book exists in the repository with the " +
-    "given ISBN" >> pending
+    "given ISBN" >> {
+      Prop.forAll(catalogGenerator, repositoryGenerator, dataGenerator) {
+        (catalog: BookCatalog, repository: FakeRepository, bookData: BookDataType) => {
+          bookData match {
+            case (title, author, isbn, description, coverImage, categories) =>
+              repository.existingISBN = isbn
+              bookExists(
+                catalog,
+                isbn
+              )(
+                repository
+              )
+          }
+        }
+      }
+    }
+
     "indicates no book exists when no book eists in the catalog nor the " +
     "repository with the given ISBN" >> pending
   }
