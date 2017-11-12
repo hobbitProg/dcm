@@ -2,6 +2,7 @@ package com.github.hobbitProg.dcm.client.books.bookCatalog.service
 
 import scala.collection.Set
 
+import cats.Id
 import cats.data.{Kleisli, Validated}
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
@@ -15,6 +16,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookCatalog
 trait BookCatalogService[Catalog] {
   type BookCatalogValidation[ResultType] = Validated[BookCatalogError, ResultType]
   type BookCatalogOperation[ResultType] = Kleisli[BookCatalogValidation, BookCatalogRepository, ResultType]
+  type BookCatalogQuery[ResultType] = Kleisli[Id, BookCatalogRepository, ResultType]
 
   /**
     * Add a book to the given book catalog
@@ -47,6 +49,7 @@ trait BookCatalogService[Catalog] {
     * @param newDescription New description of book
     * @param newCover New cover of book
     * @param newCategories New categories of book
+    * @return Routine to modify book in catalog and repository
     */
   def modifyBook(
     catalog: Catalog,
@@ -58,4 +61,18 @@ trait BookCatalogService[Catalog] {
     newCover: CoverImages,
     newCategories: Set[Categories]
   ): BookCatalogOperation[Catalog]
+
+  /**
+    * Determine if book with given title and author exists within catalog
+    * @param catalog Catalog being queried
+    * @param title Title of book being examined
+    * @param author Author of book being examined
+    * @return Routine to determine if book exists within either catalog or
+    * repository
+    */
+  def bookExists(
+    catalog: Catalog,
+    title: Titles,
+    author: Authors
+  ): BookCatalogQuery[Boolean]
 }

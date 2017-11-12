@@ -4,6 +4,7 @@ package interpreter
 import scala.collection.Set
 import scala.util.{Success, Failure}
 
+import cats.Id
 import cats.data.Kleisli
 import cats.data.Validated.{Valid, Invalid}
 
@@ -152,5 +153,21 @@ object BookCatalogServiceInterpreter
           BookNotUpdatedWithinCatalog()
         )
     }
+  }
+
+  /**
+    * Determine if book with given title and author exists within catalog
+    * @param catalog Catalog being queried
+    * @param title Title of book being examined
+    * @param author Author of book being examined
+    * @return Routine to determine if book exists within either catalog or
+    * repository
+    */
+  def bookExists(
+    catalog: BookCatalog,
+    title: Titles,
+    author: Authors
+  ): BookCatalogQuery[Boolean] = Kleisli[Id, BookCatalogRepository, Boolean] {
+    repository: BookCatalogRepository => true
   }
 }
