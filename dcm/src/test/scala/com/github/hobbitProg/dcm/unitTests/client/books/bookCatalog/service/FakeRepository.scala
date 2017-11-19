@@ -114,4 +114,10 @@ class FakeRepository
     isbn: ISBNs
   ): Boolean =
     isbn == existingISBN
+
+  /**
+    * All books that exist within repository
+    */
+  def contents: Set[Book] =
+    Set[Book]()
 }

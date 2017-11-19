@@ -1,5 +1,7 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog.repository
 
+import scala.language.implicitConversions
+
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model.{Titles, Authors, ISBNs}
 
 /**

@@ -1,5 +1,7 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog.repository.interpreter
 
+import java.net.URI
+
 import cats._
 import cats.data._
 import cats.implicits._
@@ -17,6 +19,16 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookCatalog
 class BookCatalogRepositoryInterpreter
     extends BookCatalogRepository {
   private type CategoryMappingType = (ISBNs,Categories)
+  private type BookType = (Titles, Authors, ISBNs, String, String)
+  private class ErrorBookClass(
+    val title: Titles,
+    val author: Authors,
+    val isbn: ISBNs,
+    val description: Description,
+    val coverImage: CoverImages,
+    val categories: Set[Categories]
+  ) extends Book {
+  }
 
   // Connection to database containing book catalog
   private var databaseConnection: Transactor[Task] = _
@@ -189,6 +201,52 @@ class BookCatalogRepositoryInterpreter
       .transact(databaseConnection)
       .unsafeRun
       .isEmpty
+  }
+
+  /**
+    * All books that exist within repository
+    */
+  override def contents: Set[Book] = {
+    // Get main information on defined books
+     val bookInfo: Set[BookType] =
+       sql"SELECT Title,Author,ISBN,Description,Cover FROM bookCatalog;"
+         .query[BookType]
+         .to[Set]
+         .transact(databaseConnection)
+         .unsafeRun
+
+
+    // Generate books within repository
+    bookInfo map {
+      bookDatum =>
+      Book.book(
+        bookDatum._1,
+        bookDatum._2,
+        bookDatum._3,
+        bookDatum._4 match {
+          case "NULL" => None
+          case description => Some(description)
+        },
+        bookDatum._5 match {
+          case "NULL" => None
+          case location => Some(new URI(location))
+        },
+        sql"SELECT Category FROM categoryMapping WHERE ISBN=${bookDatum._3};"
+          .query[Categories]
+          .to[Set]
+          .transact(databaseConnection)
+          .unsafeRun
+      ).getOrElse(
+        new ErrorBookClass(
+          "",
+          "",
+          "",
+          None,
+          None,
+          Set()
+        )
+      )
+    }
   }
 }
 

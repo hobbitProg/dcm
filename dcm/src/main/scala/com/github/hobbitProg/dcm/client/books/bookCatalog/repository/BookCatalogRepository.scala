@@ -1,5 +1,6 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog.repository
 
+import scala.collection.Set
 import scala.util.Either
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model.{Book, Titles, Authors, ISBNs}
@@ -62,4 +63,9 @@ trait BookCatalogRepository {
   def alreadyContains(
     isbn: ISBNs
   ): Boolean
+
+  /**
+    * All books that exist within repository
+    */
+  def contents: Set[Book]
 }
