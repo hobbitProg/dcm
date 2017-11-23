@@ -14,8 +14,16 @@
 # IntelliJ
 # mpeltonen/sbt-idea plugin
 # JIRA plugin
-# Crashlytics plugin (for Android Studio and IntelliJ)
+# Crashlytics plugin (for Android Studio and IntelliJ)# Ensime specific
+.ensime
+.ensime_cache/
+.ensime_lucene/
 target/
 
 .directory
 .idea/uiDesigner.xml
+
+# Ensime specific
+.ensime
+.ensime_cache/
+.ensime_lucene/
