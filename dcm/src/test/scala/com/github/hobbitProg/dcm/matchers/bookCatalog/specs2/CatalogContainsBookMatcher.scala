@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.matchers.bookCatalog
+package com.github.hobbitProg.dcm.matchers.bookCatalog.specs2
 
 import cats.data.Validated
 import Validated._

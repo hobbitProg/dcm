@@ -13,7 +13,7 @@ import org.specs2.ScalaCheck
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.Specification
 
-import com.github.hobbitProg.dcm.matchers.bookCatalog.Conversions._
+import com.github.hobbitProg.dcm.matchers.bookCatalog.specs2.Conversions._
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.interpreter.

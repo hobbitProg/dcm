@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.matchers.bookCatalog
+package com.github.hobbitProg.dcm.matchers.bookCatalog.specs2
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 
