@@ -1,6 +1,7 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookEntryDialog
 
-import java.io.File
+import scala.collection.Set
+
 import java.net.URI
 import java.util.function.{Consumer, Supplier}
 
@@ -12,11 +13,10 @@ import org.testfx.util.NodeQueryUtils
 
 import scalafx.Includes._
 import scalafx.scene.Scene
-import scalafx.stage.FileChooser
 
-import org.specs2.mutable.Specification
+import org.scalatest.{FreeSpec, Matchers}
 
-import org.scalamock.specs2.MockContext
+import org.scalamock.scalatest.MockFactory
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookCatalogRepository
@@ -32,7 +32,10 @@ import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
   * @since 0.2
   */
 class AddingBookSpec
-    extends Specification {
+    extends FreeSpec
+    with MockFactory
+    with Matchers {
+
   class BookData(
     val title: Titles,
     val author: Authors,
@@ -41,7 +44,51 @@ class AddingBookSpec
     val coverImage: CoverImages,
     val categories: Set[Categories]
   ) {
+    override def equals(
+      that: Any
+    ): Boolean = {
+      that match {
+        case that: BookData =>
+          title == that.title &&
+          author == that.author &&
+          isbn == that.isbn &&
+          description == that.description &&
+          coverImage == that.coverImage &&
+          categories == that.categories
+        case _ => false
+      }
+    }
+
+    override def hashCode: Int = {
+      var collectedInfo =
+        title +
+      author +
+      isbn
+      description match {
+        case Some(descriptionText) =>
+          collectedInfo =
+            collectedInfo + descriptionText
+        case None =>
+      }
+      coverImage match {
+        case Some(coverLocation) =>
+          collectedInfo =
+            collectedInfo + coverLocation.toString
+        case None =>
+      }
+      collectedInfo =
+        categories.foldLeft(
+          collectedInfo
+        ) {
+          (gatheredInfo, currentCategory) =>
+          gatheredInfo + currentCategory
+        }
+      collectedInfo.hashCode
+    }
   }
+
+  // Book data that was added to catalog
+  var newBookData: BookData = _
 
   // Robot to automate entering in information
   val newBookRobot: FxRobotInterface =
@@ -53,16 +100,16 @@ class AddingBookSpec
       "/GroundZero.jpg"
     ).toURI
 
-  "When the user enters data on a book that does not exist in the catalog nor " +
-  "the repository, when the data is accepted"  >> {
-    "the book entry dialog is closed" >> new MockContext {
-      val definedCategories: Set[String] =
-        Set[String](
-          "sci-fi",
-          "conspiracy",
-          "fantasy",
-          "thriller"
-        )
+  "Given the categories that can be associated with books" - {
+    val definedCategories: Set[String] =
+      Set[String](
+        "sci-fi",
+        "conspiracy",
+        "fantasy",
+        "thriller"
+      )
+
+    "and valid information on a book to add to the catalog" - {
       val validNewBook: BookData =
         new BookData(
           "Ground Zero",
@@ -77,118 +124,275 @@ class AddingBookSpec
             "conspiracy"
           )
         )
-      val catalog: BookCatalog =
-        new BookCatalog()
-      val repository =
-        mock[BookCatalogRepository];
-      val service =
-        new TestService()
-      val parent =
-        new TestParent(
-          catalog
-        )
 
-      val bookAdditionDialog: Scene =
-        createBookAdditionDialog(
-          catalog,
-          repository,
-          service,
-          definedCategories,
-          parent
-        )
-      
-      activateControl(
-        BookEntryDialog.titleControlId
-      )
-      enterDataIntoControl(
-        validNewBook.title
-      )
+      "and the catalog that is being updated" - {
+        val catalog: BookCatalog =
+          new BookCatalog()
 
-      activateControl(
-        BookEntryDialog.authorControlId
-      )
-      enterDataIntoControl(
-        validNewBook.author
-      )
+        "and the repository to place book catalog information into" - {
+          val repository =
+            mock[BookCatalogRepository];
 
-      activateControl(
-        BookEntryDialog.isbnControlId
-      )
-      enterDataIntoControl(
-        validNewBook.isbn
-      )
+          "and the service for the book catalog" - {
+            val service =
+              new TestService()
+            service onAdd {
+              data: TestService.BookData =>
+              data match {
+                case (title, author, isbn, description, coverImage, categories) =>
+                  newBookData =
+                    new BookData(
+                      title,
+                      author,
+                      isbn,
+                      description,
+                      coverImage,
+                      categories
+                    )
+              }
+            }
 
-      activateControl(
-        BookEntryDialog.descriptionControlId
-      )
-      enterDataIntoControl(
-        validNewBook.description match {
-          case Some(existingDescription) => existingDescription
-          case None => ""
+            "and the parent window that created the book additon dialog" - {
+              val parent =
+                new TestParent(
+                  catalog
+                )
+
+              "when the book dialog is created" - {
+                val bookAdditionDialog: Scene =
+                  createBookAdditionDialog(
+                    catalog,
+                    repository,
+                    service,
+                    definedCategories,
+                    parent
+                  )
+
+                "and the title of the book is entered" - {
+                  activateControl(
+                    BookEntryDialog.titleControlId
+                  )
+                  enterDataIntoControl(
+                    validNewBook.title
+                  )
+
+                  "and the author of the book is entered" - {
+                    activateControl(
+                      BookEntryDialog.authorControlId
+                    )
+                    enterDataIntoControl(
+                      validNewBook.author
+                    )
+
+                    "and the ISBN of the book is entered" - {
+                      activateControl(
+                        BookEntryDialog.isbnControlId
+                      )
+                      enterDataIntoControl(
+                        validNewBook.isbn
+                      )
+
+                      "and the description of the book is entered" - {
+                        activateControl(
+                          BookEntryDialog.descriptionControlId
+                        )
+                        enterDataIntoControl(
+                          validNewBook.description match {
+                            case Some(existingDescription) => existingDescription
+                            case None => ""
+                          }
+                        )
+
+                        "and the cover for the book is chosen" - {
+                          activateControl(
+                            BookEntryDialog.bookCoverButtonId
+                          )
+
+                          "and the appropriate categories are associated with " +
+                          "the book" - {
+                            activateControl(
+                              BookEntryDialog.categorySelectionButtonId
+                            )
+                            selectCategory(
+                              validNewBook.categories.head
+                            )
+                            selectCategory(
+                              validNewBook.categories.last
+                            )
+                            activateControl(
+                              CategorySelectionDialog.availableButtonId
+                            )
+                            activateControl(
+                              CategorySelectionDialog.saveButtonId
+                            )
+
+                            "and the book information is saved" - {
+                              activateControl(
+                                BookEntryDialog.saveButtonId
+                              )
+
+                              "then the book entry dialog is closed" in {
+                                (bookAdditionDialog.window.value == null ||
+                                  !bookAdditionDialog.window.value.showing.value) should be (true)
+                              }
+
+                              "and the book was saved into the catalog" in {
+                                newBookData should equal (validNewBook)
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
-      )
-
-      activateControl(
-        BookEntryDialog.bookCoverButtonId
-      )
-
-      activateControl(
-        BookEntryDialog.categorySelectionButtonId
-      )
-      selectCategory(
-        validNewBook.categories.head
-      )
-      selectCategory(
-        validNewBook.categories.last
-      )
-      activateControl(
-        CategorySelectionDialog.availableButtonId
-      )
-      activateControl(
-        CategorySelectionDialog.saveButtonId
-      )
-      activateControl(
-        BookEntryDialog.saveButtonId
-      )
-
-      (bookAdditionDialog.window.value == null ||
-        !bookAdditionDialog.window.value.showing.value) must beTrue
+      }
     }
-
-    "the book is placed into the catalog" >> pending
-    "the book is placed into the repository" >> pending
   }
 
-  "When the user enters data on a book (except the title)" >> {
-    "the user cannot accept the data" >> pending
+  "Given the categories that can be associated with books" - {
+    "and information on a book to add to the catalog (without a title)" - {
+      "and the catalog that is being updated" - {
+        "and the repository to place book catalog information into" - {
+          "and the service for the book catalog" - {
+            "and the parent window that created the book additon dialog" - {
+              "when the book dialog is created" - {
+                "and the author of the book is entered" - {
+                  "and the ISBN of the book is entered" - {
+                    "and the description of the book is entered" - {
+                      "and the cover for the book is chosen" - {
+                        "and the appropriate categories are associated with " +
+                        "the book" - {
+                          "then the book information cannot be saved" in pending
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
-  "When the user enters data on a book (except the author)" >> {
-    "the user cannot accept the data" >> pending
+  "Given the categories that can be associated with books" - {
+    "and information on a book to add to the catalog (except the author)" - {
+      "and the catalog that is being updated" - {
+        "and the repository to place book catalog information into" - {
+          "and the service for the book catalog" - {
+            "and the parent window that created the book additon dialog" - {
+              "when the book dialog is created" - {
+                "and the title of the book is entered" - {
+                  "and the ISBN of the book is entered" - {
+                    "and the description of the book is entered" - {
+                      "and the cover for the book is chosen" - {
+                        "and the appropriate categories are associated with " +
+                        "the book" - {
+                          "then the book information cannot be saved" in pending
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
-  "When the user enters data on a book (except the ISBN)" >> {
-    "the user cannot accept the data" >> pending
+  "Given the categories that can be associated with books" - {
+    "and information on a book to add to the catalog (except the ISBN)" - {
+      "and the catalog that is being updated" - {
+        "and the repository to place book catalog information into" - {
+          "and the service for the book catalog" - {
+            "and the parent window that created the book additon dialog" - {
+              "when the book dialog is created" - {
+                "and the title of the book is entered" - {
+                  "and the author of the book is entered" - {
+                    "and the description of the book is entered" - {
+                      "and the cover for the book is chosen" - {
+                        "and the appropriate categories are associated with " +
+                        "the book" - {
+                          "then the book information cannot be saved" in pending
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
-  "When the user enters data on a book (with a title and author that already " +
-  "exists in the catalog" >> {
-    "the user cannot accept the data" >> pending
+  "Given the categories that can be associated with books" - {
+    "and information on a book to add to the catalog (with a title and author " +
+    "that already exists in the catalog)" - {
+      "and the catalog that is being updated" - {
+        "and the repository to place book catalog information into" - {
+          "and the service for the book catalog" - {
+            "and the parent window that created the book additon dialog" - {
+              "when the book dialog is created" - {
+                "and the title of the book is entered" - {
+                  "and the author of the book is entered" - {
+                    "and the ISBN of the book is entered" - {
+                      "and the description of the book is entered" - {
+                        "and the cover for the book is chosen" - {
+                          "and the appropriate categories are associated with " +
+                          "the book" - {
+                            "then the book information cannot be saved" in pending
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
-  "When the user enters data on a book (with a title and author that already " +
-  "exists in the repository" >> {
-    "the user cannot accept the data" >> pending
-  }
-
-  "When the user enters data on a book (with an ISBN that already exists in " +
-  "the catalog)" >> {
-    "the user cannot accept the data" >> pending
-  }
-
-  "When the user enters data on a book (with an ISBN that already exists in " +
-  "the repository)" >> {
-    "the user cannot accept the data" >> pending
+  "Given the categories that can be associated with books" - {
+    "and information on a book to add to the catalog (with an ISBN of a book " +
+    "that already exists in the catalog)" - {
+      "and the catalog that is being updated" - {
+        "and the repository to place book catalog information into" - {
+          "and the service for the book catalog" - {
+            "and the parent window that created the book additon dialog" - {
+              "when the book dialog is created" - {
+                "and the title of the book is entered" - {
+                  "and the author of the book is entered" - {
+                    "and the ISBN of the book is entered" - {
+                      "and the description of the book is entered" - {
+                        "and the cover for the book is chosen" - {
+                          "and the appropriate categories are associated with " +
+                          "the book" - {
+                            "then the book information cannot be saved" in pending
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -215,12 +419,11 @@ class AddingBookSpec
         bookImageLocation
       )
 
-    // Create test application
     FxToolkit.registerPrimaryStage()
     FxToolkit.setupApplication(
       new Supplier[Application] {
         override def get(): BookEntryUnitTestApplication = {
-          new BookEntryUnitTestApplication()
+          new BookEntryUnitTestApplication
         }
       }
     )

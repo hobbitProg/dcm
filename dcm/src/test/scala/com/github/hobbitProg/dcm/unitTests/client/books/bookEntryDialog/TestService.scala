@@ -14,13 +14,6 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
 
 class TestService
     extends BookCatalogService[BookCatalog] {
-  var newTitle: Titles = _
-  var newAuthor: Authors = _
-  var newISBN: ISBNs = _
-  var newDescription: Description = _
-  var newCover: CoverImages = _
-  var newCategories: Set[Categories] = _
-
   /**
     * Add a book to the given book catalog
     * @param catalog Catalog being modified
@@ -42,12 +35,21 @@ class TestService
     categories: Set[Categories]
   ): BookCatalogOperation[BookCatalog] = Kleisli {
     repository: BookCatalogRepository =>
-    newTitle = title
-    newAuthor = author
-    newISBN = isbn
-    newDescription = description
-    newCover = cover
-    newCategories = categories
+    val data: TestService.BookData =
+      new TestService.BookData(
+        title,
+        author,
+        isbn,
+        description,
+        cover,
+        categories
+      )
+
+    for (callback <- newBookCallbacks) {
+      callback(
+        data
+      )
+    }
 
     Valid(catalog)
   }
@@ -109,4 +111,23 @@ class TestService
     repository: BookCatalogRepository =>
     false
   }
+
+  /**
+    * Add a callback to perform when adding a new book to the catalog
+    *
+    * @param callback The callback to execute
+    */
+  def onAdd(
+    callback: TestService.BookData => Unit
+  ) =
+    newBookCallbacks =
+      newBookCallbacks + callback
+
+  // Callbacks for when a book is added to the catalog
+  private var newBookCallbacks: Set[TestService.BookData => Unit] =
+    Set[TestService.BookData => Unit]()
+}
+
+object TestService {
+  type BookData = (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories])
 }

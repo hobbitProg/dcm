@@ -37,7 +37,7 @@ class AddBookDialog(
   definedCategories
 ) {
   // Control for dialog
-  protected def control: BookEntryControl =
+  protected val control: BookEntryControl =
     new AddBookControl(
       catalog,
       coverImageChooser,

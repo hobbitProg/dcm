@@ -20,5 +20,17 @@ lazy val root = (project in file(".")).
     libraryDependencies += "org.eu.acolyte" % "jdbc-scala_2.12" % "1.0.46" % "test",
     libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.20.0" % "test",
     libraryDependencies += "org.loadui" % "testFx" % "3.1.2" % "test",
-    libraryDependencies += "org.scalamock" % "scalamock-specs2-support_2.12" % "3.6.0" % "test"
+    libraryDependencies += "org.scalamock" % "scalamock-specs2-support_2.12" % "3.6.0" % "test",
+    libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.2.0-SNAP9" % "test",
+    libraryDependencies += "org.scalamock" % "scalamock-scalatest-support_2.12" % "3.6.0" % "test"
+
   )
+
+val printTests = taskKey[Unit]("something")
+
+printTests := {
+  val tests = (definedTests in Test).value
+  tests map { t =>
+    println(t.name)
+  }
+}

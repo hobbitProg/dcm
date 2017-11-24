@@ -37,23 +37,23 @@ class AddBookControl(
     repository: BookCatalogRepository,
     parent: Stage
   ) = {
-      val addResult =
-        insertBook(
-          catalog,
-          bookBeingEdited.title,
-          bookBeingEdited.author,
-          bookBeingEdited.isbn,
-          bookBeingEdited.description,
-          bookBeingEdited.coverImage,
-          bookBeingEdited.categories
-        )(
-          repository
-        )
-      addResult match {
-        case Valid(updatedCatalog) =>
-          parent.close
-          mainWindow.catalog = updatedCatalog
-        case Invalid(_) =>
-      }
+    val addResult =
+      insertBook(
+        catalog,
+        bookBeingEdited.title,
+        bookBeingEdited.author,
+        bookBeingEdited.isbn,
+        bookBeingEdited.description,
+        bookBeingEdited.coverImage,
+        bookBeingEdited.categories
+      )(
+        repository
+      )
+    addResult match {
+      case Valid(updatedCatalog) =>
+        parent.close
+        mainWindow.catalog = updatedCatalog
+      case Invalid(_) =>
+    }
   }
 }
