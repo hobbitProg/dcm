@@ -16,6 +16,7 @@ class TestService
     extends BookCatalogService[BookCatalog] {
   var existingTitle: Titles = _
   var existingAuthor: Authors = _
+  var existingISBN: ISBNs = _
 
   /**
     * Add a book to the given book catalog
@@ -113,7 +114,7 @@ class TestService
     isbn: ISBNs
   ): BookCatalogQuery[Boolean] = Kleisli[Id, BookCatalogRepository, Boolean] {
     repository: BookCatalogRepository =>
-    false
+    existingISBN == isbn
   }
 
   /**
