@@ -14,7 +14,7 @@ import org.testfx.util.NodeQueryUtils
 import scalafx.Includes._
 import scalafx.scene.Scene
 
-import org.scalatest.{FreeSpec, Matchers}
+import org.scalatest.{BeforeAndAfter, FreeSpec, Matchers}
 
 import org.scalamock.scalatest.MockFactory
 
@@ -25,7 +25,7 @@ import com.github.hobbitProg.dcm.client.books.dialog.{AddBookDialog, BookEntryDi
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
   BookCatalogService
 import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
-import com.github.hobbitProg.dcm.matchers.scalafx.scalatest.Disabled
+import com.github.hobbitProg.dcm.matchers.scalafx.scalatest.ButtonMatchers
 import com.github.hobbitProg.dcm.scalafx.ControlRetriever
 
 /**
@@ -35,8 +35,10 @@ import com.github.hobbitProg.dcm.scalafx.ControlRetriever
   */
 class AddingBookSpec
     extends FreeSpec
+    with BeforeAndAfter
     with MockFactory
     with Matchers
+    with ButtonMatchers
     with ControlRetriever {
 
   class BookData(
@@ -91,17 +93,27 @@ class AddingBookSpec
   }
 
   // Book data that was added to catalog
-  var newBookData: BookData = _
+  private var newBookData: BookData = _
 
   // Robot to automate entering in information
-  val newBookRobot: FxRobotInterface =
+  private val newBookRobot: FxRobotInterface =
     new FxRobot
+
+  // Application being run
+  private var runningApp: Application = _
 
   // Valid new book to add
   val bookImageLocation: URI =
     getClass.getResource(
       "/GroundZero.jpg"
     ).toURI
+
+  after {
+    FxToolkit.cleanupStages()
+    FxToolkit.cleanupApplication(
+      runningApp
+    )
+  }
 
   "Given the categories that can be associated with books" - {
     val definedCategories: Set[String] =
@@ -366,7 +378,7 @@ class AddingBookSpec
                               retrieveSaveButton(
                                 bookAdditionDialog
                               )
-                            saveButton should be (Disabled)
+                            saveButton should be (disabled)
                           }
                         }
                       }
@@ -383,19 +395,115 @@ class AddingBookSpec
 
 
   "Given the categories that can be associated with books" - {
+    val definedCategories: Set[String] =
+      Set[String](
+        "sci-fi",
+        "conspiracy",
+        "fantasy",
+        "thriller"
+      )
+
     "and information on a book to add to the catalog (except the author)" - {
+      val validNewBook: BookData =
+        new BookData(
+          "Ground Zero",
+          "",
+          "006105223X",
+          Some("Description for Ground Zero"),
+          Some[URI](
+            bookImageLocation
+          ),
+          Set[String](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+
       "and the catalog that is being updated" - {
+        val catalog: BookCatalog =
+          new BookCatalog()
+
         "and the repository to place book catalog information into" - {
+          val repository =
+            mock[BookCatalogRepository];
+
           "and the service for the book catalog" - {
+            val service =
+              new TestService()
+
             "and the parent window that created the book additon dialog" - {
+              val parent =
+                new TestParent(
+                  catalog
+                )
+
               "when the book dialog is created" - {
+                val bookAdditionDialog: Scene =
+                  createBookAdditionDialog(
+                    catalog,
+                    repository,
+                    service,
+                    definedCategories,
+                    parent
+                  )
+
                 "and the title of the book is entered" - {
+                  activateControl(
+                    BookEntryDialog.titleControlId
+                  )
+                  enterDataIntoControl(
+                    validNewBook.title
+                  )
+
                   "and the ISBN of the book is entered" - {
+                    activateControl(
+                      BookEntryDialog.isbnControlId
+                    )
+                    enterDataIntoControl(
+                      validNewBook.isbn
+                    )
+
                     "and the description of the book is entered" - {
+                      activateControl(
+                        BookEntryDialog.descriptionControlId
+                      )
+                      enterDataIntoControl(
+                        validNewBook.description match {
+                          case Some(existingDescription) => existingDescription
+                          case None => ""
+                        }
+                      )
+
                       "and the cover for the book is chosen" - {
+                        activateControl(
+                          BookEntryDialog.bookCoverButtonId
+                        )
+
                         "and the appropriate categories are associated with " +
                         "the book" - {
-                          "then the book information cannot be saved" in pending
+                          activateControl(
+                            BookEntryDialog.categorySelectionButtonId
+                          )
+                          selectCategory(
+                            validNewBook.categories.head
+                          )
+                          selectCategory(
+                            validNewBook.categories.last
+                          )
+                          activateControl(
+                            CategorySelectionDialog.availableButtonId
+                          )
+                          activateControl(
+                            CategorySelectionDialog.saveButtonId
+                          )
+
+                          "then the book information cannot be saved" in {
+                            val saveButton =
+                              retrieveSaveButton(
+                                bookAdditionDialog
+                              )
+                            saveButton should be (disabled)
+                          }
                         }
                       }
                     }
@@ -521,13 +629,14 @@ class AddingBookSpec
       )
 
     FxToolkit.registerPrimaryStage()
-    FxToolkit.setupApplication(
-      new Supplier[Application] {
-        override def get(): BookEntryUnitTestApplication = {
-          new BookEntryUnitTestApplication
+    runningApp =
+      FxToolkit.setupApplication(
+        new Supplier[Application] {
+          override def get(): BookEntryUnitTestApplication = {
+            new BookEntryUnitTestApplication
+          }
         }
-      }
-    )
+      )
     FxToolkit.showStage()
 
     // Create dialog to add book to catalog
