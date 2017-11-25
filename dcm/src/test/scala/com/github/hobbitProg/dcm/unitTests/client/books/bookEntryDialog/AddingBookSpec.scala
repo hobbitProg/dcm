@@ -279,7 +279,7 @@ class AddingBookSpec
       )
 
     "and information on a book to add to the catalog (without a title)" - {
-      val validNewBook: BookData =
+      val invalidNewBook: BookData =
         new BookData(
           "",
           "Kevin J. Anderson",
@@ -328,7 +328,7 @@ class AddingBookSpec
                     BookEntryDialog.authorControlId
                   )
                   enterDataIntoControl(
-                    validNewBook.author
+                    invalidNewBook.author
                   )
 
                   "and the ISBN of the book is entered" - {
@@ -336,7 +336,7 @@ class AddingBookSpec
                       BookEntryDialog.isbnControlId
                     )
                     enterDataIntoControl(
-                      validNewBook.isbn
+                      invalidNewBook.isbn
                     )
 
                     "and the description of the book is entered" - {
@@ -344,7 +344,7 @@ class AddingBookSpec
                         BookEntryDialog.descriptionControlId
                       )
                       enterDataIntoControl(
-                        validNewBook.description match {
+                        invalidNewBook.description match {
                           case Some(existingDescription) => existingDescription
                           case None => ""
                         }
@@ -361,10 +361,10 @@ class AddingBookSpec
                             BookEntryDialog.categorySelectionButtonId
                           )
                           selectCategory(
-                            validNewBook.categories.head
+                            invalidNewBook.categories.head
                           )
                           selectCategory(
-                            validNewBook.categories.last
+                            invalidNewBook.categories.last
                           )
                           activateControl(
                             CategorySelectionDialog.availableButtonId
@@ -404,7 +404,7 @@ class AddingBookSpec
       )
 
     "and information on a book to add to the catalog (except the author)" - {
-      val validNewBook: BookData =
+      val invalidNewBook: BookData =
         new BookData(
           "Ground Zero",
           "",
@@ -452,7 +452,7 @@ class AddingBookSpec
                     BookEntryDialog.titleControlId
                   )
                   enterDataIntoControl(
-                    validNewBook.title
+                    invalidNewBook.title
                   )
 
                   "and the ISBN of the book is entered" - {
@@ -460,7 +460,7 @@ class AddingBookSpec
                       BookEntryDialog.isbnControlId
                     )
                     enterDataIntoControl(
-                      validNewBook.isbn
+                      invalidNewBook.isbn
                     )
 
                     "and the description of the book is entered" - {
@@ -468,7 +468,7 @@ class AddingBookSpec
                         BookEntryDialog.descriptionControlId
                       )
                       enterDataIntoControl(
-                        validNewBook.description match {
+                        invalidNewBook.description match {
                           case Some(existingDescription) => existingDescription
                           case None => ""
                         }
@@ -485,10 +485,10 @@ class AddingBookSpec
                             BookEntryDialog.categorySelectionButtonId
                           )
                           selectCategory(
-                            validNewBook.categories.head
+                            invalidNewBook.categories.head
                           )
                           selectCategory(
-                            validNewBook.categories.last
+                            invalidNewBook.categories.last
                           )
                           activateControl(
                             CategorySelectionDialog.availableButtonId
@@ -527,7 +527,7 @@ class AddingBookSpec
       )
 
     "and information on a book to add to the catalog (except the ISBN)" - {
-      val validNewBook: BookData =
+      val invalidNewBook: BookData =
         new BookData(
           "Ground Zero",
           "Kevin J. Anderson",
@@ -590,7 +590,7 @@ class AddingBookSpec
                     BookEntryDialog.titleControlId
                   )
                   enterDataIntoControl(
-                    validNewBook.title
+                    invalidNewBook.title
                   )
 
                   "and the author of the book is entered" - {
@@ -598,7 +598,7 @@ class AddingBookSpec
                       BookEntryDialog.authorControlId
                     )
                     enterDataIntoControl(
-                      validNewBook.author
+                      invalidNewBook.author
                     )
 
                     "and the description of the book is entered" - {
@@ -606,7 +606,7 @@ class AddingBookSpec
                         BookEntryDialog.descriptionControlId
                       )
                       enterDataIntoControl(
-                        validNewBook.description match {
+                        invalidNewBook.description match {
                           case Some(existingDescription) => existingDescription
                           case None => ""
                         }
@@ -623,10 +623,10 @@ class AddingBookSpec
                             BookEntryDialog.categorySelectionButtonId
                           )
                           selectCategory(
-                            validNewBook.categories.head
+                            invalidNewBook.categories.head
                           )
                           selectCategory(
-                            validNewBook.categories.last
+                            invalidNewBook.categories.last
                           )
                           activateControl(
                             CategorySelectionDialog.availableButtonId
@@ -656,21 +656,128 @@ class AddingBookSpec
   }
 
   "Given the categories that can be associated with books" - {
+    val definedCategories: Set[String] =
+      Set[String](
+        "sci-fi",
+        "conspiracy",
+        "fantasy",
+        "thriller"
+      )
+
     "and information on a book to add to the catalog (with a title and author " +
     "that already exists in the catalog)" - {
+      val invalidNewBook: BookData =
+        new BookData(
+          "Ground Zero",
+          "Kevin J. Anderson",
+          "006105223X",
+          Some("Description for Ground Zero"),
+          Some[URI](
+            bookImageLocation
+          ),
+          Set[String](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+
       "and the catalog that is being updated" - {
+        val catalog: BookCatalog =
+          new BookCatalog()
+
         "and the repository to place book catalog information into" - {
+          val repository =
+            mock[BookCatalogRepository];
+
           "and the service for the book catalog" - {
+            val service =
+              new TestService()
+            service.existingTitle =
+              invalidNewBook.title
+            service.existingAuthor =
+              invalidNewBook.author
+
             "and the parent window that created the book additon dialog" - {
+              val parent =
+                new TestParent(
+                  catalog
+                )
+
               "when the book dialog is created" - {
+                val bookAdditionDialog: Scene =
+                  createBookAdditionDialog(
+                    catalog,
+                    repository,
+                    service,
+                    definedCategories,
+                    parent
+                  )
+
                 "and the title of the book is entered" - {
+                  activateControl(
+                    BookEntryDialog.titleControlId
+                  )
+                  enterDataIntoControl(
+                    invalidNewBook.title
+                  )
+
                   "and the author of the book is entered" - {
+                    activateControl(
+                      BookEntryDialog.authorControlId
+                    )
+                    enterDataIntoControl(
+                      invalidNewBook.author
+                    )
+
                     "and the ISBN of the book is entered" - {
+                      activateControl(
+                        BookEntryDialog.isbnControlId
+                      )
+                      enterDataIntoControl(
+                        invalidNewBook.isbn
+                      )
+
                       "and the description of the book is entered" - {
+                        activateControl(
+                          BookEntryDialog.descriptionControlId
+                        )
+                        enterDataIntoControl(
+                          invalidNewBook.description match {
+                            case Some(existingDescription) => existingDescription
+                            case None => ""
+                          }
+                        )
+
                         "and the cover for the book is chosen" - {
+                          activateControl(
+                            BookEntryDialog.bookCoverButtonId
+                          )
+
                           "and the appropriate categories are associated with " +
                           "the book" - {
-                            "then the book information cannot be saved" in pending
+                            activateControl(
+                              BookEntryDialog.categorySelectionButtonId
+                            )
+                            selectCategory(
+                              invalidNewBook.categories.head
+                            )
+                            selectCategory(
+                              invalidNewBook.categories.last
+                            )
+                            activateControl(
+                              CategorySelectionDialog.availableButtonId
+                            )
+                            activateControl(
+                              CategorySelectionDialog.saveButtonId
+                            )
+
+                            "then the book information cannot be saved" in {
+                              val saveButton =
+                                retrieveSaveButton(
+                                  bookAdditionDialog
+                                )
+                              saveButton should be (disabled)
+                            }
                           }
                         }
                       }

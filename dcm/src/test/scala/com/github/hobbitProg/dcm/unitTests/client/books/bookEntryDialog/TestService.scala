@@ -14,6 +14,9 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
 
 class TestService
     extends BookCatalogService[BookCatalog] {
+  var existingTitle: Titles = _
+  var existingAuthor: Authors = _
+
   /**
     * Add a book to the given book catalog
     * @param catalog Catalog being modified
@@ -94,7 +97,8 @@ class TestService
     author: Authors
   ): BookCatalogQuery[Boolean] = Kleisli[Id, BookCatalogRepository, Boolean] {
     repository: BookCatalogRepository =>
-    false
+    title == existingTitle &&
+    author == existingAuthor
   }
 
   /**
