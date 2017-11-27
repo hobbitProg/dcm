@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.unitTests.client.books.bookEntryDialog
+package com.github.hobbitProg.dcm.scalafx
 
 import javafx.application.Application
 import javafx.stage.Stage

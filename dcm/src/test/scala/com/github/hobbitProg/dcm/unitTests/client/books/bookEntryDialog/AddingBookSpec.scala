@@ -24,9 +24,11 @@ import com.github.hobbitProg.dcm.client.books.control.BookDialogParent
 import com.github.hobbitProg.dcm.client.books.dialog.{AddBookDialog, BookEntryDialog}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
   BookCatalogService
-import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
+import com.github.hobbitProg.dcm.client.dialog.{CategorySelectionDialog,
+  ImageChooser}
 import com.github.hobbitProg.dcm.matchers.scalafx.scalatest.ButtonMatchers
-import com.github.hobbitProg.dcm.scalafx.ControlRetriever
+import com.github.hobbitProg.dcm.scalafx.{ControlRetriever,
+  BookDialogHelper}
 
 /**
   * Specification for adding book to the catalog using dialog
@@ -39,7 +41,8 @@ class AddingBookSpec
     with MockFactory
     with Matchers
     with ButtonMatchers
-    with ControlRetriever {
+    with ControlRetriever
+    with BookDialogHelper {
 
   class BookData(
     val title: Titles,
@@ -95,25 +98,42 @@ class AddingBookSpec
   // Book data that was added to catalog
   private var newBookData: BookData = _
 
-  // Robot to automate entering in information
-  private val newBookRobot: FxRobotInterface =
-    new FxRobot
-
-  // Application being run
-  private var runningApp: Application = _
-
   // Valid new book to add
-  val bookImageLocation: URI =
-    getClass.getResource(
-      "/GroundZero.jpg"
-    ).toURI
-
   after {
     FxToolkit.cleanupStages()
     FxToolkit.cleanupApplication(
       runningApp
     )
   }
+
+  /**
+    * Create dialog that is to be tested
+    *
+    * @param catalog Catalog to add new book to
+    * @param repository Repository containing book catalog data
+    * @param service Service that handles book catalog
+    * @param parent Parent window that created book addition dialog
+    * @param coverImageChooser Dialog to choose image for cover
+    * @param definedCategories Categories available to be associated with book
+    *
+    * @return Dialog to be tested
+    */
+  def createDialog(
+    catalog: BookCatalog,
+    repository: BookCatalogRepository,
+    service: BookCatalogService[BookCatalog],
+    parent: BookDialogParent,
+    coverImageChooser: ImageChooser,
+    definedCategories: Set[String]
+  ): BookEntryDialog =
+    new AddBookDialog(
+      catalog,
+      repository,
+      service,
+      parent,
+      coverImageChooser,
+      definedCategories
+    )
 
   "Given the categories that can be associated with books" - {
     val definedCategories: Set[String] =
@@ -175,7 +195,7 @@ class AddingBookSpec
 
               "when the book dialog is created" - {
                 val bookAdditionDialog: Scene =
-                  createBookAdditionDialog(
+                  createBookDialog(
                     catalog,
                     repository,
                     service,
@@ -315,7 +335,7 @@ class AddingBookSpec
 
               "when the book dialog is created" - {
                 val bookAdditionDialog: Scene =
-                  createBookAdditionDialog(
+                  createBookDialog(
                     catalog,
                     repository,
                     service,
@@ -439,7 +459,7 @@ class AddingBookSpec
 
               "when the book dialog is created" - {
                 val bookAdditionDialog: Scene =
-                  createBookAdditionDialog(
+                  createBookDialog(
                     catalog,
                     repository,
                     service,
@@ -577,7 +597,7 @@ class AddingBookSpec
 
               "when the book dialog is created" - {
                 val bookAdditionDialog: Scene =
-                  createBookAdditionDialog(
+                  createBookDialog(
                     catalog,
                     repository,
                     service,
@@ -705,7 +725,7 @@ class AddingBookSpec
 
               "when the book dialog is created" - {
                 val bookAdditionDialog: Scene =
-                  createBookAdditionDialog(
+                  createBookDialog(
                     catalog,
                     repository,
                     service,
@@ -840,7 +860,7 @@ class AddingBookSpec
 
               "when the book dialog is created" - {
                 val bookAdditionDialog: Scene =
-                  createBookAdditionDialog(
+                  createBookDialog(
                     catalog,
                     repository,
                     service,
@@ -925,116 +945,5 @@ class AddingBookSpec
         }
       }
     }
-  }
-
-  /**
-    * Create dialog to add book to catalog
-    *
-    * @param catalog Catalog to add new book to
-    * @param repository Repository containing book catalog data
-    * @param service Service that handles book catalog
-    * @param definedCategories Categories available to be associated with book
-    * @param parent Parent window that created book addition dialog
-    *
-    * @return Dialog to add book to catalog
-    */
-  private def createBookAdditionDialog(
-    catalog: BookCatalog,
-    repository: BookCatalogRepository,
-    service: BookCatalogService[BookCatalog],
-    definedCategories: Set[String],
-    parent: BookDialogParent
-  ): Scene = {
-    // Create mock file chooser
-    val coverImageChooser: TestChooser =
-      new TestChooser(
-        bookImageLocation
-      )
-
-    FxToolkit.registerPrimaryStage()
-    runningApp =
-      FxToolkit.setupApplication(
-        new Supplier[Application] {
-          override def get(): BookEntryUnitTestApplication = {
-            new BookEntryUnitTestApplication
-          }
-        }
-      )
-    FxToolkit.showStage()
-
-    // Create dialog to add book to catalog
-    val bookEntryDialog =
-      new AddBookDialog(
-        catalog,
-        repository,
-        service,
-        parent,
-        coverImageChooser,
-        definedCategories
-      )
-    val bookEntryStage: javafx.stage.Stage =
-      FxToolkit.setupStage(
-        new Consumer[javafx.stage.Stage] {
-          override def accept(t: javafx.stage.Stage): Unit = {
-            t.scene = bookEntryDialog
-          }
-        }
-      )
-
-    bookEntryDialog
-  }
-
-  /**
-    * Activate control to edit
-    * @param controlId ID of control to activate
-    */
-  private def activateControl(
-    controlId: String
-  ) = {
-    newBookRobot.clickOn(
-      NodeQueryUtils hasId controlId,
-      MouseButton.PRIMARY
-    )
-  }
-
-  /**
-    * Enter data into currently active control
-    * @param dataToEnter Data to place into control
-    */
-  private def enterDataIntoControl(
-    dataToEnter: String
-  ) = {
-    dataToEnter.toCharArray foreach {
-      case current@upperCase if current.isLetter && current.isUpper =>
-        newBookRobot push(
-          KeyCode.SHIFT,
-          KeyCode getKeyCode upperCase.toString
-        )
-      case current@space if current == ' ' =>
-        newBookRobot push KeyCode.SPACE
-      case current@period if current == '.' =>
-        newBookRobot push KeyCode.PERIOD
-      case current =>
-        newBookRobot push (KeyCode getKeyCode current.toUpper.toString)
-    }
-  }
-
-  /**
-    * Select given category
-    * @param category Category to select
-    */
-  private def selectCategory(
-    category: String
-  ) = {
-    newBookRobot.press(
-      KeyCode.CONTROL
-    )
-    newBookRobot.clickOn(
-      NodeQueryUtils hasText category,
-      MouseButton.PRIMARY
-    )
-    newBookRobot.release(
-      KeyCode.CONTROL
-    )
   }
 }

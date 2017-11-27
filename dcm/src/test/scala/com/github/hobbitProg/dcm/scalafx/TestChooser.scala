@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.unitTests.client.books.bookEntryDialog
+package com.github.hobbitProg.dcm.scalafx
 
 import java.io.File
 import java.net.URI
@@ -15,9 +15,9 @@ class TestChooser(
 ) extends ImageChooser {
   /**
     * Select image for catalog entry
-    * 
+    *
     * @param parentWindow Window that requested image
-    * 
+    *
     * @return Information on file containing image
     */
   def selectImage(

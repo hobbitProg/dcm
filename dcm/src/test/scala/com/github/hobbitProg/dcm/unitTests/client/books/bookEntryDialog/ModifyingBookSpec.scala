@@ -27,9 +27,10 @@ import com.github.hobbitProg.dcm.client.books.dialog.{ModifyBookDialog,
   BookEntryDialog}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
   BookCatalogService
-import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
-import com.github.hobbitProg.dcm.scalafx.ControlRetriever
-
+import com.github.hobbitProg.dcm.client.dialog.{CategorySelectionDialog,
+  ImageChooser}
+import com.github.hobbitProg.dcm.scalafx.{ControlRetriever,
+  BookDialogHelper}
 
 /**
   * Specification for modifying book that exists in catalog
@@ -41,7 +42,8 @@ class ModifyingBookSpec
     with BeforeAndAfter
     with MockFactory
     with Matchers
-    with ControlRetriever {
+    with ControlRetriever
+    with BookDialogHelper {
   class BookData(
     val title: Titles,
     val author: Authors,
@@ -49,8 +51,7 @@ class ModifyingBookSpec
     val description: Description,
     val coverImage: CoverImages,
     val categories: Set[Categories]
-  )
-  extends Book {
+  ) extends Book {
     override def equals(
       that: Any
     ): Boolean = {
@@ -98,14 +99,7 @@ class ModifyingBookSpec
   private val modifyBookRobot: FxRobotInterface =
     new FxRobot
 
-  // Application being run
-  private var runningApp: Application = _
-
-  // Valid new book to add
-  val bookImageLocation: URI =
-    getClass.getResource(
-      "/GroundZero.jpg"
-    ).toURI
+  var originalBook: BookData = _
 
   after {
     FxToolkit.cleanupStages()
@@ -113,6 +107,36 @@ class ModifyingBookSpec
       runningApp
     )
   }
+
+  /**
+    * Create dialog that is to be tested
+    *
+    * @param catalog Catalog to add new book to
+    * @param repository Repository containing book catalog data
+    * @param service Service that handles book catalog
+    * @param parent Parent window that created book addition dialog
+    * @param coverImageChooser Dialog to choose image for cover
+    * @param definedCategories Categories available to be associated with book
+    *
+    * @return Dialog to be tested
+    */
+  def createDialog(
+    catalog: BookCatalog,
+    repository: BookCatalogRepository,
+    service: BookCatalogService[BookCatalog],
+    parent: BookDialogParent,
+    coverImageChooser: ImageChooser,
+    definedCategories: Set[String]
+  ): BookEntryDialog =
+    new ModifyBookDialog(
+      catalog,
+      repository,
+      service,
+      parent,
+      coverImageChooser,
+      definedCategories,
+      originalBook
+    )
 
   "Given the categories that can be associated with books" - {
     val definedCategories: Set[String] =
@@ -124,7 +148,7 @@ class ModifyingBookSpec
       )
 
     "and a book that already exists in the catalog" - {
-      val originalBook: BookData =
+      originalBook =
         new BookData(
           "Ruins",
           "Kevin J. Anderson",
@@ -164,13 +188,12 @@ class ModifyingBookSpec
 
                 "when the book dialog is created" - {
                   val bookModificationDialog: Scene =
-                    createBookModificationDialog(
+                    createBookDialog(
                       catalog,
                       repository,
                       service,
                       definedCategories,
-                      parent,
-                      originalBook
+                      parent
                     )
 
                   "and the title of the book is modified" - {
@@ -204,109 +227,6 @@ class ModifyingBookSpec
           }
         }
       }
-    }
-  }
-
-  /**
-    * Create dialog to modify book that exists in catalog
-    *
-    * @param catalog Catalog to add new book to
-    * @param repository Repository containing book catalog data
-    * @param service Service that handles book catalog
-    * @param definedCategories Categories available to be associated with book
-    * @param parent Parent window that created book addition dialog
-    * @param originalBook Book within catalog that is being modified
-    * @return Dialog to modify book within catalog
-    */
-  private def createBookModificationDialog(
-    catalog: BookCatalog,
-    repository: BookCatalogRepository,
-    service: BookCatalogService[BookCatalog],
-    definedCategories: Set[String],
-    parent: BookDialogParent,
-    originalBook: Book
-  ): Scene = {
-    // Create mock file chooser
-    val coverImageChooser: TestChooser =
-      new TestChooser(
-        bookImageLocation
-      )
-
-    FxToolkit.registerPrimaryStage()
-    runningApp =
-      FxToolkit.setupApplication(
-        new Supplier[Application] {
-          override def get(): BookEntryUnitTestApplication = {
-            new BookEntryUnitTestApplication
-          }
-        }
-      )
-    FxToolkit.showStage()
-
-    // Create dialog to add book to catalog
-    val bookEntryDialog =
-      new ModifyBookDialog(
-        catalog,
-        repository,
-        service,
-        parent,
-        coverImageChooser,
-        definedCategories,
-        originalBook
-      )
-    val bookEntryStage: javafx.stage.Stage =
-      FxToolkit.setupStage(
-        new Consumer[javafx.stage.Stage] {
-          override def accept(t: javafx.stage.Stage): Unit = {
-            t.scene = bookEntryDialog
-          }
-        }
-      )
-
-    bookEntryDialog
-  }
-
-  /**
-    * Activate control to edit
-    * @param controlId ID of control to activate
-    */
-  private def activateControl(
-    controlId: String
-  ) = {
-    modifyBookRobot.clickOn(
-      NodeQueryUtils hasId controlId,
-      MouseButton.PRIMARY
-    )
-  }
-
-  // Clear contents of currently selected text control
-  def clearControl(
-    lengthOfText: Int
-  ) = {
-    for (characterDeleted <- 1 to lengthOfText) {
-      modifyBookRobot push KeyCode.BACK_SPACE
-    }
-  }
-
-  /**
-    * Enter data into currently active control
-    * @param dataToEnter Data to place into control
-    */
-  private def enterDataIntoControl(
-    dataToEnter: String
-  ) = {
-    dataToEnter.toCharArray foreach {
-      case current@upperCase if current.isLetter && current.isUpper =>
-        modifyBookRobot push(
-          KeyCode.SHIFT,
-          KeyCode getKeyCode upperCase.toString
-        )
-      case current@space if current == ' ' =>
-        modifyBookRobot push KeyCode.SPACE
-      case current@period if current == '.' =>
-        modifyBookRobot push KeyCode.PERIOD
-      case current =>
-        modifyBookRobot push (KeyCode getKeyCode current.toUpper.toString)
     }
   }
 }
