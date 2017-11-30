@@ -30,6 +30,14 @@ class ModifyBookControl(
 ) {
   import bookCatalogService._
 
+  // Set the model to the original information
+  bookBeingEdited.title = originalBook.title
+  bookBeingEdited.author = originalBook.author
+  bookBeingEdited.isbn = originalBook.isbn
+  bookBeingEdited.description = originalBook.description
+  bookBeingEdited.coverImage = originalBook.coverImage
+  bookBeingEdited.categories = originalBook.categories
+
   /**
     * Save modifications to book
     * @param repository Repository containing book catalog information

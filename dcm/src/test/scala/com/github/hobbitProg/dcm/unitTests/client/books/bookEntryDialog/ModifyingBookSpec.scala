@@ -179,9 +179,12 @@ class ModifyingBookSpec
               val service =
                 new TestService()
               var bookToDelete: Book = null
+              var bookToAdd: TestService.BookData = null
               service.onModify(
-                unmodifiedBook =>
-                bookToDelete = unmodifiedBook
+                (unmodifiedBook, modifiedBook) => {
+                  bookToDelete = unmodifiedBook
+                  bookToAdd = modifiedBook
+                }
               )
 
               "and the parent window that created the book modification " +
@@ -226,7 +229,17 @@ class ModifyingBookSpec
                         bookToDelete should equal (originalBook)
                       }
 
-                      "and the new book is added via the service" in pending
+                      "and the new book is added via the service" in {
+                        bookToAdd match {
+                          case (addedTitle, addedAuthor, addedISBN, addedDescription, addedCoverImage, addedCategories) =>
+                            addedTitle should equal (newTitle)
+                            addedAuthor should equal (originalBook.author)
+                            addedISBN should equal (originalBook.isbn)
+                            addedDescription should equal (originalBook.description)
+                            addedCoverImage should equal (originalBook.coverImage)
+                            addedCategories should equal (originalBook.categories)
+                        }
+                      }
                     }
                   }
                 }
