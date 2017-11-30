@@ -81,6 +81,12 @@ class TestService
     newCategories: Set[Categories]
   ): BookCatalogOperation[BookCatalog] = Kleisli {
     repository: BookCatalogRepository =>
+    for (callback <- modifyBookCallback) {
+      callback(
+        originalBook
+      )
+    }
+
     Valid(catalog)
   }
 
@@ -128,9 +134,24 @@ class TestService
     newBookCallbacks =
       newBookCallbacks + callback
 
+  /**
+    * Add a callback to perform when modifying a book in the catalog
+    *
+    * @param callback The callback to execute
+    */
+  def onModify(
+    callback: Book => Unit
+  ) =
+    modifyBookCallback =
+      modifyBookCallback + callback
+
   // Callbacks for when a book is added to the catalog
   private var newBookCallbacks: Set[TestService.BookData => Unit] =
     Set[TestService.BookData => Unit]()
+
+  // Callbacks for when a book in the catalog is modified
+  private var modifyBookCallback: Set[Book => Unit] =
+    Set[Book => Unit]()
 }
 
 object TestService {

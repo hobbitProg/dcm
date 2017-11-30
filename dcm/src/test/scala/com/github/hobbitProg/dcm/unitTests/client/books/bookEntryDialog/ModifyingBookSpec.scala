@@ -178,6 +178,11 @@ class ModifyingBookSpec
             "and the service for the book catalog" - {
               val service =
                 new TestService()
+              var bookToDelete: Book = null
+              service.onModify(
+                unmodifiedBook =>
+                bookToDelete = unmodifiedBook
+              )
 
               "and the parent window that created the book modification " +
               "dialog" - {
@@ -217,7 +222,10 @@ class ModifyingBookSpec
                           !bookModificationDialog.window.value.showing.value) should be (true)
                       }
 
-                      "and the original book is removed via the service" in pending
+                      "and the original book is removed via the service" in {
+                        bookToDelete should equal (originalBook)
+                      }
+
                       "and the new book is added via the service" in pending
                     }
                   }
@@ -229,4 +237,5 @@ class ModifyingBookSpec
       }
     }
   }
+
 }
