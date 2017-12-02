@@ -31,7 +31,7 @@ class UpdateSpec
       val testRepository: TestRepository =
         new TestRepository()
 
-      "and a book view" - {
+      "and a book catalog view" - {
         val testScene: BookCatalogScene =
           createBookCatalogControlScene(
             testRepository
@@ -106,6 +106,26 @@ class UpdateSpec
       }
     }
   }
+
+  "Given a book catalog" - {
+    "and a populated book repository" - {
+      "and a book catalog view" - {
+        "and the information of the book to modify" - {
+          "and the new title of the book" - {
+            "when the book is updated within the catalog" - {
+              "then the original book is not displayed in the book catalog " +
+              "view" in pending
+              "and the updated book is displayed in the book catalog " +
+              "view" in pending
+              "and the other books in the catalog are still in the book " +
+              "catalog view" in pending
+            }
+          }
+        }
+      }
+    }
+  }
+
   /**
     * Create scene that contains book catalog control
     * @param repository Repository containing book catalog
