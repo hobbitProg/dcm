@@ -108,17 +108,114 @@ class UpdateSpec
   }
 
   "Given a book catalog" - {
+    val testCatalog: BookCatalog =
+      new BookCatalog()
+
     "and a populated book repository" - {
+      val testRepository: TestRepository =
+        new TestRepository()
+
       "and a book catalog view" - {
+        val testScene: BookCatalogScene =
+          createBookCatalogControlScene(
+            testRepository
+          )
+        val trackedCatalog: BookCatalog =
+          testScene.catalogControl register testCatalog
+
         "and the information of the book to modify" - {
+          val originalTitle: Titles =
+            "Goblins"
+          val originalAuthor: Authors =
+            "Charles Grant"
+          val originalISBN: ISBNs =
+            "0061054143"
+          val originalDescription: Description =
+            Some(
+              "Description for goblins"
+            )
+          val originalCover: CoverImages =
+            Some(
+              getClass.getResource(
+                "/Goblins.jpg"
+              ).toURI()
+            )
+          val originalCategories: Set[Categories] =
+            Set[Categories](
+              "Sci-fi",
+              "Conspiracy"
+            )
+
           "and the new title of the book" - {
+            val updatedTitle: Titles =
+              "Goblinz"
+
             "when the book is updated within the catalog" - {
+              val originalBook: Book =
+                testRepository.existingBooks find {
+                  existingBook =>
+                  existingBook.title == originalTitle
+                } match {
+                  case Some(repositoryBook) =>
+                    repositoryBook
+                  case None =>
+                    null
+                }
+
+              var updatedCatalog =
+                updateBook(
+                  trackedCatalog,
+                  originalBook,
+                  updatedTitle,
+                  originalAuthor,
+                  originalISBN,
+                  originalDescription,
+                  originalCover,
+                  originalCategories
+                )
+
               "then the original book is not displayed in the book catalog " +
-              "view" in pending
+              "view" in {
+                val originalVersions =
+                  testScene.catalogControl.items.value.toSeq.filter {
+                    definedBook =>
+                    definedBook.title == originalTitle
+                  }
+                originalVersions.length should be (0)
+                testScene.catalogControl.items.value.toSeq.length should be (2)
+              }
+
               "and the updated book is displayed in the book catalog " +
-              "view" in pending
+              "view" in {
+                val updatedBooks =
+                  testScene.catalogControl.items.value.toSeq.filter {
+                    definedBook =>
+                    definedBook.title == updatedTitle
+                  }
+                updatedBooks.length should be (1)
+                val updatedBook =
+                  updatedBooks(0)
+                updatedBook.author should be (originalAuthor)
+                updatedBook.isbn should be (originalISBN)
+                updatedBook.description should be (originalDescription)
+                updatedBook.coverImage should be (originalCover)
+                updatedBook.categories should be (originalCategories)
+              }
+
               "and the other books in the catalog are still in the book " +
-              "catalog view" in pending
+              "catalog view" in {
+                val remainingOriginalBooks =
+                  testRepository.existingBooks filter {
+                    currentBook =>
+                    currentBook.title != originalTitle
+                  }
+                val displayedOriginalBooks =
+                  testScene.catalogControl.items.value.toSeq.filter {
+                    currentBook =>
+                    currentBook.title != updatedTitle
+                  }
+                displayedOriginalBooks.toSet should be (remainingOriginalBooks)
+              }
             }
           }
         }
