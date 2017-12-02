@@ -23,7 +23,6 @@ import com.github.hobbitProg.dcm.client.books.control.BookCatalogControl
   * @since 0.1
   */
 class BookCatalogView(
-  private val source: BookCatalog,
   private val repository: BookCatalogRepository
 ) extends ListView[Book]
     with StringOrdering {
