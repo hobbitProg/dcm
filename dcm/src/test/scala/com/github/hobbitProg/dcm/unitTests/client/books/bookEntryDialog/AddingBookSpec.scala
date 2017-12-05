@@ -98,7 +98,6 @@ class AddingBookSpec
   // Book data that was added to catalog
   private var newBookData: BookData = _
 
-  // Valid new book to add
   after {
     FxToolkit.cleanupStages()
     FxToolkit.cleanupApplication(

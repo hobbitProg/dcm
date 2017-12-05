@@ -30,7 +30,7 @@ val printTests = taskKey[Unit]("something")
 
 printTests := {
   val tests = (definedTests in Test).value
-  tests map { t =>
+   tests map { t =>
     println(t.name)
   }
 }

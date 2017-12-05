@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.client.books.control
+package com.github.hobbitProg.dcm.client.books.view
 
 import java.net.URI
 
@@ -13,11 +13,11 @@ import com.github.hobbitProg.dcm.client.books.view.listView._
 import com.github.hobbitProg.dcm.client.books.view.text._
 
 /**
-  * Control that displays information on currently selected book
+  * View that displays information on currently selected book
   * @author Kyle Cranmer
   * @since 0.1
   */
-class SelectedBookControl
+class SelectedBookView
   extends Group {
   // Create control to display title of book
   private val titleLabel: TitleLabel =
@@ -25,7 +25,7 @@ class SelectedBookControl
   private val titleValue: TitleValue =
     new TitleValue
   titleValue.editable = false
-  titleValue.id = SelectedBookControl.titleControlId
+  titleValue.id = SelectedBookView.titleControlId
 
   // Create control to display author of book
   private val authorLabel: AuthorLabel =
@@ -33,7 +33,7 @@ class SelectedBookControl
   private val authorValue: AuthorValue =
     new AuthorValue
   authorValue.editable = false
-  authorValue.id = SelectedBookControl.authorControlId
+  authorValue.id = SelectedBookView.authorControlId
 
   // Create control to display ISBN of book
   private val isbnLabel: ISBNLabel =
@@ -41,7 +41,7 @@ class SelectedBookControl
   private val isbnValue: ISBNValue =
     new ISBNValue
   isbnValue.editable = false
-  isbnValue.id = SelectedBookControl.isbnControlId
+  isbnValue.id = SelectedBookView.isbnControlId
 
   // Create control for display book description
   private val descriptionLabel: DescriptionLabel =
@@ -49,21 +49,21 @@ class SelectedBookControl
   private val descriptionValue: DescriptionValue =
     new DescriptionValue
   descriptionValue.editable = false
-  descriptionValue.id = SelectedBookControl.descriptionControlId
+  descriptionValue.id = SelectedBookView.descriptionControlId
 
   // Create control to display cover image
   private val coverImageLabel: CoverImageLabel =
     new CoverImageLabel
   private val coverImageControl: CoverImage =
     new CoverImage
-  coverImageControl.id = SelectedBookControl.coverImageControlId
+  coverImageControl.id = SelectedBookView.coverImageControlId
 
   // Create control to display categories associated with selected book
   private val categoryLabel: CategoryLabel =
     new CategoryLabel
   private val categoryControl: BookCategories =
     new BookCategories
-  categoryControl.id = SelectedBookControl.categoriesControlId
+  categoryControl.id = SelectedBookView.categoriesControlId
 
   // Set pane for dialog
   children =
@@ -163,7 +163,7 @@ class SelectedBookControl
   }
 }
 
-object SelectedBookControl {
+object SelectedBookView {
   val titleControlId = "titleControlId"
   val authorControlId = "authorControlId"
   val isbnControlId = "isbnControlId"
