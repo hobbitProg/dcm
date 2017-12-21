@@ -129,6 +129,12 @@ class TestRepository
   /**
     * All books that exist within repository
     */
-  def contents: Set[Book] =
+  override def contents: Set[Book] =
     existingBooks
+
+  /**
+    * The categories a book can be categoriezed as
+    */
+  override def definedCategories: Set[Categories] =
+    Set[Categories]()
 }

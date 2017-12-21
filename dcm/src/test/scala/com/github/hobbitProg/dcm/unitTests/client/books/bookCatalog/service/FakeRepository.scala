@@ -118,6 +118,12 @@ class FakeRepository
   /**
     * All books that exist within repository
     */
-  def contents: Set[Book] =
+  override def contents: Set[Book] =
     Set[Book]()
+
+  /**
+    * The categories a book can be categorized as
+    */
+  override def definedCategories: Set[Categories] =
+    Set[Categories]()
 }

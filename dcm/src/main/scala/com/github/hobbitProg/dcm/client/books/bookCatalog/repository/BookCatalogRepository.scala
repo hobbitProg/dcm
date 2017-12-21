@@ -3,7 +3,8 @@ package com.github.hobbitProg.dcm.client.books.bookCatalog.repository
 import scala.collection.Set
 import scala.util.Either
 
-import com.github.hobbitProg.dcm.client.books.bookCatalog.model.{Book, Titles, Authors, ISBNs}
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model.{Book, Titles,
+  Authors, ISBNs, Categories}
 
 /**
   * Interface for repository for book catalog
@@ -68,4 +69,9 @@ trait BookCatalogRepository {
     * All books that exist within repository
     */
   def contents: Set[Book]
+
+  /**
+    * The categories a book can be categorized as
+    */
+  def definedCategories: Set[Categories]
 }

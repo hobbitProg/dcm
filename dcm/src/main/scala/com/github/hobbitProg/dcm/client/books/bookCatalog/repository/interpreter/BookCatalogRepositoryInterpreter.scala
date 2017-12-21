@@ -4,12 +4,12 @@ import java.net.URI
 
 import cats._
 import cats.data._
+import Validated._
 import cats.implicits._
 
-import doobie.imports._
+import doobie._, doobie.implicits._
 
-import fs2.Task
-import fs2.interop.cats._
+import cats._, cats.data._, cats.effect._, cats.implicits._
 
 import scala.util.{Either, Left, Right}
 
@@ -31,14 +31,14 @@ class BookCatalogRepositoryInterpreter
   }
 
   // Connection to database containing book catalog
-  private var databaseConnection: Transactor[Task] = _
+  private var databaseConnection: Transactor[IO] = _
 
   /**
     * Save connection to database containing book catalog
     * @param connection Connection to database containing book catalog
     */
   def setConnection(
-    connection: Transactor[Task]
+    connection: Transactor[IO]
   ) = {
     databaseConnection = connection
   }
@@ -164,8 +164,45 @@ class BookCatalogRepositoryInterpreter
     */
   override def retrieve(
     isbn: ISBNs
-  ): Either[String, Book] =
-    Left("Unimplement")
+  ): Either[String, Book] = {
+    val bookInfo: Set[BookType] =
+      sql"SELECT Title,Author,ISBN,Description,Cover FROM bookCatalog where ISBN=${isbn};"
+        .query[BookType]
+        .to[Set]
+        .transact(databaseConnection)
+        .unsafeRunSync
+
+    if (bookInfo.size == 0) {
+      Left(
+        "No books exist with the ISBN $isbn"
+      )
+    }
+    else {
+      val retrievedBookInfo: BookType =
+        bookInfo.head
+      Book.book(
+        retrievedBookInfo._1,
+        retrievedBookInfo._2,
+        retrievedBookInfo._3,
+        retrievedBookInfo._4 match {
+          case "NULL" => None
+          case description => Some(description)
+        },
+        retrievedBookInfo._5 match {
+          case "NULL" => None
+          case location => Some(new URI(location))
+        },
+        sql"SELECT Category FROM categoryMapping WHERE ISBN=${retrievedBookInfo._3}"
+          .query[Categories]
+          .to[Set]
+          .transact(databaseConnection)
+          .unsafeRunSync
+      ) match {
+        case Invalid(errorDescription) => Left(errorDescription)
+        case Valid(retrievedBook) => Right(retrievedBook)
+      }
+    }
+  }
 
   /**
     * Determine if book with given title and author already exists in storage
@@ -182,7 +219,7 @@ class BookCatalogRepositoryInterpreter
       .query[Titles]
       .list
       .transact(databaseConnection)
-      .unsafeRun
+      .unsafeRunSync
       .isEmpty
   }
 
@@ -199,7 +236,7 @@ class BookCatalogRepositoryInterpreter
       .query[ISBNs]
       .list
       .transact(databaseConnection)
-      .unsafeRun
+      .unsafeRunSync
       .isEmpty
   }
 
@@ -213,7 +250,7 @@ class BookCatalogRepositoryInterpreter
          .query[BookType]
          .to[Set]
          .transact(databaseConnection)
-         .unsafeRun
+         .unsafeRunSync
 
 
     // Generate books within repository
@@ -235,7 +272,7 @@ class BookCatalogRepositoryInterpreter
           .query[Categories]
           .to[Set]
           .transact(databaseConnection)
-          .unsafeRun
+          .unsafeRunSync
       ).getOrElse(
         new ErrorBookClass(
           "",
@@ -248,6 +285,16 @@ class BookCatalogRepositoryInterpreter
       )
     }
   }
+
+  /**
+    * The categories a book can be categorized as
+    */
+  override def definedCategories: Set[Categories] =
+    sql"SELECT Category FROM definedCategories;"
+      .query[Categories]
+      .to[Set]
+      .transact(databaseConnection)
+      .unsafeRunSync
 }
 
 object BookCatalogRepositoryInterpreter

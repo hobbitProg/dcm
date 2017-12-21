@@ -6,12 +6,11 @@ import acolyte.jdbc.Implicits._
 
 import cats._
 import cats.data._
+import cats.effect._
 import cats.implicits._
 
-import doobie.imports._
-
-import fs2.Task
-import fs2.interop.cats._
+import doobie._
+import doobie.implicits._
 
 import java.net.URI
 
@@ -144,7 +143,7 @@ class StubDatabase{
     bookStorageHandler
   )
   val connectionTransactor =
-    DriverManagerTransactor[Task](
+    Transactor.fromDriverManager[IO](
       "acolyte.jdbc.Driver",
       databaseURL
     )

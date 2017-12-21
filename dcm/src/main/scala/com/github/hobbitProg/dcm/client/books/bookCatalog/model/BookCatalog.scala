@@ -5,8 +5,6 @@ import scala.util.{Try, Success, Failure}
 
 import cats.data.Validated.{Valid, Invalid}
 
-import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
-
 /**
   * Algebra for catalog containing books
   * @author Kyle Cranmer
