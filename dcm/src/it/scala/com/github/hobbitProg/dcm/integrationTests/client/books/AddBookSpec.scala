@@ -17,6 +17,7 @@ import javafx.scene.input.{KeyCode, MouseButton}
 import scalafx.Includes._
 import scalafx.scene.control.{ListView, TextInputControl}
 import scalafx.scene.layout.{AnchorPane, VBox}
+import scalafx.stage.Window
 
 import org.scalamock.scalatest.MockFactory
 
@@ -173,6 +174,7 @@ class AddBookSpec
     )
   }
 
+  // Show the main catalog manager
   private def showMainApplication(
     catalog: BookCatalog
   ): Unit = {
@@ -199,6 +201,53 @@ class AddBookSpec
         }
       )
     FxToolkit.showStage()
+  }
+
+  // Add the pre-defined categories to the database
+  private def placePreDefinedCategoriesIntoDatabase() = {
+    for (definedCategory <- AddBookSpec.definedCategories) {
+      sql"INSERT INTO definedCategories (Category) VALUES ($definedCategory);"
+        .update
+        .run
+        .transact(
+          bookTransactor
+        ).unsafeRunSync
+    }
+  }
+
+  // Place the existing books into the database
+  private def placeExistingBooksIntoDatabase() = {
+    for (existingBook <- existingBooks) {
+      val description: String =
+        existingBook.description match {
+          case Some(definedDescription) =>
+            definedDescription
+          case None =>
+            ""
+        }
+      val coverImage: String =
+        existingBook.coverImage match {
+          case Some(definedCover) =>
+            definedCover.toString()
+          case None =>
+            ""
+          }
+      sql"INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES(${existingBook.title},${existingBook.author},${existingBook.isbn},$description,$coverImage);"
+        .update
+        .run
+        .transact(
+          bookTransactor
+        ).unsafeRunSync
+
+      for(associatedCategory <- existingBook.categories) {
+        sql"INSERT INTO categoryMapping(ISBN,Category)VALUES(${existingBook.isbn},$associatedCategory)"
+          .update
+          .run
+          .transact(
+            bookTransactor
+          ).unsafeRunSync
+      }
+    }
   }
 
   /**
@@ -243,6 +292,20 @@ class AddBookSpec
     )
   }
 
+  // Find book entry dialog
+  def findBookEntryDialog: Window = {
+    val context =
+      new FxRobotContext
+    val bookEntryDialogPredicate: java.util.function.Predicate[javafx.stage.Window] =
+      (currentWindow: javafx.stage.Window) => {
+        val convertedWindow: scalafx.stage.Stage = currentWindow.asInstanceOf[javafx.stage.Stage]
+        convertedWindow.title.value == "Add Book To Catalog"
+      }
+    context.getWindowFinder.window(
+      bookEntryDialogPredicate
+    )
+  }
+
   Feature("The user can add a book to the book catalog") {
     info("As someone who wants to keep track of books he owns")
     info("I want to add books to the book catalog")
@@ -251,47 +314,10 @@ class AddBookSpec
     Scenario("A book with all required fields can be added to the book " +
       "catalog.") {
       Given("the pre-defined categories")
-      for (definedCategory <- AddBookSpec.definedCategories) {
-        sql"INSERT INTO definedCategories (Category) VALUES ($definedCategory);"
-          .update
-          .run
-          .transact(
-            bookTransactor
-          ).unsafeRunSync
-      }
+      placePreDefinedCategoriesIntoDatabase()
 
       And("a populated catalog")
-      for (existingBook <- existingBooks) {
-        val description: String =
-          existingBook.description match {
-            case Some(definedDescription) =>
-              definedDescription
-            case None =>
-              ""
-          }
-        val coverImage: String =
-          existingBook.coverImage match {
-            case Some(definedCover) =>
-              definedCover.toString()
-            case None =>
-              ""
-          }
-        sql"INSERT INTO bookCatalog(Title,Author,ISBN,Description,Cover)VALUES(${existingBook.title},${existingBook.author},${existingBook.isbn},$description,$coverImage);"
-          .update
-          .run
-          .transact(
-            bookTransactor
-          ).unsafeRunSync
-
-        for(associatedCategory <- existingBook.categories) {
-          sql"INSERT INTO categoryMapping(ISBN,Category)VALUES(${existingBook.isbn},$associatedCategory)"
-            .update
-            .run
-            .transact(
-              bookTransactor
-            ).unsafeRunSync
-        }
-      }
+      placeExistingBooksIntoDatabase()
       val catalog: BookCatalog =
         new BookCatalog()
 
@@ -449,11 +475,125 @@ class AddBookSpec
     Scenario("A book that does not have a title cannot be added to the book " +
       "catalog") {
       Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog
+      )
+
       And("the information on the book without a title")
+      val bookToEnter: Book =
+        new TestBook(
+          "",
+          "Kevin J. Anderson",
+          "006105223X",
+          Some(
+            "Description for Ground Zero"
+          ),
+          Some(
+            getClass.getResource(
+              "/GroundZero.jpg"
+            ).toURI()
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+
       When("the information on the book is entered")
+      // Display dialog to enter in new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookTab.addButtonId,
+        MouseButton.PRIMARY
+      )
+
+      // Enter in author of new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.authorControlId,
+        MouseButton.PRIMARY
+      )
+      enterDataIntoControl(
+        bookToEnter.author
+      )
+
+      // Enter in ISBN of new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.isbnControlId,
+        MouseButton.PRIMARY
+      )
+      enterDataIntoControl(
+        bookToEnter.isbn
+      )
+
+      // Enter in description of new book
+      bookToEnter.description match {
+        case Some(description) =>
+          bookClientRobot.clickOn(
+            NodeQueryUtils hasId BookEntryDialog.descriptionControlId,
+            MouseButton.PRIMARY
+          )
+          enterDataIntoControl(
+            description
+          )
+        case None =>
+      }
+
+      // Select cover of new book
+      bookToEnter.coverImage match {
+        case Some(coverName) =>
+          val dialogStage =
+            bookClientRobot.listWindows().asScala.find {
+              case possibleDialog: javafx.stage.Stage =>
+                possibleDialog.getTitle == BookTab.addBookTitle
+              case _ => false
+            }
+          dialogStage match {
+            case Some(actualStage) =>
+              val adaptedStage: scalafx.stage.Window =
+                actualStage
+                  (coverChooser.selectImage _).expects(
+                    adaptedStage
+                  ).returning(
+                    new File(
+                      coverName
+                    )
+                  )
+            case None =>
+          }
+          bookClientRobot.clickOn(
+            NodeQueryUtils hasId BookEntryDialog.bookCoverButtonId,
+            MouseButton.PRIMARY
+          )
+        case None =>
+      }
+
+      // Select categories for new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.categorySelectionButtonId,
+        MouseButton.PRIMARY
+      )
+      for (bookCategory <- bookToEnter.categories) {
+        selectCategory(
+          bookCategory
+        )
+      }
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId CategorySelectionDialog.availableButtonId,
+        MouseButton.PRIMARY
+      )
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId CategorySelectionDialog.saveButtonId,
+        MouseButton.PRIMARY
+      )
+
       Then("the information on the book cannot be accepted")
-      pending
+      findBookEntryDialog should haveInactiveSaveButton()
     }
 
     Scenario("A book that does not have an author cannot be added to the " +

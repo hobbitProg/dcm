@@ -8,6 +8,7 @@ import scalafx.Includes._
 import scalafx.scene.control.{ListView, TextInputControl}
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.{AnchorPane, VBox}
+import scalafx.stage.Window
 
 import com.github.hobbitProg.dcm.client.linuxDesktop.DCMDesktop
 import com.github.hobbitProg.dcm.client.books.view.SelectedBookView
@@ -430,6 +431,67 @@ trait ScalafxMatchers {
     */
   def notHaveSelectedBookDataDisplayed() =
     new SelectedBookViewClearMatcher()
+
+  /**
+    * The matcher that determines if the button to save the book information is
+    * not active
+    */
+  class DeactivatedSaveButtonMatcher
+      extends Matcher[Window] {
+    /**
+      * Determine if the button to save the book information is not active
+      *
+      * @param left The book entry dialog
+      *
+      * @return The result indicating if the button to save the book information
+      * is not active
+      */
+    def apply(
+      left: Window
+    ) =
+      MatchResult(
+        saveButtonInactive(
+          left
+        ),
+        "Save button is inactive",
+        "Save button is active"
+      )
+
+    // Determine if the button to save the book information is not active
+    private def saveButtonInactive(
+      bookEntryDialog: Window
+    ): Boolean = {
+      if (bookEntryDialog == null) {
+        false
+      }
+      else {
+        val bookEntryPane: AnchorPane =
+          bookEntryDialog.scene.value.content.head.asInstanceOf[javafx.scene.layout.AnchorPane]
+        val saveButton =
+          bookEntryPane.children.find {
+            childNode =>
+            childNode match {
+              case buttonNode: javafx.scene.control.Button => buttonNode.text.value == "Save"
+              case _ => false
+            }
+          }
+        saveButton match {
+          case Some(saveButtonNode) =>
+            saveButtonNode.disable.value
+          case None =>
+            false
+        }
+      }
+    }
+  }
+
+  /**
+    * Create a matcher that determines if the save button is inactive
+    *
+    * @return A matcher that determines if the save button is inactive
+    */
+  def haveInactiveSaveButton() =
+    new DeactivatedSaveButtonMatcher()
 }
 
 object ScalafxMatchers extends ScalafxMatchers {
