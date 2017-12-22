@@ -23,13 +23,20 @@ trait ScalafxMatchers {
     * Base for verifying view on the DCM desktop
     */
   trait DCMDesktopMatcher {
+    /**
+      * The window showing the catalog information
+      */
     def desktop: DCMDesktop
 
-    // Find given control to check
+    /**
+      * Find the relevant control to check
+      *
+      * @param controlType The type of control that is to be verified
+      */
     def findControl(
       controlType: Class[_]
     ): Option[javafx.scene.Node] = {
-      // Get tab containing book information
+      // Get tab containing the book information
       val existingTabs =
         desktop.tabs.toList
       val possibleBookTab =
@@ -38,7 +45,7 @@ trait ScalafxMatchers {
           currentTab.getText == "Books"
         }
 
-      // Get control containing book catalog information
+      // Get the control containing the relevant book catalog information
       possibleBookTab match {
         case Some(bookTab) =>
           val adaptedTab: scalafx.scene.control.Tab =
@@ -61,19 +68,21 @@ trait ScalafxMatchers {
     */
   trait BookCatalogViewMatcher
       extends DCMDesktopMatcher {
-    /**
-      * Verify control containing book catalog meets given condition
-      */
+    // Verify the control containing the books within the book catalog meets a
+    // given condition
     protected def bookCatalogControlVerification(
       assertionPredicate: ListView[Book] => Boolean
     ): Boolean = {
-      // Verify new book is displayed in control
+      // Find the control containing the books within the book catalog
       val possibleBookCatalogControl =
         findControl(
           Class.forName(
             "javafx.scene.control.ListView"
           )
         )
+
+      // Determine if the control containing the books within the book catalog
+      // meets the given condition
       possibleBookCatalogControl match {
         case Some(bookCatalogControl) =>
           val catalogControl: ListView[Book] =
@@ -87,16 +96,31 @@ trait ScalafxMatchers {
     }
   }
 
+  /**
+    * The matcher that determines if a new book is displayed on the control that
+    * displays the entire book catalog
+    *
+    * @param desktop The window that displays the catalog information
+    */
   class BookDisplayedMatcher(
     val desktop: DCMDesktop
   ) extends BookCatalogViewMatcher
       with Matcher[Book] {
+
+    /**
+      * Determine if the new book is displayed on the book catalog control
+      *
+      * @param left The book that was added to the catalog
+      *
+      * @return The result indicating if the new book is displayed on the book
+      * catalog view
+      */
     def apply(
       left: Book
     ) =
       MatchResult(
         bookCatalogControlVerification(
-          assertionPredicate(
+          newBookIsBeingDisplayed(
             left
           )
         ),
@@ -104,21 +128,25 @@ trait ScalafxMatchers {
         "Book does not exist within the catalog"
       )
 
-    /**
-      * Determine if the given predicate is met by the given book and the book
-      * catalog view
-      */
-    protected def assertionPredicate
-      (
-        bookToVerify: Book
-      )
-      (
-        bookCatalogControl: ListView[Book]
-      ): Boolean  = {
+    // Determine if the given book is being displayed on the book catalog view
+    protected def newBookIsBeingDisplayed (
+      bookToVerify: Book
+    ) (
+      bookCatalogControl: ListView[Book]
+    ): Boolean  = {
       bookCatalogControl.items.value.toSet contains bookToVerify
     }
   }
 
+  /**
+    * Create a matcher that determines if a new book is displayed on the book
+    * catalog view
+    *
+    * @param desktop The window displaying the catalog information
+    *
+    * @return A matcher that determines if a new book is displayed on the book
+    * catalog view
+    */
   def beOn(
     desktop: DCMDesktop
   ) =
@@ -126,10 +154,26 @@ trait ScalafxMatchers {
       desktop
     )
 
+  /**
+    * The matcher that determines if the books originally in the book catalog
+    * are still displayed on the book catalog view
+    *
+    * @param desktop The window that displays the catalog information
+    */
   class BookCollectionDisplayedMatcher(
     val desktop: DCMDesktop
   ) extends BookCatalogViewMatcher
       with Matcher[Set[Book]] {
+
+    /**
+      *  Determine if the books originally in the book catalog are still
+      *  displayed on the book catalog view
+      *
+      * @param left The books that were originally in the book catalog
+      *
+      * @return The result indicating if the books that were originally in the
+      * catalog are still displayed on the book catalog view
+      */
     def apply(
       left: Set[Book]
     ) =
@@ -141,34 +185,40 @@ trait ScalafxMatchers {
         "Books do not exist within the catalog"
       )
 
+    // Determine if all of the books that were originally in the catalog are
+    // still displayed on the book catalog vier
     private def allBooksDisplayed(
       relevantBooks: Set[Book]
     ) = {
       relevantBooks forall {
         relevantBook =>
         bookCatalogControlVerification(
-          assertionPredicate(
+          originalBookIsStillDisplayed(
             relevantBook
           )
         )
       }
     }
 
-    /**
-      * Determine if the given predicate is met by the given book and the book
-      * catalog view
-      */
-    protected def assertionPredicate
-      (
-        bookToVerify: Book
-      )
-      (
-        bookCatalogControl: ListView[Book]
-      ): Boolean  = {
+    // Determine if the book that was originally in the book catalog is still
+    // being displayed on the book catalog view
+    protected def originalBookIsStillDisplayed(
+      bookToVerify: Book
+    ) (
+      bookCatalogControl: ListView[Book]
+    ): Boolean  =
       bookCatalogControl.items.value.toSet contains bookToVerify
-    }
   }
 
+  /**
+    * Create a matcher that determines if all of the books that were originally
+    * in the book catalog are still displayed on the book catalog view
+    *
+    * @param desktop The window displaying the catalog information
+    *
+    * @return A matcher that determines if all of the books that were originally
+    * in the book catalog are still displayed on the book catalog view
+    */
   def allBeOn(
     desktop: DCMDesktop
   ) =
@@ -176,12 +226,28 @@ trait ScalafxMatchers {
       desktop
     )
 
+  /**
+    * The matcher that determines if no books within the book catalog view are
+    * currently selected
+    */
   class NoBookSelectedMatcher
       extends BookCatalogViewMatcher
       with Matcher[DCMDesktop] {
 
+    /**
+      * The window that displays the catalog information
+      */
     var desktop: DCMDesktop = _
 
+    /**
+      * Determine if no books within the book catalog view are currently
+      * selected
+      *
+      * @param left The window that displays the catalog information
+      *
+      * @return The result indicating if no books are selected within the book
+      * catalog view
+      */
     def apply(
       left: DCMDesktop
     ) = {
@@ -195,21 +261,42 @@ trait ScalafxMatchers {
       )
     }
 
+    // The predicate indicating if no books are selected in the book catalog
+    // view
     private def noBookSelected(
       bookCatalogControl : ListView[Book]
     ): Boolean =
       bookCatalogControl.selectionModel.value.isEmpty()
   }
 
+  /**
+    * Create a matcher that determines if no books are selected in the book
+    * catalog view
+    *
+    * @return A matcher that determines if no books are selected in the book
+    * catalog view
+    */
   def haveNoBooksSelected() =
     new NoBookSelectedMatcher()
 
+  /**
+    * The matcher that determines no information on a selected book is displayed
+    */
   class SelectedBookViewClearMatcher
       extends DCMDesktopMatcher
       with Matcher[DCMDesktop] {
 
+    // The window that displays the catalog information
     var desktop: DCMDesktop = _
 
+    /**
+      * Determine if no information on a selected book is displayed
+      *
+      * @param left The window that displays the catalog information
+      *
+      * @return The result indicating if no information on a selected book is
+      * displayed
+      */
     def apply(
       left: DCMDesktop
     ) = {
@@ -221,47 +308,53 @@ trait ScalafxMatchers {
       )
     }
 
+    // Determine if no information on a selected book is displayed
     private def noSelectedBookIsDisplayed(): Boolean = {
+      // Get the selected book view
       val selectedBookControl =
         findControl(
           Class.forName(
             "javafx.scene.Group"
           )
         )
+
       selectedBookControl match {
         case Some(bookControl) =>
+          // Ensure no title is displayed
           selectedBookControlTextVerification(
             SelectedBookView.titleControlId,
             bookControl.asInstanceOf[javafx.scene.Group]
           ) &&
+          // Ensure no author is displayed
           selectedBookControlTextVerification(
             SelectedBookView.authorControlId,
             bookControl.asInstanceOf[javafx.scene.Group]
           ) &&
+          // Ensure no ISBN is displayed
           selectedBookControlTextVerification(
             SelectedBookView.isbnControlId,
             bookControl.asInstanceOf[javafx.scene.Group]
           ) &&
+          // Ensure no description is displayed
           selectedBookControlTextVerification(
             SelectedBookView.descriptionControlId,
             bookControl.asInstanceOf[javafx.scene.Group]
           ) &&
+          // Ensure no cover image is displayed
           selectedBookControlCoverImageVerification(
             bookControl.asInstanceOf[javafx.scene.Group]
           ) &&
+          // Ensure no categories are displayed
           selectedBookControlCategoriesVerification(
             bookControl.asInstanceOf[javafx.scene.Group]
           )
         case None =>
+          // Could not find the selected book view
           false
       }
     }
 
-    /**
-      * Verify value of field in selected book text control is empty
-      * @param fieldId ID of text control to verify
-      * @param bookControl selected book text control
-      */
+    // Verify value of field in selected book text control is empty
     private def selectedBookControlTextVerification(
       fieldId: String,
       bookControl: scalafx.scene.Group
@@ -283,10 +376,7 @@ trait ScalafxMatchers {
       }
     }
 
-    /**
-      * Verify cover image of book in selected book control is cleared
-      * @param bookControl Selected book control
-      */
+    // Verify cover image of book in selected book control is cleared
     private def selectedBookControlCoverImageVerification(
       bookControl: scalafx.scene.Group
     ): Boolean = {
@@ -309,10 +399,7 @@ trait ScalafxMatchers {
       }
     }
 
-    /**
-      * Verify categories of book in selected book control is cleared
-      * @param bookControl Selected book control
-      */
+    // Verify categories of book in selected book control is cleared
     private def selectedBookControlCategoriesVerification(
       bookControl: scalafx.scene.Group
     ): Boolean = {
@@ -334,6 +421,13 @@ trait ScalafxMatchers {
     }
   }
 
+  /**
+    * Create a matcher that determines if no selected book information is being
+    * displayed
+    *
+    * @return A matcher that determines if no selected book information is being
+    * displayed
+    */
   def notHaveSelectedBookDataDisplayed() =
     new SelectedBookViewClearMatcher()
 }
