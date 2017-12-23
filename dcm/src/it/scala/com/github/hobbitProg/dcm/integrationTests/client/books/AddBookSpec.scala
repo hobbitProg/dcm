@@ -723,31 +723,391 @@ class AddBookSpec
     Scenario("A book that does not have an ISBN cannot be added to the book " +
       "catalog") {
       Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog
+      )
+
       And("the information on the book without an ISBN")
+      val bookToEnter: Book =
+        new TestBook(
+          "Ground Zero",
+          "Kevin J. Anderson",
+          "",
+          Some(
+            "Description for Ground Zero"
+          ),
+          Some(
+            getClass.getResource(
+              "/GroundZero.jpg"
+            ).toURI()
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+
       When("the information on the book is entered")
+      // Display dialog to enter in new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookTab.addButtonId,
+        MouseButton.PRIMARY
+      )
+
+      // Enter in title of new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.titleControlId,
+        MouseButton.PRIMARY
+      )
+      enterDataIntoControl(
+        bookToEnter.title
+      )
+
+      // Enter in author of new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.authorControlId,
+        MouseButton.PRIMARY
+      )
+      enterDataIntoControl(
+        bookToEnter.author
+      )
+
+      // Enter in description of new book
+      bookToEnter.description match {
+        case Some(description) =>
+          bookClientRobot.clickOn(
+            NodeQueryUtils hasId BookEntryDialog.descriptionControlId,
+            MouseButton.PRIMARY
+          )
+          enterDataIntoControl(
+            description
+          )
+        case None =>
+      }
+
+      // Select cover of new book
+      bookToEnter.coverImage match {
+        case Some(coverName) =>
+          val dialogStage =
+            bookClientRobot.listWindows().asScala.find {
+              case possibleDialog: javafx.stage.Stage =>
+                possibleDialog.getTitle == BookTab.addBookTitle
+              case _ => false
+            }
+          dialogStage match {
+            case Some(actualStage) =>
+              val adaptedStage: scalafx.stage.Window =
+                actualStage
+                  (coverChooser.selectImage _).expects(
+                    adaptedStage
+                  ).returning(
+                    new File(
+                      coverName
+                    )
+                  )
+            case None =>
+          }
+          bookClientRobot.clickOn(
+            NodeQueryUtils hasId BookEntryDialog.bookCoverButtonId,
+            MouseButton.PRIMARY
+          )
+        case None =>
+      }
+
+      // Select categories for new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.categorySelectionButtonId,
+        MouseButton.PRIMARY
+      )
+      for (bookCategory <- bookToEnter.categories) {
+        selectCategory(
+          bookCategory
+        )
+      }
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId CategorySelectionDialog.availableButtonId,
+        MouseButton.PRIMARY
+      )
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId CategorySelectionDialog.saveButtonId,
+        MouseButton.PRIMARY
+      )
+
       Then("the information on the book cannot be accepted")
-      pending
+      findBookEntryDialog should haveInactiveSaveButton()
     }
 
     Scenario("A book that has a title/author pair that already exists within " +
       "the book catalog cannot be added to the catalog") {
       Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog
+      )
+
       And("the information on the book with a duplicate title/author pair")
+      val bookToEnter: Book =
+        new TestBook(
+          "Ruins",
+          "Kevin J. Anderson",
+          "006105223X",
+          Some(
+            "Description for Ruins"
+          ),
+          Some(
+            getClass.getResource(
+              "/Ruins.jpg"
+            ).toURI()
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+
       When("the information on the book is entered")
+      // Display dialog to enter in new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookTab.addButtonId,
+        MouseButton.PRIMARY
+      )
+
+      // Enter in title of new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.titleControlId,
+        MouseButton.PRIMARY
+      )
+      enterDataIntoControl(
+        bookToEnter.title
+      )
+
+      // Enter in author of new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.authorControlId,
+        MouseButton.PRIMARY
+      )
+      enterDataIntoControl(
+        bookToEnter.author
+      )
+
+      // Enter in ISBN of new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.isbnControlId,
+        MouseButton.PRIMARY
+      )
+      enterDataIntoControl(
+        bookToEnter.isbn
+      )
+
+      // Enter in description of new book
+      bookToEnter.description match {
+        case Some(description) =>
+          bookClientRobot.clickOn(
+            NodeQueryUtils hasId BookEntryDialog.descriptionControlId,
+            MouseButton.PRIMARY
+          )
+          enterDataIntoControl(
+            description
+          )
+        case None =>
+      }
+
+      // Select cover of new book
+      bookToEnter.coverImage match {
+        case Some(coverName) =>
+          val dialogStage =
+            bookClientRobot.listWindows().asScala.find {
+              case possibleDialog: javafx.stage.Stage =>
+                possibleDialog.getTitle == BookTab.addBookTitle
+              case _ => false
+            }
+          dialogStage match {
+            case Some(actualStage) =>
+              val adaptedStage: scalafx.stage.Window =
+                actualStage
+                  (coverChooser.selectImage _).expects(
+                    adaptedStage
+                  ).returning(
+                    new File(
+                      coverName
+                    )
+                  )
+            case None =>
+          }
+          bookClientRobot.clickOn(
+            NodeQueryUtils hasId BookEntryDialog.bookCoverButtonId,
+            MouseButton.PRIMARY
+          )
+        case None =>
+      }
+
+      // Select categories for new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.categorySelectionButtonId,
+        MouseButton.PRIMARY
+      )
+      for (bookCategory <- bookToEnter.categories) {
+        selectCategory(
+          bookCategory
+        )
+      }
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId CategorySelectionDialog.availableButtonId,
+        MouseButton.PRIMARY
+      )
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId CategorySelectionDialog.saveButtonId,
+        MouseButton.PRIMARY
+      )
+
       Then("the information on the book cannot be accepted")
-      pending
+      findBookEntryDialog should haveInactiveSaveButton()
     }
 
     Scenario("A book that has an ISBN that already exists within the book " +
       "catalog cannot be added to the catalog") {
       Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog
+      )
+
       And("the information on the book with a duplicate ISBN")
+      val bookToEnter: Book =
+        new TestBook(
+          "Ground Zero",
+          "Kevin J. Anderson",
+          "0061054143",
+          Some(
+            "Description for Ground Zero"
+          ),
+          Some(
+            getClass.getResource(
+              "/GroundZero.jpg"
+            ).toURI()
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+
       When("the information on the book is entered")
+      // Display dialog to enter in new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookTab.addButtonId,
+        MouseButton.PRIMARY
+      )
+
+      // Enter in title of new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.titleControlId,
+        MouseButton.PRIMARY
+      )
+      enterDataIntoControl(
+        bookToEnter.title
+      )
+
+      // Enter in author of new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.authorControlId,
+        MouseButton.PRIMARY
+      )
+      enterDataIntoControl(
+        bookToEnter.author
+      )
+
+      // Enter in ISBN of new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.isbnControlId,
+        MouseButton.PRIMARY
+      )
+      enterDataIntoControl(
+        bookToEnter.isbn
+      )
+
+      // Enter in description of new book
+      bookToEnter.description match {
+        case Some(description) =>
+          bookClientRobot.clickOn(
+            NodeQueryUtils hasId BookEntryDialog.descriptionControlId,
+            MouseButton.PRIMARY
+          )
+          enterDataIntoControl(
+            description
+          )
+        case None =>
+      }
+
+      // Select cover of new book
+      bookToEnter.coverImage match {
+        case Some(coverName) =>
+          val dialogStage =
+            bookClientRobot.listWindows().asScala.find {
+              case possibleDialog: javafx.stage.Stage =>
+                possibleDialog.getTitle == BookTab.addBookTitle
+              case _ => false
+            }
+          dialogStage match {
+            case Some(actualStage) =>
+              val adaptedStage: scalafx.stage.Window =
+                actualStage
+                  (coverChooser.selectImage _).expects(
+                    adaptedStage
+                  ).returning(
+                    new File(
+                      coverName
+                    )
+                  )
+            case None =>
+          }
+          bookClientRobot.clickOn(
+            NodeQueryUtils hasId BookEntryDialog.bookCoverButtonId,
+            MouseButton.PRIMARY
+          )
+        case None =>
+      }
+
+      // Select categories for new book
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.categorySelectionButtonId,
+        MouseButton.PRIMARY
+      )
+      for (bookCategory <- bookToEnter.categories) {
+        selectCategory(
+          bookCategory
+        )
+      }
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId CategorySelectionDialog.availableButtonId,
+        MouseButton.PRIMARY
+      )
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId CategorySelectionDialog.saveButtonId,
+        MouseButton.PRIMARY
+      )
+
       Then("the information on the book cannot be accepted")
-      pending
+      findBookEntryDialog should haveInactiveSaveButton()
     }
   }
 }
