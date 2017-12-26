@@ -31,12 +31,16 @@ class BookCatalogControl
     if (newBook != null) {
       newCell.text =
         newBook.title
+      displayedBooks sort {
+        (left: Book, right: Book) =>
+        lt(
+          left.title, right.title
+        )
+      }
     }
-    displayedBooks sort {
-      (left: Book, right: Book) =>
-      lt(
-        left.title, right.title
-      )
+    else {
+      newCell.text = null
+      newCell.graphic = null
     }
   }
 

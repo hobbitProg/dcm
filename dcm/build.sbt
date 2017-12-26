@@ -5,12 +5,13 @@ lazy val root = (project in file("."))
   .settings(
     inThisBuild(List(
       organization := "com.github.hobbitProg",
-      scalaVersion := "2.12.4",
+      scalaVersion :=  "2.12.4",
       version      := "0.1.0-SNAPSHOT"
     )),
     name := "dcm",
     Defaults.itSettings,
     parallelExecution in Test := false,
+    parallelExecution in IntegrationTest:= false,
     scalacOptions += "-feature",
     scalacOptions += "-Ypartial-unification",
     scalacOptions += "-deprecation",

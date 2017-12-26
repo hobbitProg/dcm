@@ -98,7 +98,7 @@ trait ScalafxMatchers {
   }
 
   /**
-    * The matcher that determines if a new book is displayed on the control that
+    * The matcher that determines if a book is displayed on the control that
     * displays the entire book catalog
     *
     * @param desktop The window that displays the catalog information
@@ -109,11 +109,11 @@ trait ScalafxMatchers {
       with Matcher[Book] {
 
     /**
-      * Determine if the new book is displayed on the book catalog control
+      * Determine if the book is displayed on the book catalog control
       *
       * @param left The book that was added to the catalog
       *
-      * @return The result indicating if the new book is displayed on the book
+      * @return The result indicating if the book is displayed on the book
       * catalog view
       */
     def apply(
@@ -121,7 +121,7 @@ trait ScalafxMatchers {
     ) =
       MatchResult(
         bookCatalogControlVerification(
-          newBookIsBeingDisplayed(
+          bookIsBeingDisplayed(
             left
           )
         ),
@@ -130,7 +130,7 @@ trait ScalafxMatchers {
       )
 
     // Determine if the given book is being displayed on the book catalog view
-    protected def newBookIsBeingDisplayed (
+    protected def bookIsBeingDisplayed (
       bookToVerify: Book
     ) (
       bookCatalogControl: ListView[Book]
@@ -140,18 +140,76 @@ trait ScalafxMatchers {
   }
 
   /**
-    * Create a matcher that determines if a new book is displayed on the book
+    * Create a matcher that determines if a book is displayed on the book
     * catalog view
     *
     * @param desktop The window displaying the catalog information
     *
-    * @return A matcher that determines if a new book is displayed on the book
+    * @return A matcher that determines if a book is displayed on the book
     * catalog view
     */
   def beOn(
     desktop: DCMDesktop
   ) =
     new BookDisplayedMatcher(
+      desktop
+    )
+
+  /**
+    * The matcher that determines if a book is not displayed on the view that
+    * displays the entire book catalog
+    *
+    * @param desktop The window that displays the catalog information
+    */
+  class HiddenBookMatcher(
+    val desktop: DCMDesktop
+  ) extends BookCatalogViewMatcher
+      with Matcher[Book] {
+    /**
+      * Determine if the book is not displayed on the book catalog control
+      *
+      * @param left The original book that was displayed
+      *
+      * @return The result indicating if the book is not displayed on the book
+      * catalog view
+      */
+    def apply(
+      left: Book
+    ) =
+      MatchResult(
+        bookCatalogControlVerification(
+          bookIsNotBeingDisplayed(
+            left
+          )
+        ),
+        "Book does not exist within the catalog",
+        "Book exists within the catalog"
+      )
+
+    // Determine if the given book is not being displayed on the book catalog
+    // view
+    protected def bookIsNotBeingDisplayed(
+      bookToVerify: Book
+    ) (
+      bookCatalogControl : ListView[Book]
+    ): Boolean = {
+      !(bookCatalogControl.items.value.toSet contains bookToVerify)
+    }
+  }
+
+  /**
+    * Create a matcher that determines if a book is displayed on the book
+    * catalog view
+    *
+    * @param desktop The window displaying the catalog information
+    *
+    * @return A matcher that determines if a book is not displayed on the book
+    * catalog view
+    */
+  def notBeOn(
+    desktop: DCMDesktop
+  ) =
+    new HiddenBookMatcher(
       desktop
     )
 

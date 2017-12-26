@@ -166,7 +166,7 @@ class BookCatalogRepositoryInterpreter
     isbn: ISBNs
   ): Either[String, Book] = {
     val bookInfo: Set[BookType] =
-      sql"SELECT Title,Author,ISBN,Description,Cover FROM bookCatalog where ISBN=${isbn};"
+      sql"SELECT Title,Author,ISBN,Description,Cover FROM bookCatalog WHERE ISBN=${isbn};"
         .query[BookType]
         .to[Set]
         .transact(databaseConnection)
@@ -192,7 +192,57 @@ class BookCatalogRepositoryInterpreter
           case "NULL" => None
           case location => Some(new URI(location))
         },
-        sql"SELECT Category FROM categoryMapping WHERE ISBN=${retrievedBookInfo._3}"
+        sql"SELECT Category FROM categoryMapping WHERE ISBN=${isbn};"
+          .query[Categories]
+          .to[Set]
+          .transact(databaseConnection)
+          .unsafeRunSync
+      ) match {
+        case Invalid(errorDescription) => Left(errorDescription)
+        case Valid(retrievedBook) => Right(retrievedBook)
+      }
+    }
+  }
+
+  /**
+    * Retrieve book with given title and author
+    * @param title The title of the book to retrieve
+    * @param author The author of the book to retrieve
+    * @return Disjoint union of either description of erro ro book with given
+    * title and author
+    */
+  override def retrieve(
+    title: Titles,
+    author: Authors
+  ): Either[String, Book] = {
+    val bookInfo: Set[BookType] =
+      sql"SELECT Title,Author,ISBN,Description,Cover FROM bookCatalog WHERE Title=${title} AND Author=${author};"
+        .query[BookType]
+        .to[Set]
+        .transact(databaseConnection)
+        .unsafeRunSync
+
+    if (bookInfo.size == 0) {
+      Left(
+        "No books exist with the title $title and author $author"
+      )
+    }
+    else {
+      val retrievedBookInfo: BookType =
+        bookInfo.head
+      Book.book(
+        retrievedBookInfo._1,
+        retrievedBookInfo._2,
+        retrievedBookInfo._3,
+        retrievedBookInfo._4 match {
+          case "NULL" => None
+          case description => Some(description)
+        },
+        retrievedBookInfo._5 match {
+          case "NULL" => None
+          case location => Some(new URI(location))
+        },
+        sql"SELECT Category from categoryMapping WHERE ISBN=${retrievedBookInfo._3};"
           .query[Categories]
           .to[Set]
           .transact(databaseConnection)
@@ -298,4 +348,5 @@ class BookCatalogRepositoryInterpreter
 }
 
 object BookCatalogRepositoryInterpreter
-    extends BookCatalogRepositoryInterpreter
+    extends BookCatalogRepositoryInterpreter {
+}

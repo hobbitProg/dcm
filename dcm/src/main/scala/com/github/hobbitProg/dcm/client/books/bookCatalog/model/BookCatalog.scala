@@ -182,6 +182,34 @@ object BookCatalog {
   }
 
   /**
+    * Attempt to retrieve a book from the catalog by a given title and author
+    * @param
+    */
+  def getByTitleAndAuthor(
+    catalog: BookCatalog,
+    desiredTitle: Titles,
+    desiredAuthor: Authors
+  ) : Try[Book] = {
+    catalog.catalog.find(
+      currentBook =>
+      currentBook.title == desiredTitle &&
+        currentBook.author == desiredAuthor
+    ) match {
+      case Some(correspondingBook)=>
+        Success(
+          correspondingBook
+        )
+      case None =>
+        Failure(
+          new NoBookHasGivenTitleAndAuthor(
+            desiredTitle,
+            desiredAuthor
+          )
+        )
+    }
+  }
+
+  /**
     * Determine if book exists within catalog with given title and author
     * @param catalog Catalog being queried
     * @param requestedTitle Title of book being queried

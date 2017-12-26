@@ -105,6 +105,19 @@ class TestRepository
     )
 
   /**
+    * Retrieve book with given title and author
+    * @param title The title of the book to retrieve
+    * @param author The author of the book to retrieve
+    * @return Disjoint union of either description of erro ro book with given
+    * title and author
+    */
+  def retrieve(
+    title: Titles,
+    author: Authors
+  ): Either[String, Book] =
+    Left("Retrieve")
+
+  /**
     * Determine if book with given title and author already exists in storage
     * @param title Title of book that is to be placed into storage
     * @param author Author of book that is to be placed into storage

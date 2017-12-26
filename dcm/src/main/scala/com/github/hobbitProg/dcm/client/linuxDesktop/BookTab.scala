@@ -6,7 +6,6 @@ import scalafx.Includes._
 import scalafx.event.ActionEvent
 import scalafx.scene.control.{Button, Tab}
 import scalafx.scene.layout.AnchorPane
-import scalafx.stage.Stage
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model.{Categories,
   BookCatalog}
@@ -16,7 +15,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
   BookCatalogService
 import com.github.hobbitProg.dcm.client.books.control.BookDialogParent
 import com.github.hobbitProg.dcm.client.books.view._
-import com.github.hobbitProg.dcm.client.books.dialog.AddBookDialog
+import com.github.hobbitProg.dcm.client.control.BookTabControl
 import com.github.hobbitProg.dcm.client.dialog.ImageChooser
 
 /**
@@ -54,10 +53,11 @@ class BookTab(
     catalogDisplay register catalog
 
   // Add button to add book to catalog
-  val addButton: Button =
+  private val addButton: Button =
     new Button(
-      "+"
+      "Add"
     )
+
   addButton.id =
     BookTab.addButtonId
   //noinspection ScalaUnusedSymbol
@@ -69,27 +69,53 @@ class BookTab(
     addButton,
     BookTab.addButtonLeft
   )
+  addButton.minWidth = BookTab.addButtonMinWidth
+
+  // Add button to modify a book in the catalog
+  private val modifyButton: Button =
+    new Button(
+      "Modify"
+    )
+  modifyButton.id =
+    BookTab.modifyButtonID
+  AnchorPane.setTopAnchor(
+    modifyButton,
+    BookTab.modifyButtonTop
+  )
+  AnchorPane.setLeftAnchor(
+    modifyButton,
+    BookTab.modifyButtonLeft
+  )
 
   // Add control to display currently added book
-  val selectedBookControl: SelectedBookView =
+  private val selectedBookControl: SelectedBookView =
     new SelectedBookView()
+  private val bookControl: BookTabControl =
+    new BookTabControl()
   addButton.onAction =
     (event: ActionEvent) => {
-      selectedBookControl.clear()
-      val dialogStage: Stage =
-        new Stage
-      dialogStage.title =
-        BookTab.addBookTitle
-      dialogStage.scene =
-        new AddBookDialog(
-          catalog,
-          repository,
-          catalogService,
-          this,
-          coverChooser,
-          definedCategories
-        )
-      dialogStage.showAndWait()
+      bookControl.addNewBook(
+        selectedBookControl,
+        catalog,
+        repository,
+        catalogService,
+        this,
+        coverChooser,
+        definedCategories
+      )
+    }
+  modifyButton.onAction =
+    (event: ActionEvent) => {
+      bookControl.modifyBook(
+        selectedBookControl,
+        catalog,
+        repository,
+        catalogService,
+        this,
+        coverChooser,
+        definedCategories,
+        catalogDisplay.selectionModel.value.selectedItem.value
+      )
     }
   AnchorPane.setTopAnchor(
     selectedBookControl,
@@ -106,6 +132,7 @@ class BookTab(
         List(
           catalogDisplay,
           addButton,
+          modifyButton,
           selectedBookControl
         )
     }
@@ -113,13 +140,15 @@ class BookTab(
 
 object BookTab {
   val addButtonId = "AddBookButton"
-
-  val addBookTitle = "Add Book To Catalog"
+  val modifyButtonID = "ModifyBookButton"
 
   private val catalogDisplayTop: Double = 4.0
   private val catalogDisplayLeft: Double = 4.0
   private val addButtonTop: Double = 175.0
   private val addButtonLeft: Double = 255.0
+  private val addButtonMinWidth: Double = 62.0
+  private val modifyButtonTop: Double = 205.0
+  private val modifyButtonLeft: Double = 255.0
   private val selectedBookTop: Double = 4.0
-  private val selectedBookLeft: Double = 310.0
+  private val selectedBookLeft: Double = 320.0
 }

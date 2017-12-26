@@ -2,6 +2,18 @@ package com.github.hobbitProg.dcm.integrationTests.client.books
 
 import org.scalatest.{FeatureSpec, GivenWhenThen, BeforeAndAfter, Matchers}
 
+import org.scalamock.scalatest.MockFactory
+
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
+import BookCatalog._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  interpreter.BookCatalogRepositoryInterpreter
+import BookCatalogRepositoryInterpreter._
+import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
+import com.github.hobbitProg.dcm.integrationTests.matchers.scalaTest.
+  {IntegrationMatchers, ScalafxMatchers}
+import com.github.hobbitProg.dcm.client.dialog.ImageChooser
+
 /**
   * Specification for modifying a book in the catalog
   * @author Kyle Cranmer
@@ -9,7 +21,30 @@ import org.scalatest.{FeatureSpec, GivenWhenThen, BeforeAndAfter, Matchers}
   */
 class ModifyBookSpec
     extends FeatureSpec
-    with GivenWhenThen {
+    with GivenWhenThen
+    with BeforeAndAfter
+    with MockFactory
+    with Matchers
+    with BookDBAccess
+    with GUIAutomation
+    with IntegrationMatchers
+    with ScalafxMatchers {
+
+  // Chooses cover of book
+  private val coverChooser: ImageChooser = mock[ImageChooser]
+
+  before {
+    createBookCatalogSchema()
+  }
+
+  after {
+    // Remove database file
+    removeDatabaseFile()
+
+    // Shut down windows
+    shutDownApplication
+  }
+
   Feature("The user can modify a book within the book catalog") {
     info("As someone who wants to keep track of books he owns")
     info("I want to change information on books within the book catalog")
@@ -17,24 +52,112 @@ class ModifyBookSpec
 
     Scenario("A book within the book catalog can have its title changed") {
       Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog,
+        bookTransactor,
+        coverChooser
+      )
+
       And("the title of the book to modify")
+      val titleOfBookToModify: Titles = "Ruins"
+
       And("the new title of the book")
+      val newTitleOfBook: Titles = "Ruinz"
+
       When("the book to modify is selected")
-      And("the book is to be modified")
+      selectBookToModify(
+        titleOfBookToModify
+      )
+
       And("the title of the book is changed")
+      changeTitle(
+        titleOfBookToModify,
+        newTitleOfBook
+      )
+
       And("the information on the book is accepted")
+      acceptBookInformation()
+
       Then("the updated book is in the catalog")
+      val updatedBook: Book =
+        new BookDBAccess.TestBook(
+          newTitleOfBook,
+          "Kevin J. Anderson",
+          "0061052477",
+          Some(
+            "Description for Ruins"
+          ),
+          Some(
+            getClass.getResource(
+              "/Ruins.jpg"
+            ).toURI()
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+      getByISBN(
+        desktop.bookDisplay.catalog,
+        updatedBook.isbn
+      ) should beInCatalog(updatedBook)
+
       And("the updated book is in the repository")
+      retrieve(
+        updatedBook.isbn
+      ) should beInRepository(updatedBook)
+
       And("the original book is not in the catalog")
+      getByTitleAndAuthor(
+        desktop.bookDisplay.catalog,
+        titleOfBookToModify,
+        updatedBook.author
+      ) should notBeInCatalog()
+
       And("the original book is not in the repository")
+      retrieve(
+        titleOfBookToModify,
+        updatedBook.author
+      ) should notBeInRepository()
+
       And("the updated book is displayed on the view displaying the book " +
         "catalog")
+      updatedBook should beOn(desktop)
+
       And("the original book is not displayed on the view displaying the " +
         "book catalog")
+      val originalBook: Book =
+        new BookDBAccess.TestBook(
+          titleOfBookToModify,
+          "Kevin J. Anderson",
+          "0061052477",
+          Some(
+            "Description for Ruins"
+          ),
+          Some(
+            getClass.getResource(
+              "/Ruins.jpg"
+            ).toURI()
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+      originalBook should notBeOn(desktop)
+
       And("no books are selected on the window displaying the book catalog")
+      desktop should haveNoBooksSelected()
+
       And("the window displaying the information on the selected book is empty")
+      desktop should notHaveSelectedBookDataDisplayed()
     }
   }
-
 }
