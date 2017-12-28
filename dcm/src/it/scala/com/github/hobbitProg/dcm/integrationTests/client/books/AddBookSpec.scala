@@ -160,10 +160,7 @@ class AddBookSpec
       )
 
       // Enter in author of new book
-      bookClientRobot.clickOn(
-        NodeQueryUtils hasId BookEntryDialog.authorControlId,
-        MouseButton.PRIMARY
-      )
+      selectAuthor()
       enterDataIntoControl(
         bookToEnter.author
       )

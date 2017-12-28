@@ -120,6 +120,14 @@ trait GUIAutomation {
     )
   }
 
+  // Activate the control containing the author of the book
+  protected def selectAuthor() = {
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId BookEntryDialog.authorControlId,
+      MouseButton.PRIMARY
+    )
+  }
+
   // Change the title of the book
   protected def changeTitle(
     originalTitle: Titles,
@@ -132,6 +140,21 @@ trait GUIAutomation {
     enterDataIntoControl(
       updatedTitle
     )
+  }
+
+  // Change the author of the book
+  protected def changeAuthor(
+    originalAuthor: Authors,
+    updatedAuthor: Authors
+  ) = {
+    selectAuthor()
+    bookClientRobot push KeyCode.END
+    for (authorCharacterIndex <- 1 to originalAuthor.length()) {
+      bookClientRobot push KeyCode.BACK_SPACE
+    }
+    enterDataIntoControl((
+      updatedAuthor
+    ))
   }
 
   // Accept the information on the book

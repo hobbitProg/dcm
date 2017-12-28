@@ -162,24 +162,117 @@ class ModifyBookSpec
 
     Scenario("A book within the book catalog can have its author changed") {
       Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog,
+        bookTransactor,
+        coverChooser
+      )
+
       And("the title of the book to modify")
+      val titleOfBookToModify: Titles = "Ruins"
+
       And("the original author of the book")
+      val originalAuthor: Authors =
+        "Kevin J. Anderson"
+
       And("the new author of the book")
+      val newAuthor: Authors =
+        "Kevin Anderson"
+
       When("the book to modify is selected")
+      selectBookToModify(
+        titleOfBookToModify
+      )
+
       And("the author of the book is changed")
+      changeAuthor(
+        originalAuthor,
+        newAuthor
+      )
+
       And("the information on the book is accepted")
+      acceptBookInformation()
+
       Then("the updated book is in the catalog")
+      val updatedBook: Book =
+        new BookDBAccess.TestBook(
+          titleOfBookToModify,
+          newAuthor,
+          "0061052477",
+          Some(
+            "Description for Ruins"
+          ),
+          Some(
+            getClass.getResource(
+              "/Ruins.jpg"
+            ).toURI()
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+      getByISBN(
+        desktop.bookDisplay.catalog,
+        updatedBook.isbn
+      ) should beInCatalog(updatedBook)
+
       And("the updated book is in the repository")
+      retrieve(
+        updatedBook.isbn
+      ) should beInRepository(updatedBook)
+
       And("the original book is not in the catalog")
+      getByTitleAndAuthor(
+        desktop.bookDisplay.catalog,
+        titleOfBookToModify,
+        originalAuthor
+      ) should notBeInCatalog()
+
       And("the original book is not in the repository")
+      retrieve(
+        titleOfBookToModify,
+        originalAuthor
+      ) should notBeInRepository()
+
       And("the updated book is displayed on the view displaying the book " +
         "catalog")
+      updatedBook should beOn(desktop)
+
       And("the original book is not displayed on the view displaying the " +
         "book catalog" )
+      val originalBook: Book =
+        new BookDBAccess.TestBook(
+          titleOfBookToModify,
+          originalAuthor,
+          "0061052477",
+          Some(
+            "Description for Ruins"
+          ),
+          Some(
+            getClass.getResource(
+              "/Ruins.jpg"
+            ).toURI()
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+      originalBook should notBeOn(desktop)
+
       And("no books are selected on the window displaying the book catalog")
+      desktop should haveNoBooksSelected()
+
       And("the window displaying the information on the selected is empty")
-      pending
+      desktop should notHaveSelectedBookDataDisplayed()
     }
   }
 }
