@@ -177,6 +177,7 @@ trait BookDialogHelper {
   def clearControl(
     lengthOfText: Int
   ) = {
+    bookDialogRobot push KeyCode.END
     for (characterDeleted <- 1 to lengthOfText) {
       bookDialogRobot push KeyCode.BACK_SPACE
     }
