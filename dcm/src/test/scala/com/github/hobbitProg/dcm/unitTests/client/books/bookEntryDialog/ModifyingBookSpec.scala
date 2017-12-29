@@ -365,19 +365,108 @@ class ModifyingBookSpec
   }
 
   "Given the categories that can be associated with books" - {
+    val definedCategories: Set[String] =
+      Set[String](
+        "sci-fi",
+        "conspiracy",
+        "fantasy",
+        "thriller"
+      )
+
     "and a book that already exists in the catalog" - {
+      originalBook =
+        new BookData(
+          "Ruins",
+          "Kevin J. Anderson",
+          "006105223X",
+          Some("Description for Ground Zero"),
+          Some[URI](
+            bookImageLocation
+          ),
+          Set[String](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+
       "and the new ISBN of the book" - {
+        val newISBN: ISBNs =
+          "0061052230"
+
         "and the catalog that is being updated" - {
+          val catalog: BookCatalog =
+            new BookCatalog()
+
           "and the repository to place book catalog information into" - {
+            val repository =
+              mock[BookCatalogRepository];
+
             "and the service for the book catalog" - {
+              val service =
+                new TestService()
+              var bookToDelete: Book = null
+              var bookToAdd: TestService.BookData = null
+              service.onModify(
+                (unmodifiedBook, modifiedBook) => {
+                  bookToDelete = unmodifiedBook
+                  bookToAdd = modifiedBook
+                }
+              )
+
               "and the parent window that created the book modification " +
               "window" - {
+                val parent =
+                  new TestParent(
+                    catalog
+                  )
+
                 "when the book dialog is created" - {
+                  val bookModificationDialog: Scene =
+                    createBookDialog(
+                      catalog,
+                      repository,
+                      service,
+                      definedCategories,
+                      parent
+                    )
+
                   "and the ISBN of the book is modified" - {
+                    activateControl(
+                      BookEntryDialog.isbnControlId
+                    )
+                    clearControl(
+                      originalBook.isbn.length()
+                    )
+                    enterDataIntoControl(
+                      newISBN
+                    )
+
                     "and the book information is saved" - {
-                      "then the book entry dialog is closed" in pending
-                      "and the original book is removed via the service" in pending
-                      "and the new book is added via the service" in pending
+                      activateControl(
+                        BookEntryDialog.saveButtonId
+                      )
+
+                      "then the book entry dialog is closed" in {
+                        (bookModificationDialog.window.value == null ||
+                          !bookModificationDialog.window.value.showing.value) should be (true)
+                      }
+
+                      "and the original book is removed via the service" in {
+                        bookToDelete should equal (originalBook)
+                      }
+
+                      "and the new book is added via the service" in {
+                        bookToAdd match {
+                          case (addedTitle, addedAuthor, addedISBN, addedDescription, addedCoverImage, addedCategories) =>
+                            addedTitle should equal (originalBook.title)
+                            addedAuthor should equal (originalBook.author)
+                            addedISBN should equal (newISBN)
+                            addedDescription should equal (originalBook.description)
+                            addedCoverImage should equal (originalBook.coverImage)
+                            addedCategories should equal (originalBook.categories)
+                        }
+                      }
+                    }
                   }
                 }
               }
