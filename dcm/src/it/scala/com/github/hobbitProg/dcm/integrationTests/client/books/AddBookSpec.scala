@@ -166,10 +166,7 @@ class AddBookSpec
       )
 
       // Enter in ISBN of new book
-      bookClientRobot.clickOn(
-        NodeQueryUtils hasId BookEntryDialog.isbnControlId,
-        MouseButton.PRIMARY
-      )
+      selectISBN()
       enterDataIntoControl(
         bookToEnter.isbn
       )

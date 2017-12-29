@@ -128,6 +128,14 @@ trait GUIAutomation {
     )
   }
 
+  // Activate the control containing the ISBN of the book
+  protected def selectISBN() = {
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId BookEntryDialog.isbnControlId,
+      MouseButton.PRIMARY
+    )
+  }
+
   // Change the title of the book
   protected def changeTitle(
     originalTitle: Titles,
@@ -155,6 +163,21 @@ trait GUIAutomation {
     enterDataIntoControl((
       updatedAuthor
     ))
+  }
+
+  // Change the ISBN of the book
+  protected def changeISBN(
+    originalISBN: ISBNs,
+    updatedISBN: ISBNs
+  ) = {
+    selectISBN()
+    bookClientRobot push KeyCode.END
+    for (isbnCharacterIndex <- 1 to originalISBN.length()) {
+      bookClientRobot push KeyCode.BACK_SPACE
+    }
+    enterDataIntoControl(
+      updatedISBN
+    )
   }
 
   // Accept the information on the book
