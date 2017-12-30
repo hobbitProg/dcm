@@ -299,7 +299,7 @@ class ModifyBookSpec
       And("the updated ISBN of the book")
       val updatedISBN: ISBNs = "0061052478"
 
-      When("the book of to modifyu is selected")
+      When("the book to modify is selected")
       selectBookToModify(
         titleOfBookToModify
       )
@@ -384,6 +384,74 @@ class ModifyBookSpec
 
       And("the window displaying the information on the selected book is empty")
       desktop should notHaveSelectedBookDataDisplayed()
-}
+    }
+
+    Scenario("A book within the book catalog can have its description changed") {
+      Given("the pre-defined categories")
+      And("a populated catalog")
+      And("the title of the book to modify")
+      And("the original description of the book")
+      And("the updated description of the book")
+      When("the book to modify is selected")
+      And("the description of the book is changed")
+      And("the information on the book is accepted")
+      Then("the updated book is in the catalog")
+      And("the updated book is in the repository")
+      And("the updated book is displayed on the view displaying the book " +
+        "catalog")
+      And("no books are selected on the window displaying the book catalog")
+      And("the window displaying the informatin on the selected book is empty")
+      pending
+    }
+
+    Scenario("A book within the book catalog can have its description " +
+      "removed"){
+      pending
+    }
+
+    Scenario("A book within the book catalog can have its cover image changed") {
+      pending
+    }
+
+    Scenario("A book within the book catalog can have its cover image removed") {
+      pending
+    }
+
+    Scenario("A book within the book catalog can have its categories modified") {
+      pending
+    }
+
+    Scenario("A book within the book catalog can have its categories removed") {
+      pending
+    }
+
+    Scenario("The modify button is inactive when no books are selected"){
+      pending
+    }
+
+    Scenario("A book within the book catalog cannot be modified when no " +
+      "title is specified") {
+      pending
+    }
+
+    Scenario("A book within the book catalog cannot be modified when no " +
+      "author is specified") {
+      pending
+    }
+
+    Scenario("A book within the book catalog cannot be modified when no " +
+      "ISBN is specified"){
+      pending
+    }
+
+    Scenario("A book within the book catalog when the modifed title and "
+      "author is associated with a different book") {
+      pending
+    }
+
+    Scenario("A book within the book catalog when the modified ISBN is "
+      "associated with a different book") {
+      pending
+    }
   }
 }
