@@ -388,20 +388,82 @@ class ModifyBookSpec
 
     Scenario("A book within the book catalog can have its description changed") {
       Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog,
+        bookTransactor,
+        coverChooser
+      )
+
       And("the title of the book to modify")
+      val titleOfBookToModify: Titles = "Ruins"
+
       And("the original description of the book")
+      val originalDescriptionText: String =
+        "Description for Ruins"
+
       And("the updated description of the book")
+      val updatedDescriptionText: String =
+        "Description for Ground Zero"
+
       When("the book to modify is selected")
+      selectBookToModify(
+        titleOfBookToModify
+      )
+
       And("the description of the book is changed")
+      changeDescription(
+        originalDescriptionText,
+        updatedDescriptionText
+      )
+
       And("the information on the book is accepted")
+      acceptBookInformation()
+
       Then("the updated book is in the catalog")
+      val updatedBook: Book =
+        new BookDBAccess.TestBook(
+          titleOfBookToModify,
+          "Kevin J. Anderson",
+          "0061052477",
+          Some(
+            updatedDescriptionText
+          ),
+          Some(
+            getClass.getResource(
+              "/Ruins.jpg"
+            ).toURI()
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+      getByISBN(
+        desktop.bookDisplay.catalog,
+        updatedBook.isbn
+      ) should beInCatalog(updatedBook)
+
       And("the updated book is in the repository")
+      retrieve(
+        updatedBook.isbn
+      ) should beInRepository(updatedBook)
+
       And("the updated book is displayed on the view displaying the book " +
         "catalog")
+      updatedBook should beOn(desktop)
+
       And("no books are selected on the window displaying the book catalog")
-      And("the window displaying the informatin on the selected book is empty")
-      pending
+      desktop should haveNoBooksSelected()
+
+      And("the window displaying the information on the selected book is empty")
+      desktop should notHaveSelectedBookDataDisplayed()
     }
 
     Scenario("A book within the book catalog can have its description " +
@@ -444,12 +506,12 @@ class ModifyBookSpec
       pending
     }
 
-    Scenario("A book within the book catalog when the modifed title and "
+    Scenario("A book within the book catalog when the modifed title and " +
       "author is associated with a different book") {
       pending
     }
 
-    Scenario("A book within the book catalog when the modified ISBN is "
+    Scenario("A book within the book catalog when the modified ISBN is " +
       "associated with a different book") {
       pending
     }

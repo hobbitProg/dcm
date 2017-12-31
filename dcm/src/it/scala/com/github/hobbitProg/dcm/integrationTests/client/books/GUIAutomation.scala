@@ -136,6 +136,14 @@ trait GUIAutomation {
     )
   }
 
+  // Activate the control containing the description of the book
+  protected def selectDescription() = {
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId BookEntryDialog.descriptionControlId,
+      MouseButton.PRIMARY
+    )
+  }
+
   // Change the title of the book
   protected def changeTitle(
     originalTitle: Titles,
@@ -177,6 +185,21 @@ trait GUIAutomation {
     }
     enterDataIntoControl(
       updatedISBN
+    )
+  }
+
+  // Change the description of the book
+  protected def changeDescription(
+    originalDescription: String,
+    updatedDescription: String
+  ) = {
+    selectDescription()
+    bookClientRobot push KeyCode.END
+    for (descriptionIndex <- 1 to originalDescription.length()) {
+      bookClientRobot push KeyCode.BACK_SPACE
+    }
+    enterDataIntoControl(
+      updatedDescription
     )
   }
 

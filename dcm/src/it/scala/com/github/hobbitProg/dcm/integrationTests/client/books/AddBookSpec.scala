@@ -174,10 +174,7 @@ class AddBookSpec
       // Enter in description of new book
       bookToEnter.description match {
         case Some(description) =>
-          bookClientRobot.clickOn(
-            NodeQueryUtils hasId BookEntryDialog.descriptionControlId,
-            MouseButton.PRIMARY
-          )
+          selectDescription()
           enterDataIntoControl(
             description
           )
