@@ -479,13 +479,6 @@ class ModifyBookSpec
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
 
-      And("the new cover of the book")
-      val newCover: URI =
-        getClass.getResource(
-          "/Goblins.jpg"
-        ).toURI()
-
-
       And("a populated catalog")
       placeExistingBooksIntoDatabase()
       val catalog: BookCatalog =
@@ -499,6 +492,13 @@ class ModifyBookSpec
 
       And("the title of the book to modify")
       val titleOfBookToModify: Titles = "Ruins"
+
+      And("the new cover of the book")
+      val newCover: URI =
+        getClass.getResource(
+          "/Goblins.jpg"
+        ).toURI()
+
 
       When("the book to modify is selected")
       selectBookToModify(
@@ -570,10 +570,19 @@ class ModifyBookSpec
     }
 
     Scenario("A book within the book catalog can have its categories modified") {
-      pending
-    }
-
-    Scenario("A book within the book catalog can have its categories removed") {
+      Given("the pre-defined categories")
+      And("a populated catalog")
+      And("the title of the book to modify")
+      And("the categories to disassociate from the book")
+      When("the book to modify is selected")
+      And("the catetgories are disassociated from the book")
+      And("the information on the book is accepted")
+      Then("the updated book is in the catalog")
+      And("the updated book is in the repository")
+      And("the updated book is displayed on the view displaying the book" +
+        "catalog")
+      And("no books are selected on the window displaying the book catalog")
+      And("the window displaying the information on the selected book is empty")
       pending
     }
 
