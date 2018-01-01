@@ -36,7 +36,6 @@ trait BookDialogHelper {
       "/GroundZero.jpg"
     ).toURI
 
-
   // Robot to automate entering in information
   val bookDialogRobot: FxRobotInterface =
     new FxRobot
@@ -78,12 +77,13 @@ trait BookDialogHelper {
     repository: BookCatalogRepository,
     service: BookCatalogService[BookCatalog],
     definedCategories: Set[String],
-    parent: BookDialogParent
+    parent: BookDialogParent,
+    coverLocation: URI = bookImageLocation
   ): Scene = {
     // Create mock file chooser
     val coverImageChooser: TestChooser =
       new TestChooser(
-        bookImageLocation
+        coverLocation
       )
 
     FxToolkit.registerPrimaryStage()

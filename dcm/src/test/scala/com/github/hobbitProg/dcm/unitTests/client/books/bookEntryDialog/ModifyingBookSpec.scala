@@ -23,14 +23,11 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   BookCatalogRepository
 import com.github.hobbitProg.dcm.client.books.control.BookDialogParent
-import com.github.hobbitProg.dcm.client.books.dialog.{ModifyBookDialog,
-  BookEntryDialog}
+import com.github.hobbitProg.dcm.client.books.dialog.{ModifyBookDialog, BookEntryDialog}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
   BookCatalogService
-import com.github.hobbitProg.dcm.client.dialog.{CategorySelectionDialog,
-  ImageChooser}
-import com.github.hobbitProg.dcm.scalafx.{ControlRetriever,
-  BookDialogHelper}
+import com.github.hobbitProg.dcm.client.dialog.{CategorySelectionDialog, ImageChooser}
+import com.github.hobbitProg.dcm.scalafx.{ControlRetriever, BookDialogHelper}
 
 /**
   * Specification for modifying book that exists in catalog
@@ -587,6 +584,117 @@ class ModifyingBookSpec
                             addedISBN should equal (originalBook.isbn)
                             addedDescription should equal (newDescription)
                             addedCoverImage should equal (originalBook.coverImage)
+                            addedCategories should equal (originalBook.categories)
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  "Given the categories that can be associated with books" - {
+    val definedCategories: Set[String] =
+      Set[String](
+        "sci-fi",
+        "conspiracy",
+        "fantasy",
+        "thriller"
+      )
+
+    "and a book that already exists in the catalog" - {
+      originalBook =
+        new BookData(
+          "Ruins",
+          "Kevin J. Anderson",
+          "006105223X",
+          Some("Description for Ground Zero"),
+          Some[URI](
+            bookImageLocation
+          ),
+          Set[String](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+
+      "and the new cover of the book" - {
+        val newCoverImage: URI =
+          getClass.getResource(
+            "/Ruins.jpg"
+          ).toURI
+
+
+        "and the catalog that is being updated" - {
+          val catalog: BookCatalog =
+            new BookCatalog()
+
+          "and the repository to place book catalog information into" - {
+            val repository =
+              mock[BookCatalogRepository];
+
+            "and the service for the book catalog" - {
+              val service =
+                new TestService()
+              var bookToDelete: Book = null
+              var bookToAdd: TestService.BookData = null
+              service.onModify(
+                (unmodifiedBook, modifiedBook) => {
+                  bookToDelete = unmodifiedBook
+                  bookToAdd = modifiedBook
+                }
+              )
+
+              "and the parent window that created the book modification " +
+              "window" - {
+                val parent =
+                  new TestParent(
+                    catalog
+                  )
+
+                "when the book dialog is created" - {
+                  val bookModificationDialog: Scene =
+                    createBookDialog(
+                      catalog,
+                      repository,
+                      service,
+                      definedCategories,
+                      parent,
+                      newCoverImage
+                    )
+
+                  "and the cover of the book is modified" - {
+                    activateControl(
+                      BookEntryDialog.bookCoverButtonId
+                    )
+
+                    "and the book information is saved" - {
+                      activateControl(
+                        BookEntryDialog.saveButtonId
+                      )
+
+                      "then the book entry dialog is closed" in {
+                        (bookModificationDialog.window.value == null ||
+                          !bookModificationDialog.window.value.showing.value) should be (true)
+                      }
+
+                      "and the original book is removed via the service" in {
+                        bookToDelete should equal (originalBook)
+                      }
+
+                      "and the new book is added via the service" in {
+                        bookToAdd match {
+                          case (addedTitle, addedAuthor, addedISBN, addedDescription, addedCoverImage, addedCategories) =>
+                            addedTitle should equal (originalBook.title)
+                            addedAuthor should equal (originalBook.author)
+                            addedISBN should equal (originalBook.isbn)
+                            addedDescription should equal (originalBook.description)
+                            addedCoverImage should equal (Some(newCoverImage))
                             addedCategories should equal (originalBook.categories)
                         }
                       }

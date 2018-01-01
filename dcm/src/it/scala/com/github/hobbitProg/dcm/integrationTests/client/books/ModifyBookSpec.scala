@@ -466,16 +466,20 @@ class ModifyBookSpec
       desktop should notHaveSelectedBookDataDisplayed()
     }
 
-    Scenario("A book within the book catalog can have its description " +
-      "removed"){
-      pending
-    }
-
     Scenario("A book within the book catalog can have its cover image changed") {
-      pending
-    }
-
-    Scenario("A book within the book catalog can have its cover image removed") {
+      Given("the pre-defined categories")
+      And("a populated catalog")
+      And("the title of the book to modify")
+      And("the new cover of the book")
+      When("the book to modify is selected")
+      And("the cover of the book is changed")
+      And("the information on the book is accepted")
+      Then("the updated book is in the catalog")
+      And("the updated book is in the repository")
+      And("the updated book is displayed on the view displaying the book " +
+        "catalog")
+      And("no books are selected on the window displaying the book catalog")
+      And("the window displaying the information on the selected book is empty")
       pending
     }
 
