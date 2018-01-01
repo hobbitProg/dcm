@@ -1,5 +1,13 @@
 package com.github.hobbitProg.dcm.integrationTests.client.books
 
+import java.io.File
+import java.net.URI
+
+import scala.collection.JavaConverters
+import JavaConverters._
+
+import scalafx.Includes._
+
 import org.scalatest.{FeatureSpec, GivenWhenThen, BeforeAndAfter, Matchers}
 
 import org.scalamock.scalatest.MockFactory
@@ -10,9 +18,10 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   interpreter.BookCatalogRepositoryInterpreter
 import BookCatalogRepositoryInterpreter._
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
+import com.github.hobbitProg.dcm.client.control.BookTabControl
+import com.github.hobbitProg.dcm.client.dialog.ImageChooser
 import com.github.hobbitProg.dcm.integrationTests.matchers.scalaTest.
   {IntegrationMatchers, ScalafxMatchers}
-import com.github.hobbitProg.dcm.client.dialog.ImageChooser
 
 /**
   * Specification for modifying a book in the catalog
@@ -468,19 +477,96 @@ class ModifyBookSpec
 
     Scenario("A book within the book catalog can have its cover image changed") {
       Given("the pre-defined categories")
-      And("a populated catalog")
-      And("the title of the book to modify")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("the new cover of the book")
+      val newCover: URI =
+        getClass.getResource(
+          "/Goblins.jpg"
+        ).toURI()
+
+
+      And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog,
+        bookTransactor,
+        coverChooser
+      )
+
+      And("the title of the book to modify")
+      val titleOfBookToModify: Titles = "Ruins"
+
       When("the book to modify is selected")
+      selectBookToModify(
+        titleOfBookToModify
+      )
+
       And("the cover of the book is changed")
+      val dialogStage =
+        bookClientRobot.listWindows().asScala.find {
+          case possibleDialog: javafx.stage.Stage =>
+            possibleDialog.getTitle == BookTabControl.modifyBookTitle
+          case _ => false
+        }
+      dialogStage match {
+        case Some(actualStage) =>
+          val adaptedStage: scalafx.stage.Window =
+            actualStage
+              (coverChooser.selectImage _).expects(
+                adaptedStage
+              ).returning(
+                new File(
+                  newCover
+                )
+              )
+        case None =>
+      }
+
+      selectNewCover()
+
       And("the information on the book is accepted")
+      acceptBookInformation()
+
       Then("the updated book is in the catalog")
+      val updatedBook: Book =
+        new BookDBAccess.TestBook(
+          titleOfBookToModify,
+          "Kevin J. Anderson",
+          "0061052477",
+          Some(
+            "Description for Ruins"
+          ),
+          Some(
+            newCover
+          ),
+          Set[Categories](
+            "sci-fi",
+            "conspiracy"
+          )
+        )
+      getByISBN(
+        desktop.bookDisplay.catalog,
+        updatedBook.isbn
+      ) should beInCatalog(updatedBook)
+
       And("the updated book is in the repository")
+      retrieve(
+        updatedBook.isbn
+      ) should beInRepository(updatedBook)
+
       And("the updated book is displayed on the view displaying the book " +
         "catalog")
+      updatedBook should beOn(desktop)
+
       And("no books are selected on the window displaying the book catalog")
+      desktop should haveNoBooksSelected()
+
       And("the window displaying the information on the selected book is empty")
-      pending
+      desktop should notHaveSelectedBookDataDisplayed()
     }
 
     Scenario("A book within the book catalog can have its categories modified") {

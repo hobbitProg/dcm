@@ -203,6 +203,14 @@ trait GUIAutomation {
     )
   }
 
+  // Select a new cover image
+  protected def selectNewCover() = {
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasId BookEntryDialog.bookCoverButtonId,
+      MouseButton.PRIMARY
+    )
+  }
+
   // Accept the information on the book
   def acceptBookInformation() = {
     bookClientRobot.clickOn(
