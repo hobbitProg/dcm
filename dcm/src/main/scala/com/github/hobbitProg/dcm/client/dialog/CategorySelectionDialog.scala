@@ -13,6 +13,8 @@ import scalafx.scene.control.{Button, Label, ListView, MultipleSelectionModel}
 import scalafx.scene.layout.AnchorPane
 import scalafx.stage.Stage
 
+import com.github.hobbitProg.dcm.client.control.CategorySelectionControl
+
 /**
   * Selects categories associated with entry
   * @author Kyle Cranmer
@@ -25,6 +27,10 @@ class CategorySelectionDialog(
   CategorySelectionDialog.dialogWidth,
   CategorySelectionDialog.dialogHeight
 ) {
+  // The control to handle user inputs
+  private val inputControl: CategorySelectionControl =
+    new CategorySelectionControl()
+
   // Locally selected/available categories
   private val available: ObservableBuffer[String] =
     FXCollections.observableArrayList(
@@ -52,6 +58,8 @@ class CategorySelectionDialog(
     new ListView[String](
       available
     )
+  availableCategoriesControl.id =
+    CategorySelectionDialog.availableCategoriesId
   availableCategoriesControl.selectionModel.value.selectionMode =
     SelectionMode.MULTIPLE
   AnchorPane.setLeftAnchor(
@@ -80,6 +88,10 @@ class CategorySelectionDialog(
     new ListView[String](
       selected
     )
+  selectedCategoriesControl.selectionModel.value.selectionMode =
+    SelectionMode.MULTIPLE
+  selectedCategoriesControl.id =
+    CategorySelectionDialog.selectedCategoriesId
   AnchorPane.setLeftAnchor(
     selectedCategoriesControl,
     CategorySelectionDialog.selectedCategoriesLeftBorder
@@ -97,17 +109,19 @@ class CategorySelectionDialog(
   associateButton.disable =
     true
   associateButton.id =
-    CategorySelectionDialog.availableButtonId
+    CategorySelectionDialog.associateButtonId
   val availableCategoriesSelectionModel: MultipleSelectionModel[String] =
     availableCategoriesControl.selectionModel.value
   availableCategoriesSelectionModel.selectedItem.onChange {
-    associateButton.disable =
-      availableCategoriesControl.selectionModel.value.isEmpty
+    inputControl.determineButtonActivation(
+      associateButton,
+      availableCategoriesControl
+    )
   }
   //noinspection ScalaUnusedSymbol
   associateButton.onAction =
     (event: ActionEvent) => {
-      moveCategories(
+      inputControl.moveCategories(
         availableCategoriesControl.selectionModel.value.getSelectedItems.toList,
         available,
         selected
@@ -127,18 +141,21 @@ class CategorySelectionDialog(
     new Button(
       "<-"
     )
+  disassociateButton.id =
+    CategorySelectionDialog.disassociateButtonId
   disassociateButton.disable =
     true
   val selectedCategoriesSelectionModel: MultipleSelectionModel[String] =
     selectedCategoriesControl.selectionModel.value
   selectedCategoriesSelectionModel.selectedItem.onChange {
-    disassociateButton.disable =
-      selectedCategoriesControl.selectionModel.value.isEmpty
+    inputControl.determineButtonActivation(
+      disassociateButton,
+      selectedCategoriesControl
+    )
   }
-  //noinspection ScalaUnusedSymbol
   disassociateButton.onAction =
     (event: ActionEvent) => {
-      moveCategories(
+      inputControl.moveCategories(
         selectedCategoriesControl.selectionModel.value.getSelectedItems.toList,
         selected,
         available
@@ -218,18 +235,6 @@ class CategorySelectionDialog(
     parentStage.close
   }
 
-  // Move given categories from given collection to other collection
-  private def moveCategories(
-    categoriesToMove: List[String],
-    origin: ObservableBuffer[String],
-    destination: ObservableBuffer[String]
-  ) = {
-    origin --=
-      categoriesToMove
-    destination ++=
-      categoriesToMove
-  }
-
   // Finalize category associations for item
   private def finalizeAssociation() = {
     val newlySelectedCategories: Set[String] =
@@ -256,7 +261,10 @@ class CategorySelectionDialog(
 }
 
 object CategorySelectionDialog {
-  val availableButtonId: String = "AvailableButtonId"
+  val associateButtonId: String = "AssociateButtonId"
+  val disassociateButtonId: String = "DisassociateButtonId"
+  val selectedCategoriesId: String = "SelectedCategoriesId"
+  val availableCategoriesId: String = "AvailableCategoriesId"
   val saveButtonId: String = "SaveButtonId"
 
   private val availableCategoriesLabelTopBorder: Double = 2.0

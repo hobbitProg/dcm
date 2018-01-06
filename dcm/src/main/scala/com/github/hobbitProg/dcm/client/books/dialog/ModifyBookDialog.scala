@@ -65,10 +65,12 @@ class ModifyBookDialog(
         descriptionText
     case None =>
   }
+
   originalBook.coverImage match {
     case Some(imageLocation) =>
       coverImageControl.image = imageLocation
     case None =>
   }
   categoryControl.items.value ++= originalBook.categories
+  unassociatedCategories --= originalBook.categories
 }

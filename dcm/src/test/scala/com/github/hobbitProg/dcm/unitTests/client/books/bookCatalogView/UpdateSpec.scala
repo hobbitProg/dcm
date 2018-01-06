@@ -8,7 +8,7 @@ import javafx.stage.Stage
 
 import scalafx.Includes._
 
-import org.scalatest.{FreeSpec, Matchers}
+import org.scalatest.{FreeSpec, Matchers, BeforeAndAfter}
 
 import org.testfx.api.FxToolkit
 
@@ -22,7 +22,17 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   */
 class UpdateSpec
     extends FreeSpec
+    with BeforeAndAfter
     with Matchers {
+  var runningApp: Application = null
+
+  after {
+    FxToolkit.cleanupStages()
+    FxToolkit.cleanupApplication(
+      runningApp
+    )
+  }
+
   "Given a book catalog" - {
     val testCatalog: BookCatalog =
       new BookCatalog()
@@ -233,13 +243,14 @@ class UpdateSpec
   ): BookCatalogScene = {
     // Create test application
     FxToolkit.registerPrimaryStage()
-    FxToolkit.setupApplication(
-      new Supplier[Application] {
-        override def get(): BookCatalogViewUnitTestApplication = {
-          new BookCatalogViewUnitTestApplication
+    runningApp =
+      FxToolkit.setupApplication(
+        new Supplier[Application] {
+          override def get(): BookCatalogViewUnitTestApplication = {
+            new BookCatalogViewUnitTestApplication
+          }
         }
-      }
-    )
+      )
     FxToolkit.showStage()
 
     // Create scene that contains book catalog control

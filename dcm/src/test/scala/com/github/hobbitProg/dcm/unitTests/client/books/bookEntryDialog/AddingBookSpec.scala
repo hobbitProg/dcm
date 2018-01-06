@@ -248,13 +248,15 @@ class AddingBookSpec
                               BookEntryDialog.categorySelectionButtonId
                             )
                             selectCategory(
-                              validNewBook.categories.head
+                              validNewBook.categories.head,
+                              CategorySelectionDialog.availableCategoriesId
                             )
                             selectCategory(
-                              validNewBook.categories.last
+                              validNewBook.categories.last,
+                              CategorySelectionDialog.availableCategoriesId
                             )
                             activateControl(
-                              CategorySelectionDialog.availableButtonId
+                              CategorySelectionDialog.associateButtonId
                             )
                             activateControl(
                               CategorySelectionDialog.saveButtonId
@@ -380,13 +382,15 @@ class AddingBookSpec
                             BookEntryDialog.categorySelectionButtonId
                           )
                           selectCategory(
-                            invalidNewBook.categories.head
+                            invalidNewBook.categories.head,
+                            CategorySelectionDialog.availableCategoriesId
                           )
                           selectCategory(
-                            invalidNewBook.categories.last
+                            invalidNewBook.categories.last,
+                            CategorySelectionDialog.availableCategoriesId
                           )
                           activateControl(
-                            CategorySelectionDialog.availableButtonId
+                            CategorySelectionDialog.associateButtonId
                           )
                           activateControl(
                             CategorySelectionDialog.saveButtonId
@@ -504,13 +508,15 @@ class AddingBookSpec
                             BookEntryDialog.categorySelectionButtonId
                           )
                           selectCategory(
-                            invalidNewBook.categories.head
+                            invalidNewBook.categories.head,
+                            CategorySelectionDialog.availableCategoriesId
                           )
                           selectCategory(
-                            invalidNewBook.categories.last
+                            invalidNewBook.categories.last,
+                            CategorySelectionDialog.availableCategoriesId
                           )
                           activateControl(
-                            CategorySelectionDialog.availableButtonId
+                            CategorySelectionDialog.associateButtonId
                           )
                           activateControl(
                             CategorySelectionDialog.saveButtonId
@@ -642,13 +648,15 @@ class AddingBookSpec
                             BookEntryDialog.categorySelectionButtonId
                           )
                           selectCategory(
-                            invalidNewBook.categories.head
+                            invalidNewBook.categories.head,
+                            CategorySelectionDialog.availableCategoriesId
                           )
                           selectCategory(
-                            invalidNewBook.categories.last
+                            invalidNewBook.categories.last,
+                            CategorySelectionDialog.availableCategoriesId
                           )
                           activateControl(
-                            CategorySelectionDialog.availableButtonId
+                            CategorySelectionDialog.associateButtonId
                           )
                           activateControl(
                             CategorySelectionDialog.saveButtonId
@@ -778,13 +786,15 @@ class AddingBookSpec
                               BookEntryDialog.categorySelectionButtonId
                             )
                             selectCategory(
-                              invalidNewBook.categories.head
+                              invalidNewBook.categories.head,
+                              CategorySelectionDialog.availableCategoriesId
                             )
                             selectCategory(
-                              invalidNewBook.categories.last
+                              invalidNewBook.categories.last,
+                              CategorySelectionDialog.availableCategoriesId
                             )
                             activateControl(
-                              CategorySelectionDialog.availableButtonId
+                              CategorySelectionDialog.associateButtonId
                             )
                             activateControl(
                               CategorySelectionDialog.saveButtonId
@@ -913,13 +923,15 @@ class AddingBookSpec
                               BookEntryDialog.categorySelectionButtonId
                             )
                             selectCategory(
-                              invalidNewBook.categories.head
+                              invalidNewBook.categories.head,
+                              CategorySelectionDialog.availableCategoriesId
                             )
                             selectCategory(
-                              invalidNewBook.categories.last
+                              invalidNewBook.categories.last,
+                              CategorySelectionDialog.availableCategoriesId
                             )
                             activateControl(
-                              CategorySelectionDialog.availableButtonId
+                              CategorySelectionDialog.associateButtonId
                             )
                             activateControl(
                               CategorySelectionDialog.saveButtonId

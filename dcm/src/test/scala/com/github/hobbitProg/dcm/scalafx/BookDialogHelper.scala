@@ -22,6 +22,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
 import com.github.hobbitProg.dcm.client.books.control.BookDialogParent
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 import com.github.hobbitProg.dcm.client.dialog.ImageChooser
+import com.github.hobbitProg.dcm.matchers.scalafx.ListViewCellMatcher
 
 /**
   * Helper routines for verifying book entry dialog
@@ -157,15 +158,20 @@ trait BookDialogHelper {
   /**
     * Select given category
     * @param category Category to select
+    * @param viewId The ID of the list view that contains the cell to click
     */
   def selectCategory(
-    category: String
+    category: String,
+    viewId: String
   ) = {
     bookDialogRobot.press(
       KeyCode.CONTROL
     )
     bookDialogRobot.clickOn(
-      NodeQueryUtils hasText category,
+      ListViewCellMatcher.hasText(
+        viewId,
+        category
+      ),
       MouseButton.PRIMARY
     )
     bookDialogRobot.release(
