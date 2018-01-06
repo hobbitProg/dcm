@@ -76,6 +76,7 @@ class BookTab(
     new Button(
       "Modify"
     )
+  modifyButton.disable = true
   modifyButton.id =
     BookTab.modifyButtonID
   AnchorPane.setTopAnchor(
@@ -117,6 +118,13 @@ class BookTab(
         catalogDisplay.selectionModel.value.selectedItem.value
       )
     }
+  catalogDisplay.selectionModel.value.selectedItem.onChange {
+    bookControl.determineModifyButtonActivation(
+      modifyButton,
+      catalogDisplay.selectionModel.value
+    )
+  }
+
   AnchorPane.setTopAnchor(
     selectedBookControl,
     BookTab.selectedBookTop

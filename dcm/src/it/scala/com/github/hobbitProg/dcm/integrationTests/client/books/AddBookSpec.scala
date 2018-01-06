@@ -39,6 +39,7 @@ import com.github.hobbitProg.dcm.client.control.BookTabControl
 import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
 import com.github.hobbitProg.dcm.integrationTests.matchers.scalaTest.
   {IntegrationMatchers, ScalafxMatchers}
+import com.github.hobbitProg.dcm.integrationTests.matchers.JavaConversions._
 import IntegrationMatchers._
 import ScalafxMatchers._
 
@@ -76,14 +77,11 @@ class AddBookSpec
   private def findBookEntryDialog: Window = {
     val context =
       new FxRobotContext
-    val bookEntryDialogPredicate: java.util.function.Predicate[javafx.stage.Window] =
-      (currentWindow: javafx.stage.Window) => {
-        val convertedWindow: scalafx.stage.Stage = currentWindow.asInstanceOf[javafx.stage.Stage]
-        convertedWindow.title.value == "Add Book To Catalog"
-      }
-    context.getWindowFinder.window(
-      bookEntryDialogPredicate
-    )
+    context.getWindowFinder.window {
+      currentWindow =>
+      currentWindow.asInstanceOf[javafx.stage.Stage].getTitle ==
+      "Add Book To Catalog"
+    }
   }
 
   Feature("The user can add a book to the book catalog") {

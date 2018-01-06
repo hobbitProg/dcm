@@ -2,6 +2,7 @@ package com.github.hobbitProg.dcm.client.control
 
 import scala.collection.Set
 
+import scalafx.scene.control.{Button, MultipleSelectionModel}
 import scalafx.stage.Stage
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model.{Book,
@@ -44,6 +45,14 @@ class BookTabControl {
         definedCategories
       )
     dialogStage.showAndWait()
+  }
+
+  def determineModifyButtonActivation(
+    modifyBookButton: Button,
+    catalogViewSelectionModel: MultipleSelectionModel[Book]
+  ) = {
+    modifyBookButton.disable =
+      catalogViewSelectionModel.isEmpty
   }
 
   def modifyBook(

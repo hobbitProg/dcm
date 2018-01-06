@@ -10,11 +10,15 @@ import JavaConverters._
 import javafx.scene.input.MouseButton
 
 import scalafx.Includes._
+import scalafx.scene.control.{Tab, TabPane}
+import scalafx.scene.layout.AnchorPane
 
 import org.scalatest.{FeatureSpec, GivenWhenThen, BeforeAndAfter, Matchers}
 
 import org.scalamock.scalatest.MockFactory
 
+import org.testfx.api.FxRobotContext
+import org.testfx.service.query.NodeQuery
 import org.testfx.util.NodeQueryUtils
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
@@ -26,6 +30,7 @@ import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 import com.github.hobbitProg.dcm.client.control.BookTabControl
 import com.github.hobbitProg.dcm.client.dialog.{CategorySelectionDialog,
   ImageChooser}
+import com.github.hobbitProg.dcm.integrationTests.matchers.JavaConversions._
 import com.github.hobbitProg.dcm.integrationTests.matchers.scalaTest.
   {IntegrationMatchers, ScalafxMatchers}
 
@@ -58,6 +63,22 @@ class ModifyBookSpec
 
     // Shut down windows
     shutDownApplication
+  }
+
+
+  private def findBookTab: Option[javafx.scene.control.Tab] = {
+    val context =
+      new FxRobotContext
+
+    val catalogPane: TabPane =
+      context.getNodeFinder.lookup {
+        currentNode : javafx.scene.Node =>
+        currentNode.isInstanceOf[javafx.scene.control.TabPane]
+      }.query.asInstanceOf[javafx.scene.control.TabPane]
+    catalogPane.tabs.find {
+      currentTab =>
+        currentTab.text.value == "Books"
+    }
   }
 
   Feature("The user can modify a book within the book catalog") {
@@ -666,10 +687,23 @@ class ModifyBookSpec
     }
 
     Scenario("The modify button is inactive when no books are selected"){
-      Given("a populated catalog")
+      Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
+      And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog,
+        bookTransactor,
+        coverChooser
+      )
+
       When("no books are selected")
       Then("the modify button is inactive")
-      pending
+      findBookTab should haveDisabledModifyButton()
     }
 
     Scenario("A book within the book catalog cannot be modified when no " +

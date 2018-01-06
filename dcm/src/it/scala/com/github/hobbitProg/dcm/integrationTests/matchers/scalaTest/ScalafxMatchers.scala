@@ -5,7 +5,8 @@ import scala.collection.Set
 import org.scalatest.matchers.{Matcher, MatchResult}
 
 import scalafx.Includes._
-import scalafx.scene.control.{ListView, TextInputControl}
+import scalafx.scene.Node
+import scalafx.scene.control.{ListView, Tab, TextInputControl}
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.{AnchorPane, VBox}
 import scalafx.stage.Window
@@ -550,6 +551,75 @@ trait ScalafxMatchers {
     */
   def haveInactiveSaveButton() =
     new DeactivatedSaveButtonMatcher()
+
+  /**
+    * The matcher that determines if the button to modify the currently selected
+    * button is not active
+    */
+  class DeactivatedModifyButtonMatcher
+      extends Matcher[Option[javafx.scene.control.Tab]] {
+
+    /**
+      * Determine if the modify button for books is not active
+      * @param left The book tab
+      * @return The result indicting if the modify button for books is not
+      * active
+      */
+    def apply(
+      left: Option[javafx.scene.control.Tab]
+    ) = {
+      MatchResult(
+        modifyButtonDisabled(
+          retrieveModifyButton(
+            left
+          )
+        ),
+        "Modify button disabled",
+        "Modify button not disabled"
+      )
+    }
+
+    // Retrieve the button to modify the currently selected book
+    private def retrieveModifyButton(
+      bookTab: Option[javafx.scene.control.Tab]
+    ) : Option[javafx.scene.Node] = {
+      bookTab match {
+        case Some(actualTab) =>
+          val tabPane: AnchorPane =
+            actualTab.content.value.asInstanceOf[javafx.scene.layout.AnchorPane]
+          tabPane.children.find {
+            childControl =>
+            childControl match {
+              case childButton: javafx.scene.control.Button =>
+                childButton.text.value == "Modify"
+              case _ => false
+            }
+          }
+        case None =>
+          None
+      }
+    }
+
+    // Determine if the given modify button is disabled
+    private def modifyButtonDisabled(
+      modifyButton: Option[javafx.scene.Node]
+    ): Boolean = {
+      modifyButton match {
+        case Some(modifyButtonNode) =>
+          modifyButtonNode.disable.value
+        case None =>
+          false
+      }
+    }
+  }
+
+  /**
+    * Create a matcher that determines if the button to modify books is disabled
+    * @return A matcher that determines if no selected book information is being
+    * displayed
+    */
+  def haveDisabledModifyButton() =
+    new DeactivatedModifyButtonMatcher()
 }
 
 object ScalafxMatchers extends ScalafxMatchers {
