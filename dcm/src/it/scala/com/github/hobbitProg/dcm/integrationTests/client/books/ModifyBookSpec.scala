@@ -666,6 +666,9 @@ class ModifyBookSpec
     }
 
     Scenario("The modify button is inactive when no books are selected"){
+      Given("a populated catalog")
+      When("no books are selected")
+      Then("the modify button is inactive")
       pending
     }
 
