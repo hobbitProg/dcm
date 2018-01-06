@@ -3,14 +3,19 @@ package com.github.hobbitProg.dcm.integrationTests.client.books
 import java.io.File
 import java.net.URI
 
-import scala.collection.JavaConverters
+import scala.collection.{JavaConverters, Set}
 import JavaConverters._
+
+
+import javafx.scene.input.MouseButton
 
 import scalafx.Includes._
 
 import org.scalatest.{FeatureSpec, GivenWhenThen, BeforeAndAfter, Matchers}
 
 import org.scalamock.scalatest.MockFactory
+
+import org.testfx.util.NodeQueryUtils
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import BookCatalog._
@@ -19,7 +24,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
 import BookCatalogRepositoryInterpreter._
 import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 import com.github.hobbitProg.dcm.client.control.BookTabControl
-import com.github.hobbitProg.dcm.client.dialog.ImageChooser
+import com.github.hobbitProg.dcm.client.dialog.{CategorySelectionDialog,
+  ImageChooser}
 import com.github.hobbitProg.dcm.integrationTests.matchers.scalaTest.
   {IntegrationMatchers, ScalafxMatchers}
 
@@ -571,19 +577,92 @@ class ModifyBookSpec
 
     Scenario("A book within the book catalog can have its categories modified") {
       Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog,
+        bookTransactor,
+        coverChooser
+      )
+
       And("the title of the book to modify")
+      val titleOfBookToModify: Titles = "Ruins"
+
       And("the categories to disassociate from the book")
+      val categoriesToDisassociate: Set[Categories] =
+        Set[Categories](
+          "sci-fi",
+          "conspiracy"
+        )
+
       When("the book to modify is selected")
+      selectBookToModify(
+        titleOfBookToModify
+      )
+
       And("the catetgories are disassociated from the book")
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId BookEntryDialog.categorySelectionButtonId,
+        MouseButton.PRIMARY
+      )
+      for (bookCategory <- categoriesToDisassociate) {
+        selectCategory(
+          bookCategory,
+          CategorySelectionDialog.selectedCategoriesId
+        )
+      }
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId CategorySelectionDialog.disassociateButtonId,
+        MouseButton.PRIMARY
+      )
+      bookClientRobot.clickOn(
+        NodeQueryUtils hasId CategorySelectionDialog.saveButtonId,
+        MouseButton.PRIMARY
+      )
+
       And("the information on the book is accepted")
+      acceptBookInformation()
+
       Then("the updated book is in the catalog")
+      val updatedBook: Book =
+        new BookDBAccess.TestBook(
+          titleOfBookToModify,
+          "Kevin J. Anderson",
+          "0061052477",
+          Some(
+            "Description for Ruins"
+         ),
+          Some(
+            getClass.getResource(
+              "/Ruins.jpg"
+            ).toURI()
+          ),
+          Set[Categories]()
+        )
+      getByISBN(
+        desktop.bookDisplay.catalog,
+        updatedBook.isbn
+      ) should beInCatalog(updatedBook)
+
       And("the updated book is in the repository")
+      retrieve(
+        updatedBook.isbn
+      ) should beInRepository(updatedBook)
+
       And("the updated book is displayed on the view displaying the book" +
         "catalog")
+      updatedBook should beOn(desktop)
+
       And("no books are selected on the window displaying the book catalog")
+      desktop should haveNoBooksSelected()
+
       And("the window displaying the information on the selected book is empty")
-      pending
+      desktop should notHaveSelectedBookDataDisplayed()
     }
 
     Scenario("The modify button is inactive when no books are selected"){

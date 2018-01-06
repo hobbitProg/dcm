@@ -23,6 +23,9 @@ import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
 import com.github.hobbitProg.dcm.client.dialog.ImageChooser
 import com.github.hobbitProg.dcm.client.linuxDesktop.{DCMDesktop, BookTab}
 
+import com.github.hobbitProg.dcm.integrationTests.matchers.scalafx.
+  ListViewCellMatcher
+
 /**
   * Common routines to automate filling in the book information
   *
@@ -141,6 +144,26 @@ trait GUIAutomation {
     bookClientRobot.clickOn(
       NodeQueryUtils hasId BookEntryDialog.descriptionControlId,
       MouseButton.PRIMARY
+    )
+  }
+
+  // Select given category
+  protected def selectCategory(
+    category: Categories,
+    parentId: String
+  ) = {
+    bookClientRobot.press(
+      KeyCode.CONTROL
+    )
+    bookClientRobot.clickOn(
+      ListViewCellMatcher.hasText(
+        parentId,
+        category
+      ),
+      MouseButton.PRIMARY
+    )
+    bookClientRobot.release(
+      KeyCode.CONTROL
     )
   }
 

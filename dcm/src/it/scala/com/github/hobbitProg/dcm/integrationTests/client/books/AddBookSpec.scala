@@ -72,27 +72,8 @@ class AddBookSpec
     shutDownApplication()
   }
 
-  /**
-    * Select given category
-    * @param category Category to select
-    */
-  private def selectCategory(
-    category: Categories
-  ) = {
-    bookClientRobot.press(
-      KeyCode.CONTROL
-    )
-    bookClientRobot.clickOn(
-      NodeQueryUtils hasText category,
-      MouseButton.PRIMARY
-    )
-    bookClientRobot.release(
-      KeyCode.CONTROL
-    )
-  }
-
   // Find book entry dialog
-  def findBookEntryDialog: Window = {
+  private def findBookEntryDialog: Window = {
     val context =
       new FxRobotContext
     val bookEntryDialogPredicate: java.util.function.Predicate[javafx.stage.Window] =
@@ -217,11 +198,12 @@ class AddBookSpec
       )
       for (bookCategory <- bookToEnter.categories) {
         selectCategory(
-          bookCategory
+          bookCategory,
+          CategorySelectionDialog.availableCategoriesId
         )
       }
       bookClientRobot.clickOn(
-        NodeQueryUtils hasId CategorySelectionDialog.availableButtonId,
+        NodeQueryUtils hasId CategorySelectionDialog.associateButtonId,
         MouseButton.PRIMARY
       )
       bookClientRobot.clickOn(
@@ -369,11 +351,12 @@ class AddBookSpec
       )
       for (bookCategory <- bookToEnter.categories) {
         selectCategory(
-          bookCategory
+          bookCategory,
+          CategorySelectionDialog.availableCategoriesId
         )
       }
       bookClientRobot.clickOn(
-        NodeQueryUtils hasId CategorySelectionDialog.availableButtonId,
+        NodeQueryUtils hasId CategorySelectionDialog.associateButtonId,
         MouseButton.PRIMARY
       )
       bookClientRobot.clickOn(
@@ -495,11 +478,12 @@ class AddBookSpec
       )
       for (bookCategory <- bookToEnter.categories) {
         selectCategory(
-          bookCategory
+          bookCategory,
+          CategorySelectionDialog.availableCategoriesId
         )
       }
       bookClientRobot.clickOn(
-        NodeQueryUtils hasId CategorySelectionDialog.availableButtonId,
+        NodeQueryUtils hasId CategorySelectionDialog.associateButtonId,
         MouseButton.PRIMARY
       )
       bookClientRobot.clickOn(
@@ -621,11 +605,12 @@ class AddBookSpec
       )
       for (bookCategory <- bookToEnter.categories) {
         selectCategory(
-          bookCategory
+          bookCategory,
+          CategorySelectionDialog.availableCategoriesId
         )
       }
       bookClientRobot.clickOn(
-        NodeQueryUtils hasId CategorySelectionDialog.availableButtonId,
+        NodeQueryUtils hasId CategorySelectionDialog.associateButtonId,
         MouseButton.PRIMARY
       )
       bookClientRobot.clickOn(
@@ -756,11 +741,12 @@ class AddBookSpec
       )
       for (bookCategory <- bookToEnter.categories) {
         selectCategory(
-          bookCategory
+          bookCategory,
+          CategorySelectionDialog.availableCategoriesId
         )
       }
       bookClientRobot.clickOn(
-        NodeQueryUtils hasId CategorySelectionDialog.availableButtonId,
+        NodeQueryUtils hasId CategorySelectionDialog.associateButtonId,
         MouseButton.PRIMARY
       )
       bookClientRobot.clickOn(
@@ -889,11 +875,12 @@ class AddBookSpec
       )
       for (bookCategory <- bookToEnter.categories) {
         selectCategory(
-          bookCategory
+          bookCategory,
+          CategorySelectionDialog.availableCategoriesId
         )
       }
       bookClientRobot.clickOn(
-        NodeQueryUtils hasId CategorySelectionDialog.availableButtonId,
+        NodeQueryUtils hasId CategorySelectionDialog.associateButtonId,
         MouseButton.PRIMARY
       )
       bookClientRobot.clickOn(
