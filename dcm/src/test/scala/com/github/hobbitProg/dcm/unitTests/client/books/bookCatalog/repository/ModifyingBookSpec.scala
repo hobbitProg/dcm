@@ -67,7 +67,7 @@ class ModifyingBookSpec
     newTitle <- arbitrary[String].suchThat(generatedTitle => generatedTitle != title && generatedTitle.length > 0)
   } yield (title, author, isbn, description, coverImage, categories.toSet, newTitle)
 
-  "Modifying books within the repository" >> {
+  "Modifying the title of an existing book within the repository" >> {
     "the repository is updated" >> {
       Prop.forAllNoShrink(databaseGenerator, repositoryGenerator, dataGenerator) {
         (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataType) => {
@@ -191,5 +191,36 @@ class ModifyingBookSpec
         }
       }
     }
+  }
+
+  "Modifying the author of an existing book within the repository" >> {
+    "the repository is updated" >> pending
+    "the updated book is placed into the repository" >> pending
+    "the original book is no longer in the repository" >> pending
+  }
+
+  "Modifying the ISBN of an existing book within the repository" >>{
+    "the repository is updated" >> pending
+    "the updated book is placed into the repository" >> pending
+    "the original book is no longer in the repository" >> pending
+  }
+
+  "Modifying the description of an existing book within the repository" >> {
+    "the repository is updated" >> pending
+    "the updated book is placed into the repository" >> pending
+  }
+
+  "Modifying the cover of an existing book within the repository" >> {
+    "the repository is updated" >> pending
+    "the updated book is placed into the repository" >> pending
+  }
+
+  "Modifying the categories associated with a book within the repository" >> {
+    "the repository is updated" >> pending
+    "the updated book is placed into the repository" >> pending
+  }
+
+  "Removing the title of a book within the repository" >> {
+    "the original book is still in the repository" >> pending
   }
 }

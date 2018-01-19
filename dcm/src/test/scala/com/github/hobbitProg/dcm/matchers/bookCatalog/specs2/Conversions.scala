@@ -1,5 +1,7 @@
 package com.github.hobbitProg.dcm.matchers.bookCatalog.specs2
 
+import scala.collection.Set
+
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 
 /**
@@ -45,5 +47,35 @@ object Conversions {
   ): RepositoryDoesNotContainBookMatcher =
     RepositoryDoesNotContainBookMatcher(
       expectedBook
+    )
+
+  /**
+    * Covert given information to a matcher that determines if a modified book
+    * was added to the catalog
+    * @param expectedTitle Title of modified book that should be in the catalog
+    * @param expectedAuthor Author of modified book that should be in the
+    * catalog
+    * @param expectedISBN ISBN of modified book that should be in the catalog
+    * @param expectedDescription Description of book that should be in the
+    * catalog
+    * @param expectedCategories Categories of modified book that should be in
+    * the catalog
+    * @return Matcher to see if the modified book is in the catalog
+    */
+  def containModifiedBook(
+    expectedTitle: Titles,
+    expectedAuthor: Authors,
+    expectedISBN: ISBNs,
+    expectedDescription: Description,
+    expectedCover: CoverImages,
+    expectedCategories: Set[Categories]
+  ) =
+    BookModificationMatcher(
+      expectedTitle,
+      expectedAuthor,
+      expectedISBN,
+      expectedDescription,
+      expectedCover,
+      expectedCategories
     )
 }
