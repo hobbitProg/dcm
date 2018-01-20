@@ -76,7 +76,11 @@ class ModifyBookSpec
     title <- arbitrary[String].suchThat(_.length > 0)
   ) yield title
 
-  // Modify a book in the catalog
+  private val authorGenerator = for (
+    author <- arbitrary[String].suchThat(_.length > 0)
+  ) yield author
+
+  // Modify the title of a book in the catalog
   private def modifyTitleOfBook(
     catalogData: Try[CatalogInfoType],
     newTitle: Titles
@@ -112,6 +116,43 @@ class ModifyBookSpec
       case Failure(errorMessage) =>
         Failure(errorMessage)
 
+    }
+
+  // Modify the author of a book in the catalog
+  private def modifyAuthorOfBook(
+    catalogData: Try[CatalogInfoType],
+    newAuthor: Authors
+  ) : Try[BookCatalog] =
+    catalogData match {
+      case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+        val catalogWithSubscriber =
+          onModify(
+            catalog,
+            (originalBook, updatedBook) => {
+              givenOriginalBook = originalBook
+              givenUpdatedBook = updatedBook
+            }
+          )
+        getByISBN(
+          catalogWithSubscriber,
+          isbn
+        ) match {
+          case Success(originalBook) =>
+            updateBook(
+              catalogWithSubscriber,
+              originalBook,
+              title,
+              newAuthor,
+              isbn,
+              description,
+              coverImage,
+              categories
+            )
+          case Failure(errorMessage) =>
+            Failure(errorMessage)
+        }
+      case Failure(errorMessage) =>
+        Failure(errorMessage)
     }
 
   "When modifying the title of an existing book" >> {
@@ -192,9 +233,78 @@ class ModifyBookSpec
   }
 
   "When modifying the author of an existing book" >> {
-    "the book with the new author is placed into the catalog" >> pending
-    "the original book is given to all listeners" >> pending
-    "the modified book is given to all listeners" >> pending
+    "the book with the new author is placed into the catalog" >> {
+      Prop.forAllNoShrink(catalogGenerator, authorGenerator) {
+        (catalogData: Try[CatalogInfoType], newAuthor: Authors) =>
+        catalogData match {
+          case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+            modifyAuthorOfBook(
+              catalogData,
+              newAuthor
+            ) must containModifiedBook(
+              title,
+              newAuthor,
+              isbn,
+              description,
+              coverImage,
+              categories)
+          case Failure(_) =>
+            catalogData must beASuccessfulTry
+        }
+      }
+    }
+
+    "the original book is given to all listeners" >> {
+      Prop.forAllNoShrink(catalogGenerator, authorGenerator) {
+        (catalogData: Try[CatalogInfoType], newAuthor: Authors) => {
+          modifyAuthorOfBook(
+            catalogData,
+            newAuthor
+          )
+          catalogData match {
+            case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+              val expectedBook =
+                TestBook(
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )
+              givenOriginalBook must beEqualTo(expectedBook)
+            case Failure(_) =>
+              catalogData must beASuccessfulTry
+          }
+        }
+      }
+    }
+
+    "the modified book is given to all listeners" >> {
+      Prop.forAllNoShrink(catalogGenerator, authorGenerator) {
+        (catalogData: Try[CatalogInfoType], newAuthor: Authors) => {
+          modifyAuthorOfBook(
+            catalogData,
+            newAuthor
+          )
+          catalogData match {
+            case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+              val expectedBook =
+                TestBook(
+                  title,
+                  newAuthor,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )
+              givenUpdatedBook must beEqualTo(expectedBook)
+            case Failure(_) =>
+              catalogData must beASuccessfulTry
+          }
+        }
+      }
+    }
   }
 
   "When modifying the ISBN of an existing book" >> {

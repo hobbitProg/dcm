@@ -2,6 +2,10 @@ package com.github.hobbitProg.dcm.client.books.control
 
 import scala.math.Ordering.StringOrdering
 
+import java.util.Comparator
+
+import javafx.collections.FXCollections
+
 import scalafx.application.Platform
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
@@ -16,6 +20,17 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.model.Book
   */
 class BookCatalogControl
     extends StringOrdering {
+  // Orders books by title
+  private object TitleOrdering
+      extends Comparator[Book] {
+    override def compare(
+      book1: Book,
+      book2: Book
+    ) = {
+      book1.title compareTo book2.title
+    }
+  }
+
   /**
     * Display a new book in a new cell within the book catalog view
     * @param displayedBooks The books that are currently being displayed in the
@@ -31,14 +46,18 @@ class BookCatalogControl
     if (newBook != null) {
       newCell.text =
         newBook.title
-      if (displayedBooks.length > 1) {
-        displayedBooks sort {
-          (left: Book, right: Book) =>
-          lt(
-            left.title, right.title
-          )
-        }
-      }
+      FXCollections.sort(
+        displayedBooks,
+        TitleOrdering
+      )
+//      if (displayedBooks.length > 1) {
+//        displayedBooks sort {
+//          (left: Book, right: Book) =>
+//          lt(
+//            left.title, right.title
+//          )
+//        }
+//      }
     }
     else {
       newCell.text = null
@@ -57,12 +76,16 @@ class BookCatalogControl
     newBook: Book
   ) = {
     displayedBooks += newBook
-    displayedBooks sort {
-      (left: Book, right: Book) =>
-      lt(
-        left.title, right.title
-      )
-    }
+    FXCollections.sort(
+      displayedBooks,
+      TitleOrdering
+    )
+//    displayedBooks sort {
+//      (left: Book, right: Book) =>
+//      lt(
+//        left.title, right.title
+//      )
+//    }
   }
 
   /**
@@ -81,12 +104,16 @@ class BookCatalogControl
   ) = {
     displayedBooks += updatedBook
     displayedBooks -= originalBook
-    displayedBooks sort {
-      (left: Book, right: Book) =>
-      lt(
-        left.title, right.title
-      )
-    }
+    FXCollections.sort(
+      displayedBooks,
+      TitleOrdering
+    )
+//    displayedBooks sort {
+//      (left: Book, right: Book) =>
+//      lt(
+//        left.title, right.title
+//      )
+//    }
 
     // Clear selected book
     selectionModel.clearSelection()
