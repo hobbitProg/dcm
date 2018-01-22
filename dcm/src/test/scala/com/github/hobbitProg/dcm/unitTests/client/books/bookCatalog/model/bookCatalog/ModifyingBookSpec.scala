@@ -88,6 +88,10 @@ class ModifyBookSpec
     description <- Gen.option(arbitrary[String])
   } yield description
 
+  private val coverGenerator = for {
+    coverImage <- Gen.oneOf(availableCovers)
+  } yield coverImage
+
   // Modify the title of a book in the catalog
   private def modifyTitleOfBook(
     catalogData: Try[CatalogInfoType],
@@ -123,7 +127,6 @@ class ModifyBookSpec
         }
       case Failure(errorMessage) =>
         Failure(errorMessage)
-
     }
 
   // Modify the author of a book in the catalog
@@ -233,6 +236,43 @@ class ModifyBookSpec
           case Failure(errorMessage) =>
             Failure(errorMessage)
        }
+      case Failure(errorMessage) =>
+        Failure(errorMessage)
+    }
+
+  // Modify the cover of a book in the catalog
+  private def modifyCoverOfBook(
+    catalogData: Try[CatalogInfoType],
+    newCover: CoverImages
+  ) =
+    catalogData match {
+      case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+        val catalogWithSubscriber =
+          onModify(
+            catalog,
+            (originalBook, updatedBook) => {
+              givenOriginalBook = originalBook
+              givenUpdatedBook = updatedBook
+            }
+          )
+        getByISBN(
+          catalogWithSubscriber,
+          isbn
+        ) match {
+          case Success(originalBook) =>
+          updateBook(
+            catalogWithSubscriber,
+            originalBook,
+            title,
+            author,
+            isbn,
+            description,
+            newCover,
+            categories
+          )
+          case Failure(errorMessage) =>
+            Failure(errorMessage)
+        }
       case Failure(errorMessage) =>
         Failure(errorMessage)
     }
@@ -544,9 +584,85 @@ class ModifyBookSpec
   }
 
   "When modifying the cover image of an existing book" >> {
-    "the book with the new cover image is placed into the catalog" >> pending
-    "the original book is given to all listeners" >> pending
-    "the modified book is given to all listeners" >> pending
+    "the book with the new cover image is placed into the catalog" >> {
+      Prop.forAllNoShrink(catalogGenerator, coverGenerator) {
+        (catalogData: Try[CatalogInfoType], newCover: CoverImages) => {
+          catalogData match {
+            case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+              modifyCoverOfBook(
+                catalogData,
+                newCover
+              ) must containModifiedBook(
+                title,
+                author,
+                isbn,
+                description,
+                newCover,
+                categories
+              )
+            case Failure(_) =>
+              catalogData must beASuccessfulTry
+          }
+        }
+      }
+    }
+
+    "the original book is given to all listeners" >> {
+      Prop.forAllNoShrink(catalogGenerator, coverGenerator) {
+        (catalogData: Try[CatalogInfoType], newCover: CoverImages) => {
+          catalogData match {
+            case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+              modifyCoverOfBook(
+                catalogData,
+                newCover
+              )
+              catalogData match {
+                case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+                  val originalBook =
+                    TestBook(
+                      title,
+                      author,
+                      isbn,
+                      description,
+                      coverImage,
+                      categories
+                    )
+                  givenOriginalBook must beEqualTo(originalBook)
+                case Failure(_) =>
+                  catalogData must beASuccessfulTry
+              }
+            case Failure(_) =>
+              catalogData must beASuccessfulTry
+          }
+        }
+      }
+    }
+
+    "the modified book is given to all listeners" >> {
+      Prop.forAllNoShrink(catalogGenerator, coverGenerator) {
+        (catalogData: Try[CatalogInfoType], newCover: CoverImages) => {
+          modifyCoverOfBook(
+            catalogData,
+            newCover
+          )
+          catalogData match {
+            case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+              val expectedBook =
+                TestBook(
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  newCover,
+                  categories
+                )
+              givenUpdatedBook must beEqualTo(expectedBook)
+            case Failure(_) =>
+              catalogData must beASuccessfulTry
+          }
+        }
+      }
+    }
   }
 
   "When modifying the categories of an existing book" >> {
