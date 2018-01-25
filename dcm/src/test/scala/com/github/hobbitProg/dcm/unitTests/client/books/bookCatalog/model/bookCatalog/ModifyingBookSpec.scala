@@ -92,6 +92,10 @@ class ModifyBookSpec
     coverImage <- Gen.oneOf(availableCovers)
   } yield coverImage
 
+  private val categoryGenerator = for {
+    categories <- Gen.listOf(arbitrary[String])
+  } yield categories.toSet
+
   // Modify the title of a book in the catalog
   private def modifyTitleOfBook(
     catalogData: Try[CatalogInfoType],
@@ -270,6 +274,43 @@ class ModifyBookSpec
             newCover,
             categories
           )
+          case Failure(errorMessage) =>
+            Failure(errorMessage)
+        }
+      case Failure(errorMessage) =>
+        Failure(errorMessage)
+    }
+
+  // Modify the categories associated with a book in the catalog
+  private def modifyCategoriesOfBook(
+    catalogData: Try[CatalogInfoType],
+    newCategories: Set[Categories]
+  ) : Try[BookCatalog] =
+    catalogData match {
+      case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+        val catalogWithSubscriber =
+          onModify(
+            catalog,
+            (originalBook, updatedBook) => {
+              givenOriginalBook = originalBook
+              givenUpdatedBook = updatedBook
+            }
+          )
+        getByISBN(
+          catalogWithSubscriber,
+          isbn
+        ) match {
+          case Success(originalBook) =>
+            updateBook(
+              catalogWithSubscriber,
+              originalBook,
+              title,
+              author,
+              isbn,
+              description,
+              coverImage,
+              newCategories
+            )
           case Failure(errorMessage) =>
             Failure(errorMessage)
         }
@@ -666,9 +707,79 @@ class ModifyBookSpec
   }
 
   "When modifying the categories of an existing book" >> {
-    "the book with the new categories is placed into the catalog" >> pending
-    "the original book is given to all listeners" >> pending
-    "the modified book is given to all listeners" >> pending
+    "the book with the new categories is placed into the catalog" >> {
+      Prop.forAllNoShrink(catalogGenerator, categoryGenerator) {
+        (catalogData: Try[CatalogInfoType], newCategories: Set[Categories]) => {
+          catalogData match {
+            case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+              modifyCategoriesOfBook(
+                catalogData,
+                newCategories
+              ) must containModifiedBook(
+                title,
+                author,
+                isbn,
+                description,
+                coverImage,
+                newCategories
+              )
+            case Failure(_) =>
+              catalogData must beASuccessfulTry
+          }
+        }
+      }
+    }
+
+    "the original book is given to all listeners" >> {
+      Prop.forAllNoShrink(catalogGenerator, categoryGenerator) {
+        (catalogData: Try[CatalogInfoType], newCategories: Set[Categories]) => {
+          modifyCategoriesOfBook(
+            catalogData,
+            newCategories
+          )
+          catalogData match {
+            case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+              val originalBook =
+                TestBook(
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )
+              givenOriginalBook must beEqualTo(originalBook)
+            case Failure(_) =>
+              catalogData must beASuccessfulTry
+          }
+        }
+      }
+    }
+    "the modified book is given to all listeners" >> {
+      Prop.forAllNoShrink(catalogGenerator, categoryGenerator) {
+        (catalogData: Try[CatalogInfoType], newCategories: Set[Categories]) => {
+          modifyCategoriesOfBook(
+            catalogData,
+            newCategories
+          )
+          catalogData match {
+            case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+              val expectedBook =
+                TestBook(
+                  title,
+                  author,
+                  isbn,
+                  description,
+                  coverImage,
+                  newCategories
+                )
+              givenUpdatedBook must beEqualTo(expectedBook)
+            case Failure(_) =>
+              catalogData must beASuccessfulTry
+          }
+        }
+      }
+    }
   }
 
   "When removing the title of a book" >> {
