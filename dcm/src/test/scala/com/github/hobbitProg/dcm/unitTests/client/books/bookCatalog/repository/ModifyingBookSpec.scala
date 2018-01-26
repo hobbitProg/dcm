@@ -23,7 +23,10 @@ class ModifyingBookSpec
     with ScalaCheck {
   sequential
 
-  private type BookDataType = (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], Titles)
+  private type BookDataTypeWithNewTitle =
+    (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], Titles)
+  private type BookDataTypeWithNewAuthor =
+    (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], Authors)
   private case class TestBook(
     title: Titles,
     author: Authors,
@@ -57,7 +60,7 @@ class ModifyingBookSpec
     repository <- new BookCatalogRepositoryInterpreter
   } yield repository
 
-  val dataGenerator = for {
+  val newTitleDataGenerator = for {
     title <- arbitrary[String].suchThat(_.length > 0)
     author <- arbitrary[String].suchThat(_.length > 0)
     isbn <- arbitrary[String].suchThat(_.length > 0)
@@ -67,75 +70,109 @@ class ModifyingBookSpec
     newTitle <- arbitrary[String].suchThat(generatedTitle => generatedTitle != title && generatedTitle.length > 0)
   } yield (title, author, isbn, description, coverImage, categories.toSet, newTitle)
 
+  val newAuthorDataGenerator = for {
+    title <- arbitrary[String].suchThat(_.length > 0)
+    author <- arbitrary[String].suchThat(_.length > 0)
+    isbn <- arbitrary[String].suchThat(_.length > 0)
+    description <- Gen.option(arbitrary[String])
+    coverImage <- Gen.oneOf(availableCovers)
+    categories <- Gen.listOf(arbitrary[String])
+    newAuthor <- arbitrary[String].suchThat(generatedAuthor => generatedAuthor != author && generatedAuthor.length > 0)
+  } yield (title, author, isbn, description, coverImage, categories.toSet, newAuthor)
+
+  // Modify the title of a book in the repository
+  private def modifyTitleOfBook(
+    database: StubDatabase,
+    repository: BookCatalogRepositoryInterpreter,
+    bookData: BookDataTypeWithNewTitle
+  ) : Either[String, Book] =
+    bookData match {
+      case (title, author, isbn, description, coverImage, categories, newTitle) =>
+        val originalBook =
+          TestBook(
+            title,
+            author,
+            isbn,
+            description,
+            coverImage,
+            categories
+          )
+        val modifiedBook =
+          TestBook(
+            newTitle,
+            author,
+            isbn,
+            description,
+            coverImage,
+            categories
+          )
+        repository.setConnection(
+          database.connectionTransactor
+        )
+        repository.update(
+          originalBook,
+          modifiedBook
+        )
+   }
+
+  // Modify the author of a book in the repository
+  private def modifyAuthorOfBook(
+    database: StubDatabase,
+    repository: BookCatalogRepositoryInterpreter,
+    bookData: BookDataTypeWithNewAuthor
+  ) : Either[String, Book] =
+    bookData match {
+      case (title, author, isbn, description, coverImage, categories, newAuthor) =>
+        val originalBook =
+          TestBook(
+            title,
+            author,
+            isbn,
+            description,
+            coverImage,
+            categories
+          )
+        val modifiedBook =
+          TestBook(
+            title,
+            newAuthor,
+            isbn,
+            description,
+            coverImage,
+            categories
+          )
+        repository.setConnection(
+          database.connectionTransactor
+        )
+        repository.update(
+          originalBook,
+          modifiedBook
+        )
+    }
+
   "Modifying the title of an existing book within the repository" >> {
     "the repository is updated" >> {
-      Prop.forAllNoShrink(databaseGenerator, repositoryGenerator, dataGenerator) {
-        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataType) => {
-          bookData match {
-            case (title, author, isbn, description, coverImage, categories, newTitle) =>
-              val originalBook =
-                TestBook(
-                  title,
-                  author,
-                  isbn,
-                  description,
-                  coverImage,
-                  categories
-                )
-              val modifiedBook =
-                TestBook(
-                  newTitle,
-                  author,
-                  isbn,
-                  description,
-                  coverImage,
-                  categories
-                )
-              repository.setConnection(
-                database.connectionTransactor
-              )
-              val updateResult =
-                repository.update(
-                  originalBook,
-                  modifiedBook
-                )
-              updateResult must beRight
-          }
+      Prop.forAllNoShrink(databaseGenerator, repositoryGenerator, newTitleDataGenerator) {
+        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataTypeWithNewTitle) => {
+          modifyTitleOfBook(
+            database,
+            repository,
+            bookData
+          ) must beRight
         }
       }
     }
 
     "the updated book is placed into the repository" >> {
-      Prop.forAll(databaseGenerator, repositoryGenerator, dataGenerator) {
-        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataType) => {
+      Prop.forAll(databaseGenerator, repositoryGenerator, newTitleDataGenerator) {
+        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataTypeWithNewTitle) => {
           bookData match {
-            case (title, author, isbn, description, coverImage, categories, newTitle) =>
-              val originalBook =
-                TestBook(
-                  title,
-                  author,
-                  isbn,
-                  description,
-                  coverImage,
-                  categories
-                )
-              val modifiedBook =
-                TestBook(
-                  newTitle,
-                  author,
-                  isbn,
-                  description,
-                  coverImage,
-                  categories
-                )
-              repository.setConnection(
-                database.connectionTransactor
+            case (_, author, isbn, description, coverImage, categories, newTitle) =>
+              modifyTitleOfBook(
+                database,
+                repository,
+                bookData
               )
-              val updateResult =
-                repository.update(
-                  originalBook,
-                  modifiedBook
-                )
               TestBook(
                 database.addedTitle,
                 database.addedAuthor,
@@ -149,27 +186,7 @@ class ModifyingBookSpec
                   association =>
                   association._2
                 }
-              ) should beEqualTo(modifiedBook)
-          }
-        }
-      }
-    }
-
-    "the original book is no longer in the repository" >> {
-      Prop.forAll(databaseGenerator, repositoryGenerator, dataGenerator) {
-        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataType) => {
-          bookData match {
-            case (title, author, isbn, description, coverImage, categories, newTitle) =>
-              val originalBook =
-                TestBook(
-                  title,
-                  author,
-                  isbn,
-                  description,
-                  coverImage,
-                  categories
-                )
-              val modifiedBook =
+              ) should beEqualTo(
                 TestBook(
                   newTitle,
                   author,
@@ -178,14 +195,22 @@ class ModifyingBookSpec
                   coverImage,
                   categories
                 )
-              repository.setConnection(
-                database.connectionTransactor
               )
-              val updateResult =
-                repository.update(
-                  originalBook,
-                  modifiedBook
-                )
+          }
+        }
+      }
+    }
+
+    "the original book is no longer in the repository" >> {
+      Prop.forAll(databaseGenerator, repositoryGenerator, newTitleDataGenerator) {
+        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataTypeWithNewTitle) => {
+          bookData match {
+            case (_, _, isbn, _, _, _, _) =>
+              modifyTitleOfBook(
+                database,
+                repository,
+                bookData
+              )
               database.removedISBN must beEqualTo(isbn)
           }
         }
@@ -194,9 +219,71 @@ class ModifyingBookSpec
   }
 
   "Modifying the author of an existing book within the repository" >> {
-    "the repository is updated" >> pending
-    "the updated book is placed into the repository" >> pending
-    "the original book is no longer in the repository" >> pending
+    "the repository is updated" >> {
+      Prop.forAllNoShrink(databaseGenerator, repositoryGenerator, newAuthorDataGenerator) {
+        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataTypeWithNewAuthor) => {
+          modifyAuthorOfBook(
+            database,
+            repository,
+            bookData
+          ) must beRight
+        }
+      }
+    }
+
+    "the updated book is placed into the repository" >> {
+      Prop.forAll(databaseGenerator, repositoryGenerator, newAuthorDataGenerator) {
+        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataTypeWithNewAuthor) => {
+          bookData match {
+            case (title, _, isbn, description, coverImage, categories, newAuthor) =>
+              modifyAuthorOfBook(
+                database,
+                repository,
+                bookData
+              )
+              TestBook(
+                database.addedTitle,
+                database.addedAuthor,
+                database.addedISBN,
+                database.addedDescription,
+                database.addedCover,
+                database.addedCategoryAssociations.filter {
+                  association =>
+                  association._1 == isbn
+                }.map {
+                  association =>
+                  association._2
+                }
+              ) should beEqualTo(
+                TestBook(
+                  title,
+                  newAuthor,
+                  isbn,
+                  description,
+                  coverImage,
+                  categories
+                )
+              )
+          }
+        }
+      }
+    }
+
+    "the original book is no longer in the repository" >> {
+      Prop.forAll(databaseGenerator, repositoryGenerator, newAuthorDataGenerator) {
+        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataTypeWithNewAuthor) => {
+          bookData match {
+            case (_, _, isbn, _, _, _, _) =>
+              modifyTitleOfBook(
+                database,
+                repository,
+                bookData
+              )
+              database.removedISBN must beEqualTo(isbn)
+          }
+        }
+      }
+    }
   }
 
   "Modifying the ISBN of an existing book within the repository" >>{
