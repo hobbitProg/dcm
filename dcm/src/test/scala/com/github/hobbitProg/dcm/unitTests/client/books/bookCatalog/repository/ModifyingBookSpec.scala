@@ -29,6 +29,8 @@ class ModifyingBookSpec
     (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], Authors)
   private type BookDataTypeWithNewISBN =
     (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], ISBNs)
+  private type BookDataTypeWithNewDescription =
+    (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], Description)
   private case class TestBook(
     title: Titles,
     author: Authors,
@@ -92,6 +94,16 @@ class ModifyingBookSpec
     newISBN <- arbitrary[String].suchThat(generatedISBN => generatedISBN != isbn && generatedISBN.length > 0)
   } yield (title, author, isbn, description, coverImage, categories.toSet, newISBN)
 
+  val newDescriptionDataGenerator = for {
+    title <- arbitrary[String].suchThat(_.length > 0)
+    author <- arbitrary[String].suchThat(_.length > 0)
+    isbn <- arbitrary[String].suchThat(_.length > 0)
+    description <- Gen.option(arbitrary[String])
+    coverImage <- Gen.oneOf(availableCovers)
+    categories <- Gen.listOf(arbitrary[String])
+    newDescription <- Gen.option(arbitrary[String]).suchThat(generatedDescription => generatedDescription != description)
+  } yield (title, author, isbn, description, coverImage, categories.toSet, newDescription)
+
   // Modify the title of a book in the repository
   private def modifyTitleOfBook(
     database: StubDatabase,
@@ -125,7 +137,7 @@ class ModifyingBookSpec
           originalBook,
           modifiedBook
         )
-   }
+    }
 
   // Modify the author of a book in the repository
   private def modifyAuthorOfBook(
@@ -185,6 +197,41 @@ class ModifyingBookSpec
             author,
             newISBN,
             description,
+            coverImage,
+            categories
+          )
+        repository.setConnection(
+          database.connectionTransactor
+        )
+        repository.update(
+          originalBook,
+          modifiedBook
+        )
+    }
+
+  // Modify the description of a book in the repository
+  private def modifyDescriptionOfBook(
+    database: StubDatabase,
+    repository: BookCatalogRepositoryInterpreter,
+    bookData: BookDataTypeWithNewDescription
+  ) : Either[String, Book] =
+    bookData match {
+      case (title, author, isbn, description, coverImage, categories, newDescription) =>
+        val originalBook =
+          TestBook(
+            title,
+            author,
+            isbn,
+            description,
+            coverImage,
+            categories
+          )
+        val modifiedBook =
+          TestBook(
+            title,
+            author,
+            isbn,
+            newDescription,
             coverImage,
             categories
           )
@@ -402,8 +449,55 @@ class ModifyingBookSpec
   }
 
   "Modifying the description of an existing book within the repository" >> {
-    "the repository is updated" >> pending
-    "the updated book is placed into the repository" >> pending
+    "the repository is updated" >> {
+      Prop.forAllNoShrink(databaseGenerator, repositoryGenerator, newDescriptionDataGenerator) {
+        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataTypeWithNewDescription) => {
+          modifyDescriptionOfBook(
+            database,
+            repository,
+            bookData
+          ) must beRight
+        }
+      }
+    }
+
+    "the updated book is placed into the repository" >> {
+      Prop.forAllNoShrink(databaseGenerator, repositoryGenerator, newDescriptionDataGenerator) {
+        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataTypeWithNewDescription) => {
+          bookData match {
+            case (title, author, isbn, _, coverImage, categories, newDescription) =>
+              modifyDescriptionOfBook(
+                database,
+                repository,
+                bookData
+              )
+              TestBook(
+                database.addedTitle,
+                database.addedAuthor,
+                database.addedISBN,
+                database.addedDescription,
+                database.addedCover,
+                database.addedCategoryAssociations.filter {
+                  association =>
+                  association._1 == isbn
+                }.map {
+                  association =>
+                  association._2
+                }
+              ) should beEqualTo(
+                TestBook(
+                  title,
+                  author,
+                  isbn,
+                  newDescription,
+                  coverImage,
+                  categories
+                )
+              )
+          }
+        }
+      }
+    }
   }
 
   "Modifying the cover of an existing book within the repository" >> {
