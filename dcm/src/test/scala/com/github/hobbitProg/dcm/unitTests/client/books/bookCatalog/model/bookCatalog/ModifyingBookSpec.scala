@@ -783,7 +783,40 @@ class ModifyBookSpec
   }
 
   "When removing the title of a book" >> {
-    "no book is placed into the catalog" >> pending
-    "no book is fiven to the listener" >> pending
+    "an indication that an error occurred is generated" >> {
+      Prop.forAllNoShrink(catalogGenerator) {
+        (catalogData: Try[CatalogInfoType]) => {
+          catalogData match {
+            case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+              modifyTitleOfBook(
+                catalogData,
+                ""
+              ) must beAFailedTry
+            case Failure(_) =>
+              catalogData must beASuccessfulTry
+          }
+        }
+      }
+    }
+
+    "no book is given to the listener" >> {
+      Prop.forAllNoShrink(catalogGenerator) {
+        (catalogData: Try[CatalogInfoType]) => {
+          catalogData match {
+            case Success((catalog, title, author, isbn, description, coverImage, categories)) =>
+              givenOriginalBook = null
+              givenUpdatedBook = null
+              modifyTitleOfBook(
+                catalogData,
+                ""
+              )
+              givenOriginalBook must beNull
+              givenUpdatedBook must beNull
+            case Failure(_) =>
+              catalogData must beASuccessfulTry
+          }
+        }
+      }
+    }
   }
 }
