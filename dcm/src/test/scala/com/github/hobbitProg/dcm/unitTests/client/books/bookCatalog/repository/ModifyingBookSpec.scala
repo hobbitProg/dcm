@@ -79,6 +79,15 @@ class ModifyingBookSpec
     newTitle <- arbitrary[String].suchThat(generatedTitle => generatedTitle != title && generatedTitle.length > 0)
   } yield (title, author, isbn, description, coverImage, categories.toSet, newTitle)
 
+  val emptyTitleDataGenerator = for {
+    title <- arbitrary[String].suchThat(_.length > 0)
+    author <- arbitrary[String].suchThat(_.length > 0)
+    isbn <- arbitrary[String].suchThat(_.length > 0)
+    description <- Gen.option(arbitrary[String])
+    coverImage <- Gen.oneOf(availableCovers)
+    categories <- Gen.listOf(arbitrary[String])
+  } yield (title, author, isbn, description, coverImage, categories.toSet, "")
+
   val newAuthorDataGenerator = for {
     title <- arbitrary[String].suchThat(_.length > 0)
     author <- arbitrary[String].suchThat(_.length > 0)
@@ -700,7 +709,61 @@ class ModifyingBookSpec
   }
 
   "Removing the title of a book within the repository" >> {
-    "the repository is not updated" >> pending
-    "the original book is still in the repository" >> pending
+    "the repository is not updated" >> {
+      Prop.forAllNoShrink(databaseGenerator, repositoryGenerator, emptyTitleDataGenerator) {
+        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataTypeWithNewTitle) => {
+          modifyTitleOfBook(
+            database,
+            repository,
+            bookData
+          ) must beLeft
+        }
+      }
+    }
+
+    "the original book is still in the repository" >> {
+      Prop.forAllNoShrink(databaseGenerator, repositoryGenerator, emptyTitleDataGenerator) {
+        (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataTypeWithNewTitle) => {
+          database.addedTitle = ""
+          database.addedAuthor = ""
+          database.addedISBN = ""
+          database.addedDescription = None
+          database.addedCover = None
+          database.addedCategoryAssociations =
+            Set[(ISBNs, Categories)]()
+          bookData match {
+            case (_, _, isbn, _, _, _, _) =>
+              modifyTitleOfBook(
+                database,
+                repository,
+                bookData
+              )
+              TestBook(
+                database.addedTitle,
+                database.addedAuthor,
+                database.addedISBN,
+                database.addedDescription,
+                database.addedCover,
+                database.addedCategoryAssociations.filter {
+                  association =>
+                  association._1 == isbn
+                }.map {
+                  association =>
+                  association._2
+                }
+              ) should beEqualTo(
+                TestBook(
+                  "",
+                  "",
+                  "",
+                  None,
+                  None,
+                  Set[Categories]()
+                )
+              )
+          }
+        }
+      }
+    }
   }
 }
