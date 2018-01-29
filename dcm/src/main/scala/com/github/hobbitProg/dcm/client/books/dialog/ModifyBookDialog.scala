@@ -51,7 +51,8 @@ class ModifyBookDialog(
     *
     * @return True if book cannot be saved and false otherwise
     */
-  protected def bookUnableToBeSaved: Boolean = false
+  protected def bookUnableToBeSaved: Boolean =
+    titleIsUndefined
 
   titleControl.text =
     originalBook.title
