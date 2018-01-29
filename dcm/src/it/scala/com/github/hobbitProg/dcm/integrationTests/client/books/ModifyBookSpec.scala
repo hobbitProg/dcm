@@ -709,12 +709,35 @@ class ModifyBookSpec
     Scenario("A book within the book catalog cannot be modified when no " +
       "title is specified") {
       Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog,
+        bookTransactor,
+        coverChooser
+      )
+
       And("the title of the book to modify")
+      val titleOfBookToModify: Titles = "Ruins"
+
       When("the book to modify is selected")
+      selectBookToModify(
+        titleOfBookToModify
+      )
+
       And("the title of the book is removed")
+      deleteTitle(
+        titleOfBookToModify
+      )
+
       Then("the save button on the modify book dialog is inactive")
-      pending
+      findBookEntryDialog("Modify Book") should haveInactiveSaveButton()
+
     }
 
     Scenario("A book within the book catalog cannot be modified when no " +

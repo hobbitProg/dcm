@@ -73,17 +73,6 @@ class AddBookSpec
     shutDownApplication()
   }
 
-  // Find book entry dialog
-  private def findBookEntryDialog: Window = {
-    val context =
-      new FxRobotContext
-    context.getWindowFinder.window {
-      currentWindow =>
-      currentWindow.asInstanceOf[javafx.stage.Stage].getTitle ==
-      "Add Book To Catalog"
-    }
-  }
-
   Feature("The user can add a book to the book catalog") {
     info("As someone who wants to keep track of books he owns")
     info("I want to add books to the book catalog")
@@ -363,7 +352,7 @@ class AddBookSpec
       )
 
       Then("the information on the book cannot be accepted")
-      findBookEntryDialog should haveInactiveSaveButton()
+      findBookEntryDialog("Add Book To Catalog") should haveInactiveSaveButton()
     }
 
     Scenario("A book that does not have an author cannot be added to the " +
@@ -490,7 +479,7 @@ class AddBookSpec
       )
 
       Then("the information on the book cannot be accepted")
-      findBookEntryDialog should haveInactiveSaveButton()
+      findBookEntryDialog("Add Book To Catalog") should haveInactiveSaveButton()
     }
 
     Scenario("A book that does not have an ISBN cannot be added to the book " +
@@ -617,7 +606,7 @@ class AddBookSpec
       )
 
       Then("the information on the book cannot be accepted")
-      findBookEntryDialog should haveInactiveSaveButton()
+      findBookEntryDialog("Add Book To Catalog") should haveInactiveSaveButton()
     }
 
     Scenario("A book that has a title/author pair that already exists within " +
@@ -753,7 +742,7 @@ class AddBookSpec
       )
 
       Then("the information on the book cannot be accepted")
-      findBookEntryDialog should haveInactiveSaveButton()
+      findBookEntryDialog("Add Book To Catalog") should haveInactiveSaveButton()
     }
 
     Scenario("A book that has an ISBN that already exists within the book " +
@@ -887,7 +876,7 @@ class AddBookSpec
       )
 
       Then("the information on the book cannot be accepted")
-      findBookEntryDialog should haveInactiveSaveButton()
+      findBookEntryDialog("Add Book To Catalog") should haveInactiveSaveButton()
     }
   }
 }

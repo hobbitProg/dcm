@@ -9,6 +9,9 @@ import cats.effect.IO
 import javafx.application.Application
 import javafx.scene.input.{KeyCode, MouseButton}
 
+import scalafx.Includes._
+import scalafx.stage.Window
+
 import org.testfx.api.{FxRobot, FxRobotContext, FxRobotInterface, FxToolkit}
 import org.testfx.matcher.control.{ComboBoxMatchers}
 import org.testfx.util.{NodeQueryUtils, WaitForAsyncUtils}
@@ -167,15 +170,24 @@ trait GUIAutomation {
     )
   }
 
+  // Delete the title of the book
+  protected def deleteTitle(
+    originalTitle: Titles
+  ) = {
+    for (titleCharacterIndex <- 1 to originalTitle.length()) {
+      bookClientRobot push KeyCode.BACK_SPACE
+    }
+  }
+
   // Change the title of the book
   protected def changeTitle(
     originalTitle: Titles,
     updatedTitle: Titles
   ) = {
     selectTitle()
-    for (titleCharacterIndex <- 1 to originalTitle.length()) {
-      bookClientRobot push KeyCode.BACK_SPACE
-    }
+    deleteTitle(
+      originalTitle
+    )
     enterDataIntoControl(
       updatedTitle
     )
@@ -235,10 +247,23 @@ trait GUIAutomation {
   }
 
   // Accept the information on the book
-  def acceptBookInformation() = {
+  protected def acceptBookInformation() = {
     bookClientRobot.clickOn(
       NodeQueryUtils hasId BookEntryDialog.saveButtonId,
       MouseButton.PRIMARY
     )
+  }
+
+  // Find book entry dialog
+  protected def findBookEntryDialog(
+    windowTitle: String
+  ): Window = {
+    val context =
+      new FxRobotContext
+    context.getWindowFinder.window {
+      currentWindow =>
+      currentWindow.asInstanceOf[javafx.stage.Stage].getTitle ==
+      windowTitle
+    }
   }
 }
