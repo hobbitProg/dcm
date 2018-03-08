@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository
+package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.database
 
 import acolyte.jdbc.{AcolyteDSL, StatementHandler, UpdateExecution,
   UpdateResult, QueryExecution, QueryResult, RowLists, Driver => AcolyteDriver}
