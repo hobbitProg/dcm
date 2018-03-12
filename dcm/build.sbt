@@ -15,6 +15,7 @@ lazy val root = (project in file(".")).
     libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.144-R12",
     libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % Test,
+    libraryDependencies += "com.ironcorelabs" %% "cats-scalatest" % "2.3.1" % Test,
     libraryDependencies += "org.hamcrest" % "hamcrest-core" % "1.3" % Test,
     libraryDependencies += "org.testfx" % "testfx-core" % "4.0.11-alpha" % Test,
     libraryDependencies += "org.eu.acolyte" %% "jdbc-scala" % "1.0.47" % Test,

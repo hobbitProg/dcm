@@ -737,11 +737,16 @@ class ModifyBookSpec
 
       Then("the save button on the modify book dialog is inactive")
       findBookEntryDialog("Modify Book") should haveInactiveSaveButton()
-
     }
 
     Scenario("A book within the book catalog cannot be modified when no " +
       "author is specified") {
+      Given("the pre-defined categories")
+      And("a populated catalog")
+      And("the title of the book to modify")
+      When("the book to modify is selected")
+      And("the author of the book is removed")
+      Then("the save button on the modify book dialog is inactive")
       pending
     }
 
