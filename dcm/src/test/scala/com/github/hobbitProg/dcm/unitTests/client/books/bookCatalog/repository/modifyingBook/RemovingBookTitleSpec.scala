@@ -24,43 +24,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
 class RemovingBookTitleSpec
     extends PropSpec
     with GeneratorDrivenPropertyChecks
-    with Matchers {
-
-  private type BookDataTypeWithNewTitle =
-    (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], Titles)
-
-  private case class TestBook(
-    title: Titles,
-    author: Authors,
-    isbn: ISBNs,
-    description: Description,
-    coverImage: CoverImages,
-    categories: Set[Categories]
-  ) extends Book {
-  }
-
-  private val availableCovers =
-    Seq(
-      "/Goblins.jpg",
-      "/GroundZero.jpg",
-      "/Ruins.jpg"
-    ).map(
-      image =>
-      Some(
-        getClass().
-          getResource(
-            image
-          ).toURI
-      )
-    )
-
-  val databaseGenerator = for {
-    database <- new StubDatabase()
-  } yield database
-
-  val repositoryGenerator = for {
-    repository <- new BookCatalogRepositoryInterpreter
-  } yield repository
+    with Matchers
+    with ModifyingTitleSpec {
 
   val emptyTitleDataGenerator = for {
     title <- arbitrary[String].suchThat(_.length > 0)
@@ -70,41 +35,6 @@ class RemovingBookTitleSpec
     coverImage <- Gen.oneOf(availableCovers)
     categories <- Gen.listOf(arbitrary[String])
   } yield (title, author, isbn, description, coverImage, categories.toSet, "")
-
-  // Modify the title of a book in the repository
-  private def modifyTitleOfBook(
-    database: StubDatabase,
-    repository: BookCatalogRepositoryInterpreter,
-    bookData: BookDataTypeWithNewTitle
-  ) : Either[String, Book] =
-    bookData match {
-      case (title, author, isbn, description, coverImage, categories, newTitle) =>
-        val originalBook =
-          TestBook(
-            title,
-            author,
-            isbn,
-            description,
-            coverImage,
-            categories
-          )
-        val modifiedBook =
-          TestBook(
-            newTitle,
-            author,
-            isbn,
-            description,
-            coverImage,
-            categories
-          )
-        repository.setConnection(
-          database.connectionTransactor
-        )
-        repository.update(
-          originalBook,
-          modifiedBook
-        )
-    }
 
   property("the repository is not updated") {
     forAll(

@@ -5,7 +5,7 @@ import scala.collection.Set
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
 import Gen.const
-           
+
 import org.scalatest.{Matchers, PropSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
@@ -23,43 +23,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
 class ModifyingBookTitleSpec
     extends PropSpec
     with GeneratorDrivenPropertyChecks
-    with Matchers {
-
-  private type BookDataTypeWithNewTitle =
-    (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], Titles)
-
-  private case class TestBook(
-    title: Titles,
-    author: Authors,
-    isbn: ISBNs,
-    description: Description,
-    coverImage: CoverImages,
-    categories: Set[Categories]
-  ) extends Book {
-  }
-
-  private val availableCovers =
-    Seq(
-      "/Goblins.jpg",
-      "/GroundZero.jpg",
-      "/Ruins.jpg"
-    ).map(
-      image =>
-      Some(
-        getClass().
-          getResource(
-            image
-          ).toURI
-      )
-    )
-
-  val databaseGenerator = for {
-    database <- new StubDatabase()
-  } yield database
-
-  val repositoryGenerator = for {
-    repository <- new BookCatalogRepositoryInterpreter
-  } yield repository
+    with Matchers
+    with ModifyingTitleSpec {
 
   val newTitleDataGenerator = for {
     title <- arbitrary[String].suchThat(_.length > 0)
@@ -71,41 +36,6 @@ class ModifyingBookTitleSpec
     newTitle <- arbitrary[String].suchThat(generatedTitle => generatedTitle != title && generatedTitle.length > 0)
   } yield (title, author, isbn, description, coverImage, categories.toSet,
     newTitle)
-
-  // Modify the title of a book in the repository
-  private def modifyTitleOfBook(
-    database: StubDatabase,
-    repository: BookCatalogRepositoryInterpreter,
-    bookData: BookDataTypeWithNewTitle
-  ) : Either[String, Book] =
-    bookData match {
-      case (title, author, isbn, description, coverImage, categories, newTitle) =>
-        val originalBook =
-          TestBook(
-            title,
-            author,
-            isbn,
-            description,
-            coverImage,
-            categories
-          )
-        val modifiedBook =
-          TestBook(
-            newTitle,
-            author,
-            isbn,
-            description,
-            coverImage,
-            categories
-          )
-        repository.setConnection(
-          database.connectionTransactor
-        )
-        repository.update(
-          originalBook,
-          modifiedBook
-        )
-    }
 
   property("the repository is marked as being updated"){
     forAll(databaseGenerator, repositoryGenerator, newTitleDataGenerator) {

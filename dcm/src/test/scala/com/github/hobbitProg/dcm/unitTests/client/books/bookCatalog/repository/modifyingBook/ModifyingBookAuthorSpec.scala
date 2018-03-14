@@ -23,43 +23,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
 class ModifyingBookAuthorSpec
     extends PropSpec
     with GeneratorDrivenPropertyChecks
-    with Matchers {
-
-  private type BookDataTypeWithNewAuthor =
-    (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], Authors)
-
-  private case class TestBook(
-    title: Titles,
-    author: Authors,
-    isbn: ISBNs,
-    description: Description,
-    coverImage: CoverImages,
-    categories: Set[Categories]
-  ) extends Book {
-  }
-
-  private val availableCovers =
-    Seq(
-      "/Goblins.jpg",
-      "/GroundZero.jpg",
-      "/Ruins.jpg"
-    ).map(
-      image =>
-      Some(
-        getClass().
-          getResource(
-            image
-          ).toURI
-      )
-    )
-
-  val databaseGenerator = for {
-    database <- new StubDatabase()
-  } yield database
-
-  val repositoryGenerator = for {
-    repository <- new BookCatalogRepositoryInterpreter
-  } yield repository
+    with Matchers
+    with ModifyingAuthorSpec {
 
   val newAuthorDataGenerator = for {
     title <- arbitrary[String].suchThat(_.length > 0)
@@ -70,41 +35,6 @@ class ModifyingBookAuthorSpec
     categories <- Gen.listOf(arbitrary[String])
     newAuthor <- arbitrary[String].suchThat(generatedAuthor => generatedAuthor != author && generatedAuthor.length > 0)
   } yield (title, author, isbn, description, coverImage, categories.toSet, newAuthor)
-
-  // Modify the author of a book in the repository
-  private def modifyAuthorOfBook(
-    database: StubDatabase,
-    repository: BookCatalogRepositoryInterpreter,
-    bookData: BookDataTypeWithNewAuthor
-  ) : Either[String, Book] =
-    bookData match {
-      case (title, author, isbn, description, coverImage, categories, newAuthor) =>
-        val originalBook =
-          TestBook(
-            title,
-            author,
-            isbn,
-            description,
-            coverImage,
-            categories
-          )
-        val modifiedBook =
-          TestBook(
-            title,
-            newAuthor,
-            isbn,
-            description,
-            coverImage,
-            categories
-          )
-        repository.setConnection(
-          database.connectionTransactor
-        )
-        repository.update(
-          originalBook,
-          modifiedBook
-        )
-    }
 
   property("the repository is marked as being updated") {
     forAll(databaseGenerator, repositoryGenerator, newAuthorDataGenerator) {
