@@ -24,35 +24,35 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.interpreter.
 import BookCatalogServiceInterpreter._
 
 /**
-  * Specification for changing the title of the book in the catalog using the
+  * Specification for changing the author of the book in the catalog using the
   * service
   * @author Kyle Cranmer
   * @since 0.2
   */
-class ChangingBookTitleSpec
+class ChangingBookAuthorSpec
     extends PropSpec
     with Matchers
     with GeneratorDrivenPropertyChecks
     with ModifyingBookSpec
     with ValidatedMatchers {
 
-  private type TitleModificationType =
-    (OriginalDataType, Titles)
+  private type AuthorModificationType =
+    (OriginalDataType, Authors)
 
-  private val titleModificationGenerator = for {
+  private val authorModificationGenerator = for {
     title <- arbitrary[String].suchThat(_.length > 0)
     author <- arbitrary[String].suchThat(_.length > 0)
     isbn <- arbitrary[String].suchThat(_.length > 0)
     description <- Gen.option(arbitrary[String])
     coverImage <- Gen.oneOf(availableCovers)
     categories <- Gen.listOf(arbitrary[String])
-    newTitle <- arbitrary[String].suchThat(generatedTitle => generatedTitle != title && generatedTitle.length > 0)
-  } yield ((title, author, isbn, description, coverImage, categories.toSet), newTitle)
+    newAuthor <- arbitrary[String].suchThat(generatedAuthor => generatedAuthor != author && generatedAuthor.length > 0)
+  } yield ((title, author, isbn, description, coverImage, categories.toSet), newAuthor)
 
-  private def modifyTitle(
+  private def modifyAuthor(
     populatedCatalog: BookCatalog,
     repository: FakeRepository,
-    bookData: TitleModificationType
+    bookData: AuthorModificationType
   ) : Validated[BookCatalogError, BookCatalog] =
     bookData match {
       case (
@@ -64,7 +64,7 @@ class ChangingBookTitleSpec
           coverImage,
           categories
         ),
-        newTitle
+        newAuthor
       ) =>
         val Success(originalBook) =
           getByISBN(
@@ -84,8 +84,8 @@ class ChangingBookTitleSpec
         modifyBook(
           catalogWithSubscriber,
           originalBook,
-          newTitle,
-          author,
+          title,
+          newAuthor,
           isbn,
           description,
           coverImage,
@@ -96,11 +96,11 @@ class ChangingBookTitleSpec
     }
 
   property("indicates the catalog was updated") {
-    forAll(catalogGenerator, repositoryGenerator, titleModificationGenerator) {
+    forAll(catalogGenerator, repositoryGenerator, authorModificationGenerator) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: TitleModificationType
+        bookData: AuthorModificationType
       ) =>
       bookData match {
         case (originalData, _) =>
@@ -111,26 +111,25 @@ class ChangingBookTitleSpec
               originalData
             )
           val resultingCatalog =
-            modifyTitle(
+            modifyAuthor(
               populatedCatalog,
               repository,
               bookData
             )
           resultingCatalog should be (valid[BookCatalog])
       }
-
     }
   }
 
   property("places the updated book in the catalog") {
-    forAll(catalogGenerator, repositoryGenerator, titleModificationGenerator) {
+    forAll(catalogGenerator, repositoryGenerator, authorModificationGenerator) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: TitleModificationType
+        bookData: AuthorModificationType
       ) =>
       bookData match {
-        case (originalData, newTitle) =>
+        case (originalData, newAuthor) =>
           val populatedCatalog =
             populateCatalog(
               catalog,
@@ -138,7 +137,7 @@ class ChangingBookTitleSpec
               originalData
             )
           val Valid(resultingCatalog) =
-            modifyTitle(
+            modifyAuthor(
               populatedCatalog,
               repository,
               bookData
@@ -152,8 +151,8 @@ class ChangingBookTitleSpec
                 )
               val expectedBook =
                 TestBook(
-                  newTitle,
-                  author,
+                  title,
+                  newAuthor,
                   isbn,
                   description,
                   coverImage,
@@ -166,22 +165,22 @@ class ChangingBookTitleSpec
   }
 
   property("places the updated book in the repository") {
-    forAll(catalogGenerator, repositoryGenerator, titleModificationGenerator) {
+    forAll(catalogGenerator, repositoryGenerator, authorModificationGenerator) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: TitleModificationType
+        bookData: AuthorModificationType
       ) =>
       bookData match {
-        case (originalData, newTitle) =>
+        case (originalData, newAuthor) =>
           val populatedCatalog =
             populateCatalog(
               catalog,
               repository,
               originalData
             )
-          val resultingCatalog =
-            modifyTitle(
+          val Valid(resultingCatalog) =
+            modifyAuthor(
               populatedCatalog,
               repository,
               bookData
@@ -190,8 +189,8 @@ class ChangingBookTitleSpec
             case (title, author, isbn, description, coverImage, categories) =>
               val expectedBook =
                 TestBook(
-                  newTitle,
-                  author,
+                  title,
+                  newAuthor,
                   isbn,
                   description,
                   coverImage,
@@ -208,22 +207,22 @@ class ChangingBookTitleSpec
   }
 
   property("gives the updated book to the listener") {
-    forAll(catalogGenerator, repositoryGenerator, titleModificationGenerator) {
+    forAll(catalogGenerator, repositoryGenerator, authorModificationGenerator) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: TitleModificationType
+        bookData: AuthorModificationType
       ) =>
       bookData match {
-        case (originalData, newTitle) =>
+        case (originalData, newAuthor) =>
           val populatedCatalog =
             populateCatalog(
               catalog,
               repository,
               originalData
             )
-          val resultingCatalog =
-            modifyTitle(
+          val Valid(resultingCatalog) =
+            modifyAuthor(
               populatedCatalog,
               repository,
               bookData
@@ -232,8 +231,8 @@ class ChangingBookTitleSpec
             case (title, author, isbn, description, coverImage, categories) =>
               val expectedBook =
                 TestBook(
-                  newTitle,
-                  author,
+                  title,
+                  newAuthor,
                   isbn,
                   description,
                   coverImage,
@@ -246,14 +245,14 @@ class ChangingBookTitleSpec
   }
 
   property("removes the original book from the catalog") {
-    forAll(catalogGenerator, repositoryGenerator, titleModificationGenerator) {
+    forAll(catalogGenerator, repositoryGenerator, authorModificationGenerator) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: TitleModificationType
+        bookData: AuthorModificationType
       ) =>
       bookData match {
-        case (originalData, newTitle) =>
+        case (originalData, newAuthor) =>
           val populatedCatalog =
             populateCatalog(
               catalog,
@@ -261,7 +260,7 @@ class ChangingBookTitleSpec
               originalData
             )
           val Valid(resultingCatalog) =
-            modifyTitle(
+            modifyAuthor(
               populatedCatalog,
               repository,
               bookData
@@ -289,22 +288,22 @@ class ChangingBookTitleSpec
   }
 
   property("removes the original book from the repository") {
-    forAll(catalogGenerator, repositoryGenerator, titleModificationGenerator) {
+    forAll(catalogGenerator, repositoryGenerator, authorModificationGenerator) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: TitleModificationType
+        bookData: AuthorModificationType
       ) =>
       bookData match {
-        case (originalData, newTitle) =>
+        case (originalData, newAuthor) =>
           val populatedCatalog =
             populateCatalog(
               catalog,
               repository,
               originalData
             )
-          val resultingCatalog =
-            modifyTitle(
+          val Valid(resultingCatalog) =
+            modifyAuthor(
               populatedCatalog,
               repository,
               bookData
@@ -327,22 +326,22 @@ class ChangingBookTitleSpec
   }
 
   property("gives the original book to the listener") {
-    forAll(catalogGenerator, repositoryGenerator, titleModificationGenerator) {
+    forAll(catalogGenerator, repositoryGenerator, authorModificationGenerator) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: TitleModificationType
+        bookData: AuthorModificationType
       ) =>
       bookData match {
-        case (originalData, newTitle) =>
+        case (originalData, newAuthor) =>
           val populatedCatalog =
             populateCatalog(
               catalog,
               repository,
               originalData
             )
-          val resultingCatalog =
-            modifyTitle(
+          val Valid(resultingCatalog) =
+            modifyAuthor(
               populatedCatalog,
               repository,
               bookData
