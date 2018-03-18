@@ -24,26 +24,26 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.interpreter.
 import BookCatalogServiceInterpreter._
 
 /**
-  * Specification for trying to remove the title of a book using the service
+  * Specification for trying to remove the author of a book using the service
   * @author Kyle Cranmer
   * @since 0.2
   */
-class RemovingBookTitleSpec
+class RemovingBookAuthorSpec
     extends PropSpec
     with Matchers
     with GeneratorDrivenPropertyChecks
     with ModifyingBookSpec
     with ValidatedMatchers {
 
-  private def removeTitle(
+  private def removeAuthor(
     populatedCatalog: BookCatalog,
     repository: FakeRepository,
     bookData: OriginalDataType
   ) : Validated[BookCatalogError, BookCatalog] =
     bookData match {
       case (
+        title,
         _,
-        author,
         isbn,
         description,
         coverImage,
@@ -67,8 +67,8 @@ class RemovingBookTitleSpec
         modifyBook(
           catalogWithSubscriber,
           originalBook,
+          title,
           "",
-          author,
           isbn,
           description,
           coverImage,
@@ -96,7 +96,7 @@ class RemovingBookTitleSpec
           bookData
         )
       val resultingCatalog =
-        removeTitle(
+        removeAuthor(
           populatedCatalog,
           repository,
           bookData
@@ -123,7 +123,7 @@ class RemovingBookTitleSpec
           bookData
         )
       val resultingCatalog =
-        removeTitle(
+        removeAuthor(
           populatedCatalog,
           repository,
           bookData
@@ -166,7 +166,7 @@ class RemovingBookTitleSpec
           bookData
         )
       val resultingCatalog =
-        removeTitle(
+        removeAuthor(
           populatedCatalog,
           repository,
           bookData
@@ -193,7 +193,7 @@ class RemovingBookTitleSpec
           bookData
         )
       val resultingCatalog =
-        removeTitle(
+        removeAuthor(
           populatedCatalog,
           repository,
           bookData
