@@ -118,7 +118,6 @@ class ChangingBookTitleSpec
             )
           resultingCatalog should be (valid[BookCatalog])
       }
-
     }
   }
 
