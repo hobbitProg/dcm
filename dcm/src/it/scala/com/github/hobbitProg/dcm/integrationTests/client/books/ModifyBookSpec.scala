@@ -81,12 +81,12 @@ class ModifyBookSpec
     }
   }
 
-  Feature("The user can modify a book within the book catalog") {
+  feature("The user can modify a book within the book catalog") {
     info("As someone who wants to keep track of books he owns")
     info("I want to change information on books within the book catalog")
     info("So any problems with the books can be fixed")
 
-    Scenario("A book within the book catalog can have its title changed") {
+    scenario("A book within the book catalog can have its title changed") {
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
 
@@ -196,7 +196,7 @@ class ModifyBookSpec
       desktop should notHaveSelectedBookDataDisplayed()
     }
 
-    Scenario("A book within the book catalog can have its author changed") {
+    scenario("A book within the book catalog can have its author changed") {
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
 
@@ -311,7 +311,7 @@ class ModifyBookSpec
       desktop should notHaveSelectedBookDataDisplayed()
     }
 
-    Scenario("A book within the book catalog can have its ISBN changed") {
+    scenario("A book within the book catalog can have its ISBN changed") {
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
 
@@ -422,7 +422,7 @@ class ModifyBookSpec
       desktop should notHaveSelectedBookDataDisplayed()
     }
 
-    Scenario("A book within the book catalog can have its description changed") {
+    scenario("A book within the book catalog can have its description changed") {
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
 
@@ -502,7 +502,7 @@ class ModifyBookSpec
       desktop should notHaveSelectedBookDataDisplayed()
     }
 
-    Scenario("A book within the book catalog can have its cover image changed") {
+    scenario("A book within the book catalog can have its cover image changed") {
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
 
@@ -596,7 +596,7 @@ class ModifyBookSpec
       desktop should notHaveSelectedBookDataDisplayed()
     }
 
-    Scenario("A book within the book catalog can have its categories modified") {
+    scenario("A book within the book catalog can have its categories modified") {
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
 
@@ -686,7 +686,7 @@ class ModifyBookSpec
       desktop should notHaveSelectedBookDataDisplayed()
     }
 
-    Scenario("The modify button is inactive when no books are selected"){
+    scenario("The modify button is inactive when no books are selected"){
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
 
@@ -706,7 +706,7 @@ class ModifyBookSpec
       findBookTab should haveDisabledModifyButton()
     }
 
-    Scenario("A book within the book catalog cannot be modified when no " +
+    scenario("A book within the book catalog cannot be modified when no " +
       "title is specified") {
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
@@ -739,28 +739,54 @@ class ModifyBookSpec
       findBookEntryDialog("Modify Book") should haveInactiveSaveButton()
     }
 
-    Scenario("A book within the book catalog cannot be modified when no " +
+    scenario("A book within the book catalog cannot be modified when no " +
       "author is specified") {
       Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog,
+        bookTransactor,
+        coverChooser
+      )
+
       And("the title of the book to modify")
+      val titleOfBookToModify: Titles = "Ruins"
+
+      And("the original author of the book")
+      val originalAuthor: Authors =
+        "Kevin J. Anderson"
+
       When("the book to modify is selected")
+      selectBookToModify(
+        titleOfBookToModify
+      )
+
       And("the author of the book is removed")
+      deleteAuthor(
+        originalAuthor
+      )
+
       Then("the save button on the modify book dialog is inactive")
-      pending
+      findBookEntryDialog("Modify Book") should haveInactiveSaveButton()
     }
 
-    Scenario("A book within the book catalog cannot be modified when no " +
+    scenario("A book within the book catalog cannot be modified when no " +
       "ISBN is specified"){
       pending
     }
 
-    Scenario("A book within the book catalog when the modifed title and " +
+    scenario("A book within the book catalog when the modifed title and " +
       "author is associated with a different book") {
       pending
     }
 
-    Scenario("A book within the book catalog when the modified ISBN is " +
+    scenario("A book within the book catalog when the modified ISBN is " +
       "associated with a different book") {
       pending
     }

@@ -193,16 +193,25 @@ trait GUIAutomation {
     )
   }
 
-  // Change the author of the book
-  protected def changeAuthor(
-    originalAuthor: Authors,
-    updatedAuthor: Authors
+  // Delete the author of the book
+  protected def deleteAuthor(
+    originalAuthor: Authors
   ) = {
     selectAuthor()
     bookClientRobot push KeyCode.END
     for (authorCharacterIndex <- 1 to originalAuthor.length()) {
       bookClientRobot push KeyCode.BACK_SPACE
     }
+  }
+
+  // Change the author of the book
+  protected def changeAuthor(
+    originalAuthor: Authors,
+    updatedAuthor: Authors
+  ) = {
+    deleteAuthor(
+      originalAuthor
+    )
     enterDataIntoControl((
       updatedAuthor
     ))

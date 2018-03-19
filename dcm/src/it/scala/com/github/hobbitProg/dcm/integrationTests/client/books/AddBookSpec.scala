@@ -73,12 +73,12 @@ class AddBookSpec
     shutDownApplication()
   }
 
-  Feature("The user can add a book to the book catalog") {
+  feature("The user can add a book to the book catalog") {
     info("As someone who wants to keep track of books he owns")
     info("I want to add books to the book catalog")
     info("So that I can know what books I own")
 
-    Scenario("A book with all required fields can be added to the book " +
+    scenario("A book with all required fields can be added to the book " +
       "catalog.") {
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
@@ -227,7 +227,7 @@ class AddBookSpec
       desktop should notHaveSelectedBookDataDisplayed()
     }
 
-    Scenario("A book that does not have a title cannot be added to the book " +
+    scenario("A book that does not have a title cannot be added to the book " +
       "catalog") {
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
@@ -355,7 +355,7 @@ class AddBookSpec
       findBookEntryDialog("Add Book To Catalog") should haveInactiveSaveButton()
     }
 
-    Scenario("A book that does not have an author cannot be added to the " +
+    scenario("A book that does not have an author cannot be added to the " +
       "book catalog") {
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
@@ -482,7 +482,7 @@ class AddBookSpec
       findBookEntryDialog("Add Book To Catalog") should haveInactiveSaveButton()
     }
 
-    Scenario("A book that does not have an ISBN cannot be added to the book " +
+    scenario("A book that does not have an ISBN cannot be added to the book " +
       "catalog") {
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
@@ -609,7 +609,7 @@ class AddBookSpec
       findBookEntryDialog("Add Book To Catalog") should haveInactiveSaveButton()
     }
 
-    Scenario("A book that has a title/author pair that already exists within " +
+    scenario("A book that has a title/author pair that already exists within " +
       "the book catalog cannot be added to the catalog") {
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
@@ -745,7 +745,7 @@ class AddBookSpec
       findBookEntryDialog("Add Book To Catalog") should haveInactiveSaveButton()
     }
 
-    Scenario("A book that has an ISBN that already exists within the book " +
+    scenario("A book that has an ISBN that already exists within the book " +
       "catalog cannot be added to the catalog") {
       Given("the pre-defined categories")
       placePreDefinedCategoriesIntoDatabase()
