@@ -778,6 +778,13 @@ class ModifyBookSpec
 
     scenario("A book within the book catalog cannot be modified when no " +
       "ISBN is specified"){
+      Given("the pre-defined categories")
+      And("a populated catalog")
+      And("the title of the book to modify")
+      And("the original ISBN of the book")
+      When("the book to modify is selected")
+      And("the ISBN of the book is removed")
+      Then("the save button on the modify book dialog is inactive")
       pending
     }
 
