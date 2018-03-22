@@ -23,43 +23,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
 class ModifyingBookISBNSpec
     extends PropSpec
     with GeneratorDrivenPropertyChecks
-    with Matchers {
-
-  private type BookDataTypeWithNewISBN =
-    (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], ISBNs)
-
-  private case class TestBook(
-    title: Titles,
-    author: Authors,
-    isbn: ISBNs,
-    description: Description,
-    coverImage: CoverImages,
-    categories: Set[Categories]
-  ) extends Book {
-  }
-
-  private val availableCovers =
-    Seq(
-      "/Goblins.jpg",
-      "/GroundZero.jpg",
-      "/Ruins.jpg"
-    ).map(
-      image =>
-      Some(
-        getClass().
-          getResource(
-            image
-          ).toURI
-      )
-    )
-
-  val databaseGenerator = for {
-    database <- new StubDatabase()
-  } yield database
-
-  val repositoryGenerator = for {
-    repository <- new BookCatalogRepositoryInterpreter
-  } yield repository
+    with Matchers
+    with ModifyingISBNSpec {
 
   val newISBNDataGenerator = for {
     title <- arbitrary[String].suchThat(_.length > 0)
@@ -70,41 +35,6 @@ class ModifyingBookISBNSpec
     categories <- Gen.listOf(arbitrary[String])
     newISBN <- arbitrary[String].suchThat(generatedISBN => generatedISBN != isbn && generatedISBN.length > 0)
   } yield (title, author, isbn, description, coverImage, categories.toSet, newISBN)
-
-  // Modify the ISBN of a book in the repository
-  private def modifyISBNOfBook(
-    database: StubDatabase,
-    repository: BookCatalogRepositoryInterpreter,
-    bookData: BookDataTypeWithNewISBN
-  ) =
-    bookData match {
-      case (title, author, isbn, description, coverImage, categories, newISBN) =>
-        val originalBook =
-          TestBook(
-            title,
-            author,
-            isbn,
-            description,
-            coverImage,
-            categories
-          )
-        val modifiedBook =
-          TestBook(
-            title,
-            author,
-            newISBN,
-            description,
-            coverImage,
-            categories
-          )
-        repository.setConnection(
-          database.connectionTransactor
-        )
-        repository.update(
-          originalBook,
-          modifiedBook
-        )
-    }
 
   property("the repository is marked as being updated") {
     forAll(databaseGenerator, repositoryGenerator, newISBNDataGenerator) {
