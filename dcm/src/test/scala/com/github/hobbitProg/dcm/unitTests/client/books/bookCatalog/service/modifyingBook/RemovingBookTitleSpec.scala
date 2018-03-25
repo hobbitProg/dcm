@@ -122,12 +122,11 @@ class RemovingBookTitleSpec
           repository,
           bookData
         )
-      val resultingCatalog =
-        removeTitle(
-          populatedCatalog,
-          repository,
-          bookData
-        )
+      removeTitle(
+        populatedCatalog,
+        repository,
+        bookData
+      )
       bookData match {
         case (title, author, isbn, description, coverImage, categories) =>
           val originalBook =
@@ -165,12 +164,11 @@ class RemovingBookTitleSpec
           repository,
           bookData
         )
-      val resultingCatalog =
-        removeTitle(
-          populatedCatalog,
-          repository,
-          bookData
-        )
+      removeTitle(
+        populatedCatalog,
+        repository,
+        bookData
+      )
       givenUpdatedBook should be (null)
     }
   }
@@ -192,12 +190,11 @@ class RemovingBookTitleSpec
           repository,
           bookData
         )
-      val resultingCatalog =
-        removeTitle(
-          populatedCatalog,
-          repository,
-          bookData
-        )
+      removeTitle(
+        populatedCatalog,
+        repository,
+        bookData
+      )
       givenOriginalBook should be (null)
     }
   }
