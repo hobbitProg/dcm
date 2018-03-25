@@ -53,7 +53,8 @@ class ModifyBookDialog(
     */
   protected def bookUnableToBeSaved: Boolean =
     titleIsUndefined ||
-  authorIsUndefined
+  authorIsUndefined ||
+  isbnIsUndefined
 
   titleControl.text =
     originalBook.title
