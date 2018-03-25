@@ -779,13 +779,38 @@ class ModifyBookSpec
     scenario("A book within the book catalog cannot be modified when no " +
       "ISBN is specified"){
       Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog,
+        bookTransactor,
+        coverChooser
+      )
+
       And("the title of the book to modify")
+      val titleOfBookToModify: Titles = "Ruins"
+
       And("the original ISBN of the book")
+      val originalISBN: ISBNs =
+        "0061052477"
+
       When("the book to modify is selected")
+      selectBookToModify(
+        titleOfBookToModify
+      )
+
       And("the ISBN of the book is removed")
+      deleteISBN(
+        originalISBN
+      )
+
       Then("the save button on the modify book dialog is inactive")
-      pending
+      findBookEntryDialog("Modify Book") should haveInactiveSaveButton()
     }
 
     scenario("A book within the book catalog when the modifed title and " +

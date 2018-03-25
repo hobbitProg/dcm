@@ -217,16 +217,25 @@ trait GUIAutomation {
     ))
   }
 
-  // Change the ISBN of the book
-  protected def changeISBN(
-    originalISBN: ISBNs,
-    updatedISBN: ISBNs
+  // Delete the ISBN of the book
+  protected def deleteISBN(
+    originalISBN: ISBNs
   ) = {
     selectISBN()
     bookClientRobot push KeyCode.END
     for (isbnCharacterIndex <- 1 to originalISBN.length()) {
       bookClientRobot push KeyCode.BACK_SPACE
     }
+  }
+
+  // Change the ISBN of the book
+  protected def changeISBN(
+    originalISBN: ISBNs,
+    updatedISBN: ISBNs
+  ) = {
+    deleteISBN(
+      originalISBN
+    )
     enterDataIntoControl(
       updatedISBN
     )
