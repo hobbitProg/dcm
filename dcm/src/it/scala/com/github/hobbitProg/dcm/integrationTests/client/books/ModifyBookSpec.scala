@@ -815,6 +815,15 @@ class ModifyBookSpec
 
     scenario("A book within the book catalog when the modifed title and " +
       "author is associated with a different book") {
+      Given("the pre-defined categories")
+      And("a populated catalog")
+      And("the title of the book to modify")
+      And("the title of a different book in the repository")
+      And("the author of the different book in the repository")
+      When("the book to modify is selected")
+      And("the title of the book is changed")
+      And("and the author of the book is changed")
+      Then("the save button on the modify book dialog is inactive")
       pending
     }
 

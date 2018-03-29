@@ -1092,4 +1092,27 @@ class ModifyingBookSpec
       }
     }
   }
+
+  "Given the categories that can be associated with books" - {
+    "and books that already exist in the catalog" - {
+      "and the catalog that is being updated" - {
+        "and the repository to place book catalog information into" - {
+          "and the service for the book catalog" - {
+            "and the parent window that created the book modification " +
+            "dialog" - {
+              "when the book dialog is created" - {
+                "and the title of the book is changed to a title of another " +
+                "book in the catalog" - {
+                  "and the author of the book is changed to the author of " +
+                  "the other book in the catalog" - {
+                    "then the save button is inactive" in (pending)
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

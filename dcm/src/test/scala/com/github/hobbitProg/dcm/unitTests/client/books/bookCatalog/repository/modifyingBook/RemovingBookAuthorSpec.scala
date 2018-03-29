@@ -16,7 +16,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   interpreter.BookCatalogRepositoryInterpreter
 
 /**
-  * Specificatgion for trying to remove the author of a book within the book
+  * Specification for trying to remove the author of a book within the book
   * repository
   * @author Kyle Cranmer
   * @since 0.2
@@ -49,7 +49,7 @@ class RemovingBookAuthorSpec
       ) should be ('left)
     }
   }
-  property("the repository was not updated") {
+  property("the updated book was not placed into the repository") {
     forAll(databaseGenerator, repositoryGenerator, removedAuthorDataGenerator) {
       (
         database: StubDatabase,
