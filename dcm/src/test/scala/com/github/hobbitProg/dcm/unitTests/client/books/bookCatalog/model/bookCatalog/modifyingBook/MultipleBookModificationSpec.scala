@@ -12,11 +12,12 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import BookCatalog._
 
 /**
-  * Common functionality to define how book information can be modified
+  * Common functionality to define how book information can be modified to the
+  * information associated with another book
   * @author Kyle Cranmer
   * @since 0.2
   */
-trait BookModificationSpec
+trait MultipleBookModificationSpec
     extends BookGenerators {
   protected case class TestBook(
     val title: Titles,
@@ -30,6 +31,7 @@ trait BookModificationSpec
 
   protected type CatalogInfoType = (
     BookCatalog,
+    BookInfoType,
     BookInfoType
   )
 
@@ -37,18 +39,28 @@ trait BookModificationSpec
   protected var givenUpdatedBook: Book = null
 
   protected val catalogGenerator = for {
-    bookInfo <- bookDataGen
+    firstBookInfo <- bookDataGen
+    secondBookInfo <- bookDataGen
     catalog <- addBook(
-      new BookCatalog(),
-      bookInfo._1,
-      bookInfo._2,
-      bookInfo._3,
-      bookInfo._4,
-      bookInfo._5,
-      bookInfo._6
+      addBook(
+        new BookCatalog(),
+        firstBookInfo._1,
+        firstBookInfo._2,
+        firstBookInfo._3,
+        firstBookInfo._4,
+        firstBookInfo._5,
+        firstBookInfo._6
+      ).get,
+      secondBookInfo._1,
+      secondBookInfo._2,
+      secondBookInfo._3,
+      secondBookInfo._4,
+      secondBookInfo._5,
+      secondBookInfo._6
     )
   } yield (
     catalog,
-    bookInfo
+    firstBookInfo,
+    secondBookInfo
   )
 }

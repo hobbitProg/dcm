@@ -31,12 +31,14 @@ class RemovingTitleOfBookSpec
       val Success(
         (
           catalog,
-          title,
-          author,
-          isbn,
-          description,
-          coverImage,
-          categories
+          (
+            title,
+            author,
+            isbn,
+            description,
+            coverImage,
+            categories
+          )
         )
       ) = catalogData
       modifyTitleOfBook(
@@ -52,12 +54,14 @@ class RemovingTitleOfBookSpec
       val Success(
         (
           catalog,
-          title,
-          author,
-          isbn,
-          description,
-          coverImage,
-          categories
+          (
+            title,
+            author,
+            isbn,
+            description,
+            coverImage,
+            categories
+          )
         )
       ) = catalogData
       modifyTitleOfBook(

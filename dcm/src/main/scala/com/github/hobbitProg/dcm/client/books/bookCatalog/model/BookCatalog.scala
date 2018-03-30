@@ -91,36 +91,80 @@ object BookCatalog {
     updatedCover: CoverImages,
     updatedCategories: Set[Categories]
   ): Try[BookCatalog] = {
-    Book.book(
-      updatedTitle,
-      updatedAuthor,
-      updatedISBN,
-      updatedDescription,
-      updatedCover,
-      updatedCategories
-    ) match {
-      case Valid(updatedBook) =>
-        for (action <- catalog.modifySubscribers) {
-          action(
-            originalBook,
-            updatedBook
-          )
-        }
-        Success(
-          new BookCatalog(
-            (catalog.catalog - originalBook) + updatedBook,
-            catalog.addSubscribers,
-            catalog.modifySubscribers
-          )
-        )
-      case Invalid(errorReason) =>
+    (updatedTitle, updatedAuthor) match {
+      case (repeatedTitle, repeatedAuthor)
+          if exists(
+            remove(
+              catalog,
+              originalBook.title,
+              originalBook.author
+            ),
+            updatedTitle,
+            updatedAuthor
+          ) =>
         Failure(
           new InvalidBookException(
-            errorReason
+            repeatedTitle +
+              " by " +
+              repeatedAuthor +
+              " already exists in the catalog"
           )
-      )
+        )
+      case _ =>
+        Book.book(
+          updatedTitle,
+          updatedAuthor,
+          updatedISBN,
+          updatedDescription,
+          updatedCover,
+          updatedCategories
+        ) match {
+          case Valid(updatedBook) =>
+            for (action <- catalog.modifySubscribers) {
+              action(
+                originalBook,
+                updatedBook
+              )
+            }
+            Success(
+              new BookCatalog(
+                (catalog.catalog - originalBook) + updatedBook,
+                catalog.addSubscribers,
+                catalog.modifySubscribers
+              )
+            )
+          case Invalid(errorReason) =>
+            Failure(
+              new InvalidBookException(
+                errorReason
+              )
+            )
+        }
     }
   }
+
+  /**
+    * Remove a book with the given title and author from the given catalog
+    * @param catalog The catalog to remove the book from
+    * @param existingTitle The title of the book to remove from the catalog
+    * @param existingAuthor The author of the book to remove from the catalog
+    * @return The catalog without the book with the given title and author
+    */
+  def remove(
+    catalog: BookCatalog,
+    existingTitle: Titles,
+    existingAuthor: Authors
+  ) : BookCatalog =
+    new BookCatalog(
+      catalog.catalog.filterNot {
+        existingBook =>
+        existingBook.title == existingTitle &&
+        existingBook.author == existingAuthor
+      },
+      catalog.addSubscribers,
+      catalog.modifySubscribers
+    )
+
 
   /**
     * Register action to perform when book is added to catalog
@@ -130,13 +174,12 @@ object BookCatalog {
   def onAdd(
     catalog: BookCatalog,
     addAction: Book => Unit
-  ): BookCatalog = {
+  ): BookCatalog =
     new BookCatalog(
       catalog.catalog,
       catalog.addSubscribers :+ addAction,
       catalog.modifySubscribers
     )
-  }
 
   /**
     * Register action to perform when book is added to catalog

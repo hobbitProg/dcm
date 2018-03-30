@@ -26,12 +26,14 @@ trait TitleModificationSpec
     val Success(
       (
         catalog,
-        title,
-        author,
-        isbn,
-        description,
-        coverImage,
-        categories
+        (
+          title,
+          author,
+          isbn,
+          description,
+          coverImage,
+          categories
+        )
       )
     ) = catalogData
     val catalogWithSubscriber =

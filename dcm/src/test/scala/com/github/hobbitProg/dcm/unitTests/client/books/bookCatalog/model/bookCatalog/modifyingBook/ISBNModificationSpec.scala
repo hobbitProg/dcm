@@ -12,13 +12,12 @@ import BookCatalog._
   */
 trait ISBNModificationSpec
     extends BookModificationSpec {
-
   // Modify the ISBN of a book in the catalog
   protected def modifyISBNOfBook(
     catalogData: Try[CatalogInfoType],
     newISBN: ISBNs
   ) : Try[BookCatalog] = {
-    val Success((catalog, title, author, isbn, description, coverImage, categories)) =
+    val Success((catalog, (title, author, isbn, description, coverImage, categories))) =
       catalogData
     val catalogWithSubscriber =
       onModify(

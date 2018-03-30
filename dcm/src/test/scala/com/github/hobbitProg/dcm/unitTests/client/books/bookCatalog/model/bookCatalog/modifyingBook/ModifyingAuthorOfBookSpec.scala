@@ -34,7 +34,7 @@ class ModifyingAuthorOfBookSpec
   property("the book with the new author is placed in the catalog") {
     forAll(catalogGenerator, authorGenerator) {
       (catalogData: Try[CatalogInfoType], newAuthor: Authors) =>
-      val Success((catalog, title, author, isbn, description, coverImage, categories)) =
+      val Success((catalog, (title, author, isbn, description, coverImage, categories))) =
         catalogData
       modifyAuthorOfBook(
         catalogData,
@@ -59,7 +59,7 @@ class ModifyingAuthorOfBookSpec
           catalogData,
           newAuthor
         )
-        val Success((catalog, title, author, isbn, description, coverImage, categories)) =
+        val Success((catalog, (title, author, isbn, description, coverImage, categories))) =
           catalogData
         val expectedBook =
           TestBook(
@@ -82,7 +82,7 @@ class ModifyingAuthorOfBookSpec
           catalogData,
           newAuthor
         )
-        val Success((catalog, title, author, isbn, description, coverImage, categories)) =
+        val Success((catalog, (title, author, isbn, description, coverImage, categories))) =
           catalogData
         val expectedBook =
           TestBook(

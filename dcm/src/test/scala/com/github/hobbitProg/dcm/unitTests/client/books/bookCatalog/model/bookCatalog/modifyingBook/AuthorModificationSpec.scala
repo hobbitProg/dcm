@@ -17,7 +17,7 @@ trait AuthorModificationSpec
     catalogData: Try[CatalogInfoType],
     newAuthor: Authors
   ) : Try[BookCatalog] = {
-    val Success((catalog, title, author, isbn, description, coverImage, categories)) =
+    val Success((catalog, (title, author, isbn, description, coverImage, categories))) =
       catalogData
     val catalogWithSubscriber =
       onModify(
