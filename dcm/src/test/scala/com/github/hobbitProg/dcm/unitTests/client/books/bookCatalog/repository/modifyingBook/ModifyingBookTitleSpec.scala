@@ -27,19 +27,35 @@ class ModifyingBookTitleSpec
     with ModifyingTitleSpec {
 
   val newTitleDataGenerator = for {
-    title <- arbitrary[String].suchThat(_.length > 0)
-    author <- arbitrary[String].suchThat(_.length > 0)
-    isbn <- arbitrary[String].suchThat(_.length > 0)
-    description <- Gen.option(arbitrary[String])
-    coverImage <- Gen.oneOf(availableCovers)
-    categories <- Gen.listOf(arbitrary[String])
-    newTitle <- arbitrary[String].suchThat(generatedTitle => generatedTitle != title && generatedTitle.length > 0)
-  } yield (title, author, isbn, description, coverImage, categories.toSet,
-    newTitle)
+    title <- TitleGen
+    author <- AuthorGen
+    isbn <- ISBNGen
+    description <- DescriptionGen
+    coverImage <- CoverImageGen
+    categories <- CategoriesGen
+    newTitle <- TitleGen.suchThat(
+      generatedTitle =>
+      generatedTitle != title
+    )
+  } yield (
+    (
+      title,
+      author,
+      isbn,
+      description,
+      coverImage,
+      categories
+    ),
+    newTitle
+  )
 
   property("the repository is marked as being updated"){
     forAll(databaseGenerator, repositoryGenerator, newTitleDataGenerator) {
-      (database: StubDatabase, repository: BookCatalogRepositoryInterpreter, bookData: BookDataTypeWithNewTitle) =>
+      (
+        database: StubDatabase,
+        repository: BookCatalogRepositoryInterpreter,
+        bookData: BookDataTypeWithNewTitle
+      ) =>
       modifyTitleOfBook(
         database,
         repository,
@@ -50,10 +66,24 @@ class ModifyingBookTitleSpec
 
   property("the updated book is placed into the repository"){
     forAll(databaseGenerator, repositoryGenerator, newTitleDataGenerator) {
-      (database: StubDatabase, repository: BookCatalogRepositoryInterpreter,
-        bookData: BookDataTypeWithNewTitle) =>
+      (
+        database: StubDatabase,
+        repository: BookCatalogRepositoryInterpreter,
+        bookData: BookDataTypeWithNewTitle
+      ) =>
       bookData match {
-        case (_, author, isbn, description, coverImage, categories, newTitle) =>
+        case
+            (
+              (
+                _,
+                author,
+                isbn,
+                description,
+                coverImage,
+                categories
+              ),
+              newTitle
+            ) =>
           modifyTitleOfBook(
             database,
             repository,
@@ -90,10 +120,13 @@ class ModifyingBookTitleSpec
 
   property("the original book is no longer in the repository"){
     forAll(databaseGenerator, repositoryGenerator, newTitleDataGenerator) {
-      (database: StubDatabase, repository: BookCatalogRepositoryInterpreter,
-    bookData: BookDataTypeWithNewTitle) =>
+      (
+        database: StubDatabase,
+        repository: BookCatalogRepositoryInterpreter,
+        bookData: BookDataTypeWithNewTitle
+      ) =>
       bookData match {
-        case (_, _, isbn, _, _, _, _) =>
+        case ((_, _, isbn, _, _, _), _) =>
           modifyTitleOfBook(
             database,
             repository,

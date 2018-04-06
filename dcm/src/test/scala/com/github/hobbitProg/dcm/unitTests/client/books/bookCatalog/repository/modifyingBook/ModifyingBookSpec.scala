@@ -8,6 +8,8 @@ import Gen.const
 
 import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.database.StubDatabase
 
+import com.github.hobbitProg.dcm.generator.BookGenerators
+
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   interpreter.BookCatalogRepositoryInterpreter
@@ -16,7 +18,9 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   * @author Kyle Cranmer
   * @since 0.2
   */
-trait ModifyingBookSpec {
+trait ModifyingBookSpec
+    extends BookGenerators {
+
   protected case class TestBook(
     title: Titles,
     author: Authors,
@@ -26,21 +30,6 @@ trait ModifyingBookSpec {
     categories: Set[Categories]
   ) extends Book {
   }
-
-  protected val availableCovers =
-    Seq(
-      "/Goblins.jpg",
-      "/GroundZero.jpg",
-      "/Ruins.jpg"
-    ).map(
-      image =>
-      Some(
-        getClass().
-          getResource(
-            image
-          ).toURI
-      )
-    )
 
   protected val databaseGenerator = for {
     database <- new StubDatabase()

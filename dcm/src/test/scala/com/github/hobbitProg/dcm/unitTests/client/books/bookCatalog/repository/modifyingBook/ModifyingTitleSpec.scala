@@ -17,7 +17,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
 trait ModifyingTitleSpec
     extends ModifyingBookSpec {
   protected type BookDataTypeWithNewTitle =
-    (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], Titles)
+    (BookInfoType, Titles)
 
   // Modify the title of a book in the repository
   protected def modifyTitleOfBook(
@@ -26,7 +26,17 @@ trait ModifyingTitleSpec
     bookData: BookDataTypeWithNewTitle
   ) : Either[String, Book] =
     bookData match {
-      case (title, author, isbn, description, coverImage, categories, newTitle) =>
+      case (
+        (
+          title,
+          author,
+          isbn,
+          description,
+          coverImage,
+          categories
+        ),
+        newTitle
+      ) =>
         val originalBook =
           TestBook(
             title,

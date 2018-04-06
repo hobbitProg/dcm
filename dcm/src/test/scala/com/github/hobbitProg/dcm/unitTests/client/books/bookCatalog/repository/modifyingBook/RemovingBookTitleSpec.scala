@@ -28,13 +28,23 @@ class RemovingBookTitleSpec
     with ModifyingTitleSpec {
 
   val emptyTitleDataGenerator = for {
-    title <- arbitrary[String].suchThat(_.length > 0)
-    author <- arbitrary[String].suchThat(_.length > 0)
-    isbn <- arbitrary[String].suchThat(_.length > 0)
-    description <- Gen.option(arbitrary[String])
-    coverImage <- Gen.oneOf(availableCovers)
-    categories <- Gen.listOf(arbitrary[String])
-  } yield (title, author, isbn, description, coverImage, categories.toSet, "")
+    title <- TitleGen
+    author <- AuthorGen
+    isbn <- ISBNGen
+    description <- DescriptionGen
+    coverImage <- CoverImageGen
+    categories <- CategoriesGen
+  } yield (
+    (
+      title,
+      author,
+      isbn,
+      description,
+      coverImage,
+      categories
+    ),
+    ""
+  )
 
   property("the repository is not updated") {
     forAll(
@@ -74,7 +84,7 @@ class RemovingBookTitleSpec
       database.addedCategoryAssociations =
         Set[(ISBNs, Categories)]()
       bookData match {
-        case (_, _, isbn, _, _, _, _) =>
+        case ((_, _, isbn, _, _, _), _) =>
           modifyTitleOfBook(
             database,
             repository,

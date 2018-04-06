@@ -19,7 +19,7 @@ trait ModifyingISBNSpec
     extends ModifyingBookSpec {
 
   protected type BookDataTypeWithNewISBN =
-    (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], ISBNs)
+    (BookInfoType, ISBNs)
 
   // Modify the ISBN of a book in the repository
   protected def modifyISBNOfBook(
@@ -28,7 +28,17 @@ trait ModifyingISBNSpec
     bookData: BookDataTypeWithNewISBN
   ) =
     bookData match {
-      case (title, author, isbn, description, coverImage, categories, newISBN) =>
+      case (
+        (
+          title,
+          author,
+          isbn,
+          description,
+          coverImage,
+          categories
+        ),
+        newISBN
+      ) =>
         val originalBook =
           TestBook(
             title,

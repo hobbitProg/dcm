@@ -18,8 +18,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
 trait ModifyingAuthorSpec
     extends ModifyingBookSpec {
   protected type BookDataTypeWithNewAuthor =
-    (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], Authors)
-
+    (BookInfoType, Authors)
 
   // Modify the author of a book in the repository
   protected def modifyAuthorOfBook(
@@ -28,8 +27,18 @@ trait ModifyingAuthorSpec
     bookData: BookDataTypeWithNewAuthor
   ) : Either[String, Book] =
     bookData match {
-      case (title, author, isbn, description, coverImage, categories, newAuthor) =>
-        val originalBook =
+      case (
+        (
+          title,
+          author,
+          isbn,
+          description,
+          coverImage,
+          categories
+        ),
+        newAuthor
+      ) =>
+          val originalBook =
           TestBook(
             title,
             author,

@@ -27,13 +27,23 @@ class RemovingBookAuthorSpec
     with Matchers
     with ModifyingAuthorSpec {
   val removedAuthorDataGenerator = for {
-    title <- arbitrary[String].suchThat(_.length > 0)
-    author <- arbitrary[String].suchThat(_.length > 0)
-    isbn <- arbitrary[String].suchThat(_.length > 0)
-    description <- Gen.option(arbitrary[String])
-    coverImage <- Gen.oneOf(availableCovers)
-    categories <- Gen.listOf(arbitrary[String])
-  } yield (title, author, isbn, description, coverImage, categories.toSet, "")
+    title <- TitleGen
+    author <- AuthorGen
+    isbn <- ISBNGen
+    description <- DescriptionGen
+    coverImage <- CoverImageGen
+    categories <- CategoriesGen
+  } yield (
+    (
+      title,
+      author,
+      isbn,
+      description,
+      coverImage,
+      categories
+    ),
+    ""
+  )
 
   property("the repository is not updated") {
     forAll(databaseGenerator, repositoryGenerator, removedAuthorDataGenerator) {
@@ -57,7 +67,17 @@ class RemovingBookAuthorSpec
         bookData: BookDataTypeWithNewAuthor
       ) =>
       bookData match {
-        case (title, author, isbn, description, coverImage, categories, _) =>
+        case (
+          (
+            title,
+            author,
+            isbn,
+            description,
+            coverImage,
+            categories
+          ),
+          _
+        ) =>
           database.addedTitle = ""
           database.addedAuthor = ""
           database.addedISBN = ""

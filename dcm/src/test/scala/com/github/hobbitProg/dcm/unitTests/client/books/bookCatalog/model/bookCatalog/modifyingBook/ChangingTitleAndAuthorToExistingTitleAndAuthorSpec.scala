@@ -74,7 +74,7 @@ class ChangingTitleAndAuthorToExistingTitleAndAuthorSpec
     )
   }
 
-  property("the repository is not updated") {
+  property("the catalog is not updated") {
     forAll(catalogGenerator) {
       (catalogData: Try[CatalogInfoType]) =>
       modifyTitleAndAuthorOfBook(
@@ -83,13 +83,22 @@ class ChangingTitleAndAuthorToExistingTitleAndAuthorSpec
     }
   }
 
-  property("the updated book was not placed into the repository") {
+  property("the original book was not given to the listener") {
     forAll(catalogGenerator) {
       (catalogData: Try[CatalogInfoType]) =>
       modifyTitleAndAuthorOfBook(
         catalogData
       )
       givenOriginalBook should equal (null)
+    }
+  }
+
+  property("the updated book was not given to the listener") {
+    forAll(catalogGenerator) {
+      (catalogData: Try[CatalogInfoType]) =>
+      modifyTitleAndAuthorOfBook(
+        catalogData
+      )
       givenUpdatedBook should equal (null)
     }
   }

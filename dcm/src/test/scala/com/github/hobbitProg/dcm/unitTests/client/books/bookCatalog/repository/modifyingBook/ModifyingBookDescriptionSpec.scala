@@ -24,53 +24,33 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
 class ModifyingBookDescriptionSpec
     extends PropSpec
     with GeneratorDrivenPropertyChecks
-    with Matchers {
+    with Matchers
+    with ModifyingBookSpec {
 
   private type BookDataTypeWithNewDescription =
-    (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories], Description)
-
-  private case class TestBook(
-    title: Titles,
-    author: Authors,
-    isbn: ISBNs,
-    description: Description,
-    coverImage: CoverImages,
-    categories: Set[Categories]
-  ) extends Book {
-  }
-
-  private val availableCovers =
-    Seq(
-      "/Goblins.jpg",
-      "/GroundZero.jpg",
-      "/Ruins.jpg"
-    ).map(
-      image =>
-      Some(
-        getClass().
-          getResource(
-            image
-          ).toURI
-      )
-    )
-
-  val databaseGenerator = for {
-    database <- new StubDatabase()
-  } yield database
-
-  val repositoryGenerator = for {
-    repository <- new BookCatalogRepositoryInterpreter
-  } yield repository
+    (BookInfoType, Description)
 
   val newDescriptionDataGenerator = for {
-    title <- arbitrary[String].suchThat(_.length > 0)
-    author <- arbitrary[String].suchThat(_.length > 0)
-    isbn <- arbitrary[String].suchThat(_.length > 0)
-    description <- Gen.option(arbitrary[String])
-    coverImage <- Gen.oneOf(availableCovers)
-    categories <- Gen.listOf(arbitrary[String])
-    newDescription <- Gen.option(arbitrary[String]).suchThat(generatedDescription => generatedDescription != description)
-  } yield (title, author, isbn, description, coverImage, categories.toSet, newDescription)
+    title <- TitleGen
+    author <- AuthorGen
+    isbn <- ISBNGen
+    description <- DescriptionGen
+    coverImage <- CoverImageGen
+    categories <- CategoriesGen
+    newDescription <- DescriptionGen.suchThat(
+      generatedDescription => generatedDescription != description
+    )
+  } yield (
+    (
+      title,
+      author,
+      isbn,
+      description,
+      coverImage,
+      categories
+    ),
+    newDescription
+  )
 
   // Modify the description of a book in the repository
   private def modifyDescriptionOfBook(
@@ -79,7 +59,17 @@ class ModifyingBookDescriptionSpec
     bookData: BookDataTypeWithNewDescription
   ) : Either[String, Book] =
     bookData match {
-      case (title, author, isbn, description, coverImage, categories, newDescription) =>
+      case (
+        (
+          title,
+          author,
+          isbn,
+          description,
+          coverImage,
+          categories,
+        ),
+        newDescription
+      ) =>
         val originalBook =
           TestBook(
             title,
@@ -137,7 +127,17 @@ class ModifyingBookDescriptionSpec
         bookData: BookDataTypeWithNewDescription
       ) =>
       bookData match {
-        case (title, author, isbn, _, coverImage, categories, newDescription) =>
+        case (
+          (
+            title,
+            author,
+            isbn,
+            _,
+            coverImage,
+            categories,
+          ),
+          newDescription
+        ) =>
           modifyDescriptionOfBook(
             database,
             repository,
