@@ -9,7 +9,10 @@ import org.scalacheck.{Gen, Arbitrary}
 import Arbitrary.arbitrary
 import Gen.const
 
-import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.service.repository.FakeRepository
+import com.github.hobbitProg.dcm.generator.BookGenerators
+
+import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.service.
+  repository.FakeRepository
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.interpreter.
@@ -22,10 +25,13 @@ import BookCatalogServiceInterpreter._
   * @author Kyle Cranmer
   * @since 0.2
   */
-trait ModifyingBookSpec {
+trait ModifyingBookSpec
+    extends BookGenerators {
 
-  protected type OriginalDataType =
-    (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories])
+  protected type TwoBookDataType = (
+    BookInfoType,
+    BookInfoType
+  )
 
   protected case class TestBook(
     val title: Titles,
@@ -39,21 +45,6 @@ trait ModifyingBookSpec {
   protected var givenOriginalBook: Book = null
   protected var givenUpdatedBook: Book = null
 
-  protected val availableCovers =
-    Seq(
-      "/Goblins.jpg",
-      "/GroundZero.jpg",
-      "/Ruins.jpg"
-    ).map(
-      image =>
-      Some(
-        getClass().
-          getResource(
-            image
-          ).toURI
-      )
-    )
-
   protected val catalogGenerator = for {
     catalog <- new BookCatalog
   } yield catalog
@@ -62,41 +53,87 @@ trait ModifyingBookSpec {
     repository <- new FakeRepository
   } yield repository
 
-  protected val baseBookDataGenerator = for {
-    title <- arbitrary[String].suchThat(_.length > 0)
-    author <- arbitrary[String].suchThat(_.length > 0)
-    isbn <- arbitrary[String].suchThat(_.length > 0)
-    description <- Gen.option(arbitrary[String])
-    coverImage <- Gen.oneOf(availableCovers)
-    categories <- Gen.listOf(arbitrary[String])
-  } yield (title, author, isbn, description, coverImage, categories.toSet)
+  protected val twoBookDataGen = for {
+    firstTitle <- TitleGen
+    secondTitle <- TitleGen.suchThat(
+      generatedTitle =>
+      generatedTitle != firstTitle
+    )
+    firstAuthor <- AuthorGen
+    secondAuthor <- AuthorGen.suchThat(
+      generatedAuthor =>
+      generatedAuthor != firstAuthor
+    )
+    firstISBN <- ISBNGen
+    secondISBN <- ISBNGen.suchThat(
+      generatedISBN =>
+      generatedISBN != firstISBN
+    )
+    firstDescription <- DescriptionGen
+    secondDescription <- DescriptionGen.suchThat(
+      generatedDescription =>
+      generatedDescription != firstDescription
+    )
+    firstCover <- CoverImageGen
+    secondCover <- CoverImageGen.suchThat(
+      generatedCover =>
+      generatedCover != firstCover
+    )
+    firstCategories <- CategoriesGen
+    secondCategories <- CategoriesGen.suchThat(
+      generatedCategories =>
+      generatedCategories != firstCategories
+    )
+  } yield (
+    (
+      firstTitle,
+      firstAuthor,
+      firstISBN,
+      firstDescription,
+      firstCover,
+      firstCategories
+    ),
+    (
+      secondTitle,
+      secondAuthor,
+      secondISBN,
+      secondDescription,
+      secondCover,
+      secondCategories
+    )
+  )
 
   protected def populateCatalog(
     originalCatalog: BookCatalog,
     repository: FakeRepository,
-    bookData: OriginalDataType
+    bookData: BookInfoType*
   ): BookCatalog =
-    bookData match {
-      case (
-        title,
-        author,
-        isbn,
-        description,
-        coverImage,
-        categories
-      ) =>
-        val Valid(populatedCatalog) =
-          insertBook(
-            originalCatalog,
-            title,
-            author,
-            isbn,
-            description,
-            coverImage,
-            categories
-          )(
-            repository
-          )
-        populatedCatalog
-    }
+    bookData.foldLeft(
+      originalCatalog
+    ){
+      (catalog, currentBook) =>
+      currentBook match {
+        case (
+          title,
+          author,
+          isbn,
+          description,
+          coverImage,
+          categories
+        ) =>
+          val Valid(populatedCatalog) =
+            insertBook(
+              catalog,
+              title,
+              author,
+              isbn,
+              description,
+              coverImage,
+              categories
+            )(
+              repository
+            )
+          populatedCatalog
+      }
+  }
 }

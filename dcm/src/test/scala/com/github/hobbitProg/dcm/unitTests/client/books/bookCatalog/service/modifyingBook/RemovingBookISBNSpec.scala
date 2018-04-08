@@ -40,7 +40,7 @@ class RemovingBookISBNSpec
   private def removeISBN(
     populatedCatalog: BookCatalog,
     repository: FakeRepository,
-    bookData: OriginalDataType
+    bookData: BookInfoType
   ) : Validated[BookCatalogError, BookCatalog] =
     bookData match {
       case (
@@ -84,12 +84,12 @@ class RemovingBookISBNSpec
     forAll(
       catalogGenerator,
       repositoryGenerator,
-      baseBookDataGenerator
+      bookDataGen
     ) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: OriginalDataType
+        bookData: BookInfoType
       ) =>
       val populatedCatalog =
         populateCatalog(
@@ -111,12 +111,12 @@ class RemovingBookISBNSpec
     forAll(
       catalogGenerator,
       repositoryGenerator,
-      baseBookDataGenerator
+      bookDataGen
     ) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: OriginalDataType
+        bookData: BookInfoType
       ) =>
       val populatedCatalog =
         populateCatalog(
@@ -153,12 +153,12 @@ class RemovingBookISBNSpec
     forAll(
       catalogGenerator,
       repositoryGenerator,
-      baseBookDataGenerator
+      bookDataGen
     ) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: OriginalDataType
+        bookData: BookInfoType
       ) =>
       val populatedCatalog =
         populateCatalog(
@@ -179,12 +179,12 @@ class RemovingBookISBNSpec
     forAll(
       catalogGenerator,
       repositoryGenerator,
-      baseBookDataGenerator
+      bookDataGen
     ) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: OriginalDataType
+        bookData: BookInfoType
       ) =>
       val populatedCatalog =
         populateCatalog(

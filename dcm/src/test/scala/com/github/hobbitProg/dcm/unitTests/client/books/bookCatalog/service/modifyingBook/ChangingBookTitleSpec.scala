@@ -13,7 +13,6 @@ import org.scalacheck.{Gen, Arbitrary}
 import Arbitrary.arbitrary
 import Gen.const
 
-
 import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.service.repository.FakeRepository
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
@@ -37,17 +36,33 @@ class ChangingBookTitleSpec
     with ValidatedMatchers {
 
   private type TitleModificationType =
-    (OriginalDataType, Titles)
+    (
+      BookInfoType,
+      Titles
+    )
 
   private val titleModificationGenerator = for {
-    title <- arbitrary[String].suchThat(_.length > 0)
-    author <- arbitrary[String].suchThat(_.length > 0)
-    isbn <- arbitrary[String].suchThat(_.length > 0)
-    description <- Gen.option(arbitrary[String])
-    coverImage <- Gen.oneOf(availableCovers)
-    categories <- Gen.listOf(arbitrary[String])
-    newTitle <- arbitrary[String].suchThat(generatedTitle => generatedTitle != title && generatedTitle.length > 0)
-  } yield ((title, author, isbn, description, coverImage, categories.toSet), newTitle)
+    title <- TitleGen
+    author <- AuthorGen
+    isbn <- ISBNGen
+    description <- DescriptionGen
+    coverImage <- CoverImageGen
+    categories <- CategoriesGen
+    newTitle <- TitleGen.suchThat(
+      generatedTitle =>
+      generatedTitle != title
+    )
+  } yield (
+    (
+      title,
+      author,
+      isbn,
+      description,
+      coverImage,
+      categories
+    ),
+    newTitle
+  )
 
   private def modifyTitle(
     populatedCatalog: BookCatalog,
@@ -96,7 +111,11 @@ class ChangingBookTitleSpec
     }
 
   property("indicates the catalog was updated") {
-    forAll(catalogGenerator, repositoryGenerator, titleModificationGenerator) {
+    forAll(
+      catalogGenerator,
+      repositoryGenerator,
+      titleModificationGenerator
+    ) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
@@ -122,7 +141,11 @@ class ChangingBookTitleSpec
   }
 
   property("places the updated book in the catalog") {
-    forAll(catalogGenerator, repositoryGenerator, titleModificationGenerator) {
+    forAll(
+      catalogGenerator,
+      repositoryGenerator,
+      titleModificationGenerator
+    ) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
@@ -165,7 +188,11 @@ class ChangingBookTitleSpec
   }
 
   property("places the updated book in the repository") {
-    forAll(catalogGenerator, repositoryGenerator, titleModificationGenerator) {
+    forAll(
+      catalogGenerator,
+      repositoryGenerator,
+      titleModificationGenerator
+    ) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,

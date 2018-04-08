@@ -37,17 +37,33 @@ class ChangingBookCategoriesSpec
     with ValidatedMatchers {
 
   private type CategoriesModificationType =
-    (OriginalDataType, Set[Categories])
+    (
+      BookInfoType,
+      Set[Categories]
+    )
 
   private val categoriesModificationGenerator = for {
-    title <- arbitrary[String].suchThat(_.length > 0)
-    author <- arbitrary[String].suchThat(_.length > 0)
-    isbn <- arbitrary[String].suchThat(_.length > 0)
-    description <- Gen.option(arbitrary[String])
-    coverImage <- Gen.oneOf(availableCovers)
-    categories <- Gen.listOf(arbitrary[String])
-    newCategories <- Gen.listOf(arbitrary[String]).suchThat(generatedCategories => generatedCategories != categories)
-  } yield ((title, author, isbn, description, coverImage, categories.toSet), newCategories.toSet)
+    title <- TitleGen
+    author <- AuthorGen
+    isbn <- ISBNGen
+    description <- DescriptionGen
+    coverImage <- CoverImageGen
+    categories <- CategoriesGen
+    newCategories <- CategoriesGen.suchThat(
+      generatedCategories =>
+      generatedCategories != categories
+    )
+  } yield (
+    (
+      title,
+      author,
+      isbn,
+      description,
+      coverImage,
+      categories
+    ),
+    newCategories
+  )
 
   private def modifyCategories(
     populatedCatalog: BookCatalog,

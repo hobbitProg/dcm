@@ -15,7 +15,7 @@ class FakeRepository
   /**
     * Book that was placed into repository
     */
-  private var bookPlacedIntoRepository: Book = _
+  var bookPlacedIntoRepository: Book = _
 
   /**
     * Book that was removed from repository

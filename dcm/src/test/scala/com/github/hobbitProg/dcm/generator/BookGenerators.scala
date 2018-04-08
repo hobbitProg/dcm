@@ -98,6 +98,6 @@ trait BookGenerators {
     isbn,
     description,
     coverImage,
-    categories.toSet
+    categories
   )
 }

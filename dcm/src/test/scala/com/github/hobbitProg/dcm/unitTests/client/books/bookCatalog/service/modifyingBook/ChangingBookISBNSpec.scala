@@ -38,17 +38,33 @@ class ChangingBookISBNSpec
     with TryValues {
 
   private type ISBNModificationType =
-    (OriginalDataType, ISBNs)
+    (
+      BookInfoType,
+      ISBNs
+    )
 
   private val isbnModificationGenerator = for {
-    title <- arbitrary[String].suchThat(_.length > 0)
-    author <- arbitrary[String].suchThat(_.length > 0)
-    isbn <- arbitrary[String].suchThat(_.length > 0)
-    description <- Gen.option(arbitrary[String])
-    coverImage <- Gen.oneOf(availableCovers)
-    categories <- Gen.listOf(arbitrary[String])
-    newISBN <- arbitrary[String].suchThat(generatedISBN => generatedISBN != isbn && generatedISBN.length > 0)
-  } yield ((title, author, isbn, description, coverImage, categories.toSet), newISBN)
+    title <- TitleGen
+    author <- AuthorGen
+    isbn <- ISBNGen
+    description <- DescriptionGen
+    coverImage <- CoverImageGen
+    categories <- CategoriesGen
+    newISBN <- ISBNGen.suchThat(
+      generatedISBN =>
+      generatedISBN != isbn
+    )
+  } yield (
+    (
+      title,
+      author,
+      isbn,
+      description,
+      coverImage,
+      categories
+    ),
+    newISBN
+  )
 
   private def modifyISBN(
     populatedCatalog: BookCatalog,

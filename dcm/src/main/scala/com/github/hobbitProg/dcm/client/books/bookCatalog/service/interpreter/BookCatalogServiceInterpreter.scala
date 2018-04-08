@@ -115,43 +115,42 @@ object BookCatalogServiceInterpreter
     newCover: CoverImages,
     newCategories: Set[Categories]
   ): BookCatalogOperation[BookCatalog] = Kleisli {
-    repository: BookCatalogRepository =>
-    updateBook(
-      catalog,
-      originalBook,
-      newTitle,
-      newAuthor,
-      newISBN,
-      newDescription,
-      newCover,
-      newCategories
-    ) match {
-      case Success(updatedCatalog) =>
-        getByISBN(
-          updatedCatalog,
-          newISBN
-        ) match {
-          case Success(newBook) =>
-            repository.update(
-              originalBook,
-              newBook
-            ) match {
-              case Right(_) =>
-                Valid(updatedCatalog)
-              case Left(_) =>
-                Invalid(
-                  BookNotUpdatedWithinCatalog()
-                )
-            }
-          case Failure(_) =>
-            Invalid(
-              BookNotUpdatedWithinCatalog()
-            )
-        }
-      case Failure(_) =>
-        Invalid(
-          BookNotUpdatedWithinCatalog()
-        )
+    repository: BookCatalogRepository => {
+      val updatedInfo =
+        for {
+          updatedCatalog <- updateBook(
+            catalog,
+            originalBook,
+            newTitle,
+            newAuthor,
+            newISBN,
+            newDescription,
+            newCover,
+            newCategories
+          )
+          newBook <- getByISBN(
+            updatedCatalog,
+            newISBN
+          )
+        } yield (updatedCatalog, newBook)
+      updatedInfo match {
+        case Success((resultingCatalog, newBook)) =>
+          repository.update(
+            originalBook,
+            newBook
+          ) match {
+            case Right(_) =>
+              Valid(resultingCatalog)
+            case Left(_) =>
+              Invalid(
+                BookNotUpdatedWithinCatalog()
+              )
+          }
+        case Failure(_) =>
+          Invalid(
+            BookNotUpdatedWithinCatalog()
+          )
+      }
     }
   }
 

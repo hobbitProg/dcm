@@ -37,17 +37,33 @@ class ChangingBookAuthorSpec
     with ValidatedMatchers {
 
   private type AuthorModificationType =
-    (OriginalDataType, Authors)
+    (
+      BookInfoType,
+      Authors
+    )
 
   private val authorModificationGenerator = for {
-    title <- arbitrary[String].suchThat(_.length > 0)
-    author <- arbitrary[String].suchThat(_.length > 0)
-    isbn <- arbitrary[String].suchThat(_.length > 0)
-    description <- Gen.option(arbitrary[String])
-    coverImage <- Gen.oneOf(availableCovers)
-    categories <- Gen.listOf(arbitrary[String])
-    newAuthor <- arbitrary[String].suchThat(generatedAuthor => generatedAuthor != author && generatedAuthor.length > 0)
-  } yield ((title, author, isbn, description, coverImage, categories.toSet), newAuthor)
+    title <- TitleGen
+    author <- AuthorGen
+    isbn <- ISBNGen
+    description <- DescriptionGen
+    coverImage <- CoverImageGen
+    categories <- CategoriesGen
+    newAuthor <- AuthorGen.suchThat(
+      generatedAuthor =>
+      generatedAuthor != author
+    )
+  } yield (
+    (
+      title,
+      author,
+      isbn,
+      description,
+      coverImage,
+      categories
+    ),
+    newAuthor
+  )
 
   private def modifyAuthor(
     populatedCatalog: BookCatalog,

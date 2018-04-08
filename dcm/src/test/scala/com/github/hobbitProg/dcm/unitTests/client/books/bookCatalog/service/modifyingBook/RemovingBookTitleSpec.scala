@@ -38,7 +38,7 @@ class RemovingBookTitleSpec
   private def removeTitle(
     populatedCatalog: BookCatalog,
     repository: FakeRepository,
-    bookData: OriginalDataType
+    bookData: BookInfoType
   ) : Validated[BookCatalogError, BookCatalog] =
     bookData match {
       case (
@@ -82,12 +82,12 @@ class RemovingBookTitleSpec
     forAll(
       catalogGenerator,
       repositoryGenerator,
-      baseBookDataGenerator
+      bookDataGen
     ) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: OriginalDataType
+        bookData: BookInfoType
       ) =>
       val populatedCatalog =
         populateCatalog(
@@ -109,12 +109,12 @@ class RemovingBookTitleSpec
     forAll(
       catalogGenerator,
       repositoryGenerator,
-      baseBookDataGenerator
+      bookDataGen
     ) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: OriginalDataType
+        bookData: BookInfoType
       ) =>
       val populatedCatalog =
         populateCatalog(
@@ -151,12 +151,12 @@ class RemovingBookTitleSpec
     forAll(
       catalogGenerator,
       repositoryGenerator,
-      baseBookDataGenerator
+      bookDataGen
     ) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: OriginalDataType
+        bookData: BookInfoType
       ) =>
       val populatedCatalog =
         populateCatalog(
@@ -177,12 +177,12 @@ class RemovingBookTitleSpec
     forAll(
       catalogGenerator,
       repositoryGenerator,
-      baseBookDataGenerator
+      bookDataGen
     ) {
       (
         catalog: BookCatalog,
         repository: FakeRepository,
-        bookData: OriginalDataType
+        bookData: BookInfoType
       ) =>
       val populatedCatalog =
         populateCatalog(

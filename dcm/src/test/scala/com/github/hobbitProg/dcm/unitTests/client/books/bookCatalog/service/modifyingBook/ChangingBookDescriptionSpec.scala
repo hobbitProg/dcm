@@ -37,17 +37,33 @@ class ChangingBookDescriptionSpec
     with ValidatedMatchers {
 
   private type DescriptionModificationType =
-    (OriginalDataType, Description)
+    (
+      BookInfoType,
+      Description
+    )
 
   private val descriptionModificationGenerator = for {
-    title <- arbitrary[String].suchThat(_.length > 0)
-    author <- arbitrary[String].suchThat(_.length > 0)
-    isbn <- arbitrary[String].suchThat(_.length > 0)
-    description <- Gen.option(arbitrary[String])
-    coverImage <- Gen.oneOf(availableCovers)
-    categories <- Gen.listOf(arbitrary[String])
-    newDescription <- Gen.option(arbitrary[String]).suchThat(generatedDescription => generatedDescription != description)
-  } yield ((title, author, isbn, description, coverImage, categories.toSet), newDescription)
+    title <- TitleGen
+    author <- AuthorGen
+    isbn <- ISBNGen
+    description <- DescriptionGen
+    coverImage <- CoverImageGen
+    categories <- CategoriesGen
+    newDescription <- DescriptionGen.suchThat(
+      generatedDescription =>
+      generatedDescription != description
+    )
+  } yield (
+    (
+      title,
+      author,
+      isbn,
+      description,
+      coverImage,
+      categories
+    ),
+    newDescription
+  )
 
   private def modifyDescription(
     populatedCatalog: BookCatalog,

@@ -37,17 +37,33 @@ class ChangingBookCoverSpec
     with ValidatedMatchers {
 
   private type CoverModificationType =
-    (OriginalDataType, CoverImages)
+    (
+      BookInfoType,
+      CoverImages
+    )
 
   private val coverModificationGenerator = for {
-    title <- arbitrary[String].suchThat(_.length > 0)
-    author <- arbitrary[String].suchThat(_.length > 0)
-    isbn <- arbitrary[String].suchThat(_.length > 0)
-    description <- Gen.option(arbitrary[String])
-    coverImage <- Gen.oneOf(availableCovers)
-    categories <- Gen.listOf(arbitrary[String])
-    newCover <- Gen.oneOf(availableCovers).suchThat(generatedCover => generatedCover != coverImage)
-  } yield ((title, author, isbn, description, coverImage, categories.toSet), newCover)
+    title <- TitleGen
+    author <- AuthorGen
+    isbn <- ISBNGen
+    description <- DescriptionGen
+    coverImage <- CoverImageGen
+    categories <- CategoriesGen
+    newCover <- CoverImageGen.suchThat(
+      generatedCover =>
+      generatedCover != coverImage
+    )
+  } yield (
+    (
+      title,
+      author,
+      isbn,
+      description,
+      coverImage,
+      categories
+    ),
+    newCover
+  )
 
   private def modifyCover(
     populatedCatalog: BookCatalog,
