@@ -816,15 +816,52 @@ class ModifyBookSpec
     scenario("A book within the book catalog when the modifed title and " +
       "author is associated with a different book") {
       Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog,
+        bookTransactor,
+        coverChooser
+      )
+
       And("the title of the book to modify")
+      val titleOfBookToModify: Titles = "Ruins"
+
       And("the title of a different book in the repository")
+      val titleOfOtherBook: Titles = "Goblins"
+
+      And("the original author of the book")
+      val originalAuthor: Authors =
+        "Kevin J. Anderson"
+
       And("the author of the different book in the repository")
+      val authorOfOtherBook: Authors =
+        "Charles Grant"
+
       When("the book to modify is selected")
+      selectBookToModify(
+        titleOfBookToModify
+      )
+
       And("the title of the book is changed")
+      changeTitle(
+        titleOfBookToModify,
+        titleOfOtherBook
+      )
+
       And("and the author of the book is changed")
+      changeAuthor(
+        originalAuthor,
+        authorOfOtherBook
+      )
+
       Then("the save button on the modify book dialog is inactive")
-      pending
+      findBookEntryDialog("Modify Book") should haveInactiveSaveButton()
     }
 
     scenario("A book within the book catalog when the modified ISBN is " +
