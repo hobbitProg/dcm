@@ -36,6 +36,8 @@ class ModifyBookDialog(
   repository,
   definedCategories
 ) {
+  import catalogService._
+
   // Control for dialog
   protected val control: BookEntryControl =
     new ModifyBookControl(
@@ -54,7 +56,8 @@ class ModifyBookDialog(
   protected def bookUnableToBeSaved: Boolean =
     titleIsUndefined ||
   authorIsUndefined ||
-  isbnIsUndefined
+  isbnIsUndefined ||
+  modifiedTitleAndAuthorAssociatedWithAnotherBook
 
   titleControl.text =
     originalBook.title
@@ -76,4 +79,21 @@ class ModifyBookDialog(
   }
   categoryControl.items.value ++= originalBook.categories
   unassociatedCategories --= originalBook.categories
+
+  // Determine if the title and author have been modified
+  private def titleAndAuthorModified: Boolean =
+    titleControl.text.value != originalBook.title ||
+  authorControl.text.value != originalBook.author
+
+  // Determine if the title and author have been changed to the title and author
+  // of another book
+  private def modifiedTitleAndAuthorAssociatedWithAnotherBook: Boolean =
+    titleAndAuthorModified &&
+    bookExists(
+      catalog,
+      titleControl.text.value,
+      authorControl.text.value
+    )(
+      repository
+    )
 }

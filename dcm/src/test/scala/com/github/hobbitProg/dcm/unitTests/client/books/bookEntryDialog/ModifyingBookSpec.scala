@@ -1,6 +1,7 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookEntryDialog
 
-import scala.collection.Set
+import scala.collection.{Set, Seq}
+import scala.util.Success
 
 import java.net.URI
 import java.util.function.{Consumer, Supplier}
@@ -20,6 +21,7 @@ import org.scalatest.{BeforeAndAfter, FreeSpec, Matchers}
 import org.scalamock.scalatest.MockFactory
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
+import BookCatalog._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   BookCatalogRepository
 import com.github.hobbitProg.dcm.client.books.control.BookDialogParent
@@ -1094,18 +1096,134 @@ class ModifyingBookSpec
   }
 
   "Given the categories that can be associated with books" - {
+    val definedCategories: Set[String] =
+      Set[String](
+        "sci-fi",
+        "conspiracy",
+        "fantasy",
+        "thriller"
+      )
+
     "and books that already exist in the catalog" - {
+      val existingBooks =
+        Seq[BookData](
+          new BookData(
+            "Ruins",
+            "Kevin J. Anderson",
+            "006105223X",
+            Some("Description for Ground Zero"),
+            Some[URI](
+              bookImageLocation
+            ),
+            Set[String](
+              "sci-fi",
+              "conspiracy"
+            )
+          ),
+          new BookData(
+            "Goblins",
+            "Charles Grant",
+            "0061054143",
+            Some("Description of Goblins"),
+            Some[URI](
+              getClass.getResource(
+                "/Goblins.jpg"
+              ).toURI
+            ),
+            Set[String](
+              "sci-fi",
+              "conspiracy"
+            )
+          )
+        )
+      originalBook =
+        existingBooks.head
+
       "and the catalog that is being updated" - {
+        val catalog =
+          existingBooks.foldLeft(
+            new BookCatalog()
+          ) {
+            (currentCatalog, currentBook) =>
+            addBook(
+              currentCatalog,
+              currentBook.title,
+              currentBook.author,
+              currentBook.isbn,
+              currentBook.description,
+              currentBook.coverImage,
+              currentBook.categories
+            ).get
+          }
+
         "and the repository to place book catalog information into" - {
+          val repository =
+            mock[BookCatalogRepository];
+
           "and the service for the book catalog" - {
+            val service =
+              new TestService()
+            service.existingTitle =
+              existingBooks.last.title
+            service.existingAuthor =
+              existingBooks.last.author
+            var bookToDelete: Book = null
+            var bookToAdd: TestService.BookData = null
+            service.onModify(
+              (unmodifiedBook, modifiedBook) => {
+                bookToDelete = unmodifiedBook
+                bookToAdd = modifiedBook
+              }
+            )
+
             "and the parent window that created the book modification " +
             "dialog" - {
+              val parent =
+                new TestParent(
+                  catalog
+                )
+
               "when the book dialog is created" - {
+                val bookModificationDialog: Scene =
+                  createBookDialog(
+                    catalog,
+                    repository,
+                    service,
+                    definedCategories,
+                    parent
+                  )
+
                 "and the title of the book is changed to a title of another " +
                 "book in the catalog" - {
+                  activateControl(
+                    BookEntryDialog.titleControlId
+                  )
+                  clearControl(
+                    existingBooks.head.title.length
+                  )
+                  enterDataIntoControl(
+                    existingBooks.last.title
+                  )
+
                   "and the author of the book is changed to the author of " +
                   "the other book in the catalog" - {
-                    "then the save button is inactive" in (pending)
+                    activateControl(
+                      BookEntryDialog.authorControlId
+                    )
+                    clearControl(
+                      existingBooks.head.author.length
+                    )
+                    enterDataIntoControl(
+                      existingBooks.last.author
+                    )
+
+                    "then the save button is inactive" in {
+                      val saveButton =
+                        retrieveSaveButton(
+                          bookModificationDialog
+                        )
+                      saveButton should be (disabled)
+                    }
                   }
                 }
               }
