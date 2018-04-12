@@ -40,6 +40,58 @@ object BookCatalogServiceInterpreter
     categories: Set[Categories]
   ): BookCatalogOperation[BookCatalog] = Kleisli {
     repository: BookCatalogRepository =>
+//    if (exists(catalog, title, author) ||
+//      repository.alreadyContains(title, author) ||
+//      exists(catalog, isbn) ||
+//      repository.alreadyContains(isbn)) {
+//      Invalid(
+//        BookNotAddedToCatalog()
+//      )
+//    }
+//    else {
+//      addBook(
+//        catalog,
+//        title,
+//        author,
+//        isbn,
+//        description,
+//        cover,
+//        categories
+//      ) match {
+//        case Success(updatedCatalog) =>
+//          getByISBN(
+//            updatedCatalog,
+//            isbn
+//          ) match {
+//            case Success(
+//              newBook
+//            ) =>
+//              repository.add(
+//                newBook
+//              ) match {
+//                case Success(_) =>
+//                  Valid(
+//                    updatedCatalog
+//                  )
+//                case Failure(_) =>
+//                  Invalid(
+//                    BookNotAddedToRepository()
+//                  )
+//              }
+//            case Failure(_) =>
+//              Invalid(
+//                BookNotAddedToRepository()
+//              )
+//          }
+//          Valid(
+//            updatedCatalog
+//          )
+//        case Failure(_) =>
+//          Invalid(
+//            BookNotAddedToCatalog()
+//          )
+//      }
+//    }
     if (exists(catalog, title, author) ||
       repository.alreadyContains(title, author) ||
       exists(catalog, isbn) ||
@@ -49,46 +101,33 @@ object BookCatalogServiceInterpreter
       )
     }
     else {
-      addBook(
-        catalog,
-        title,
-        author,
-        isbn,
-        description,
-        cover,
-        categories
-      ) match {
-        case Success(updatedCatalog) =>
-          getByISBN(
+      val resultingCatalog =
+        for {
+          updatedCatalog <- addBook(
+            catalog,
+            title,
+            author,
+            isbn,
+            description,
+            cover,
+            categories
+          )
+          newBook <- getByISBN(
             updatedCatalog,
             isbn
-          ) match {
-            case Success(
-              newBook
-            ) =>
-              repository.add(
-                newBook
-              ) match {
-                case Success(_) =>
-                  Valid(
-                    updatedCatalog
-                  )
-                case Failure(_) =>
-                  Invalid(
-                    BookNotAddedToRepository()
-                  )
-              }
-            case Failure(_) =>
-              Invalid(
-                BookNotAddedToRepository()
-              )
-          }
+          )
+          _ <- repository.add(
+            newBook
+          )
+        } yield updatedCatalog
+      resultingCatalog match {
+        case Success(generatedCatalog) =>
           Valid(
-            updatedCatalog
+            generatedCatalog
           )
         case Failure(_) =>
           Invalid(
-            BookNotAddedToCatalog()
+            BookNotAddedToRepository()
           )
       }
     }
