@@ -1,6 +1,6 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.service.repository
 
-import scala.util.{Either, Left}
+import scala.util.{Try, Success}
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookCatalogRepository
@@ -45,9 +45,9 @@ class FakeRepository
     */
   override def add(
     newBook: Book
-  ): Either[String, Book] = {
+  ): Try[Book] = {
     bookPlacedIntoRepository = newBook
-    Right(
+    Success(
       newBook
     )
   }
@@ -61,10 +61,10 @@ class FakeRepository
   override def update(
     originalBook: Book,
     updatedBook: Book
-  ): Either[String, Book] = {
+  ): Try[Book] = {
     bookPlacedIntoRepository = updatedBook
     bookRemovedFromRepository = originalBook
-    Right(
+    Success(
       updatedBook
     )
   }

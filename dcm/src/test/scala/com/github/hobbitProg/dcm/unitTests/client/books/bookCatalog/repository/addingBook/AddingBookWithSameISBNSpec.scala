@@ -2,6 +2,7 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.
 
 import scala.collection.Set
 import scala.language.implicitConversions
+import scala.util.Failure
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
@@ -96,7 +97,7 @@ class AddingBookWithSameISBNSpec
       repository.setConnection(
         database.connectionTransactor
       )
-      (repository add bookToStore) should be ('left)
+      (repository add bookToStore) shouldBe a [Failure[_]]
     }
   }
 }

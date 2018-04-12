@@ -1,6 +1,9 @@
 package com.github.dcm.unitTests.client.books.bookCatalog.repository.modifyingBook
 
-import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.database.StubDatabase
+import scala.util.Try
+
+import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.
+  database.StubDatabase
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
@@ -25,7 +28,7 @@ trait ModifyingAuthorSpec
     database: StubDatabase,
     repository: BookCatalogRepositoryInterpreter,
     bookData: BookDataTypeWithNewAuthor
-  ) : Either[String, Book] =
+  ) : Try[Book] =
     bookData match {
       case (
         (

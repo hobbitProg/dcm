@@ -1,6 +1,7 @@
 package com.github.dcm.unitTests.client.books.bookCatalog.repository.modifyingBook
 
 import scala.collection.Set
+import scala.util.Failure
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
@@ -61,7 +62,7 @@ class RemovingBookTitleSpec
         database,
         repository,
         bookData
-      ) should be ('left)
+      ) shouldBe a [Failure[_]]
     }
   }
 

@@ -1,6 +1,7 @@
 package com.github.dcm.unitTests.client.books.bookCatalog.repository.modifyingBook
 
 import scala.collection.Set
+import scala.util.{Try, Success}
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
@@ -56,7 +57,7 @@ class ModifyingBookCoverSpec
     database: StubDatabase,
     repository: BookCatalogRepositoryInterpreter,
     bookData: BookDataTypeWithNewCover
-  ) : Either[String, Book] =
+  ) : Try[Book] =
     bookData match {
       case (
         (
@@ -111,7 +112,7 @@ class ModifyingBookCoverSpec
         database,
         repository,
         bookData
-      ) should be ('right)
+      ) shouldBe a [Success[_]]
     }
   }
   property("the updated book is placed into the repository") {

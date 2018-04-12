@@ -1,6 +1,7 @@
 package com.github.dcm.unitTests.client.books.bookCatalog.repository.modifyingBook
 
 import scala.collection.Set
+import scala.util.Success
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
@@ -9,7 +10,8 @@ import Gen.const
 import org.scalatest.{Matchers, PropSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
-import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.database.StubDatabase
+import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.
+  database.StubDatabase
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
@@ -60,7 +62,7 @@ class ModifyingBookTitleSpec
         database,
         repository,
         bookData
-      ) should be ('right)
+      ) shouldBe a [Success[_]]
     }
   }
 

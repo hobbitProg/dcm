@@ -2,6 +2,7 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.
 
 import scala.collection.Set
 import scala.language.implicitConversions
+import scala.util.{Try, Success}
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
@@ -90,7 +91,7 @@ class AddingValidBookSpec
     database: StubDatabase,
     repository: BookCatalogRepositoryInterpreter,
     bookData: BookDataType
-  ) : Either[String, Book] = {
+  ) : Try[Book] = {
     repository.setConnection(
       database.connectionTransactor
     )
@@ -106,7 +107,7 @@ class AddingValidBookSpec
         database,
         repository,
         bookData
-      ) should be ('right)
+      ) shouldBe a [Success[_]]
     }
   }
 

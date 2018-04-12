@@ -69,11 +69,11 @@ object BookCatalogServiceInterpreter
               repository.add(
                 newBook
               ) match {
-                case Right(_) =>
+                case Success(_) =>
                   Valid(
                     updatedCatalog
                   )
-                case Left(_) =>
+                case Failure(_) =>
                   Invalid(
                     BookNotAddedToRepository()
                   )
@@ -132,20 +132,15 @@ object BookCatalogServiceInterpreter
             updatedCatalog,
             newISBN
           )
-        } yield (updatedCatalog, newBook)
-      updatedInfo match {
-        case Success((resultingCatalog, newBook)) =>
-          repository.update(
+          updatedBook <- repository.update(
             originalBook,
             newBook
-          ) match {
-            case Right(_) =>
-              Valid(resultingCatalog)
-            case Left(_) =>
-              Invalid(
-                BookNotUpdatedWithinCatalog()
-              )
-          }
+          )
+
+        } yield (updatedCatalog)
+      updatedInfo match {
+        case Success(resultingCatalog) =>
+          Valid(resultingCatalog)
         case Failure(_) =>
           Invalid(
             BookNotUpdatedWithinCatalog()

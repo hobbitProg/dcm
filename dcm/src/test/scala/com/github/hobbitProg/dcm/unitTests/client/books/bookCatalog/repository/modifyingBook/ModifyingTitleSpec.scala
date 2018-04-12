@@ -1,6 +1,7 @@
 package com.github.dcm.unitTests.client.books.bookCatalog.repository.modifyingBook
 
 import scala.collection.Set
+import scala.util.Try
 
 import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.database.StubDatabase
 
@@ -24,7 +25,7 @@ trait ModifyingTitleSpec
     database: StubDatabase,
     repository: BookCatalogRepositoryInterpreter,
     bookData: BookDataTypeWithNewTitle
-  ) : Either[String, Book] =
+  ) : Try[Book] =
     bookData match {
       case (
         (

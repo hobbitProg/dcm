@@ -1,6 +1,7 @@
 package com.github.dcm.unitTests.client.books.bookCatalog.repository.modifyingBook
 
 import scala.collection.Set
+import scala.util.Success
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
@@ -59,7 +60,7 @@ class ModifyingBookISBNSpec
         database,
         repository,
         bookData
-      ) should be ('right)
+      ) shouldBe a [Success[_]]
     }
   }
 

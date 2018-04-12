@@ -2,6 +2,7 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.
 
 import scala.collection.Set
 import scala.language.implicitConversions
+import scala.util.Failure
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
@@ -17,7 +18,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   interpreter.BookCatalogRepositoryInterpreter
 
 /**
-  * Specification for trying to add a book with 
+  * Specification for trying to add a book with
   * @author Kyle Cranmer
   * @since 0.2
   */
@@ -91,7 +92,7 @@ class AddingBookWithNoTitleSpec
       repository.setConnection(
         database.connectionTransactor
       )
-      (repository add bookToStore) should be ('left)
+      (repository add bookToStore) shouldBe a [Failure[_]]
     }
   }
 }

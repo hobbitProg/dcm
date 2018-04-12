@@ -1,6 +1,7 @@
 package com.github.dcm.unitTests.client.books.bookCatalog.repository.modifyingBook
 
 import scala.collection.Set
+import scala.util.Failure
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
@@ -56,7 +57,7 @@ class RemovingBookAuthorSpec
         database,
         repository,
         bookData
-      ) should be ('left)
+      ) shouldBe a [Failure[_]]
     }
   }
   property("the updated book was not placed into the repository") {

@@ -1,4 +1,5 @@
-package com.github.hobbitProg.dcm.client.books.bookCatalog.repository.interpreter
+package com.github.hobbitProg.dcm.client.books.bookCatalog.repository
+package interpreter
 
 import java.net.URI
 
@@ -11,7 +12,7 @@ import doobie._, doobie.implicits._
 
 import cats._, cats.data._, cats.effect._, cats.implicits._
 
-import scala.util.{Either, Left, Right}
+import scala.util.{Try, Success, Failure}
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookCatalogRepository
@@ -51,32 +52,37 @@ class BookCatalogRepositoryInterpreter
     */
   override def add(
     newBook: Book
-  ): Either[String, Book] = {
+  ): Try[Book] = {
     newBook match {
       case noTitleDefined if newBook.title == "" =>
-        Left("Given book does not have a title")
+        Failure(
+          new NoTitleException()
+        )
       case noAuthorDefined if newBook.author == "" =>
-        Left("Given book does hot have an author")
+        Failure(
+          new NoAuthorException()
+        )
       case noISBNDefined if newBook.isbn == "" =>
-        Left("Given book does not have an ISBN")
+        Failure(
+          new NoISBNException()
+        )
       case titleAuthorPairAlreadyExists if alreadyContains(
         newBook.title,
         newBook.author
       ) =>
-        Left(
-          "The book " +
-            newBook.title +
-            " by " +
-            newBook.author +
-            " already exists in catalog"
+        Failure(
+          new DuplicateTitleAndAuthorException(
+            newBook.title,
+            newBook.author
+          )
         )
       case isbnAlreadyExists if alreadyContains(
         newBook.isbn
       ) =>
-        Left(
-          "The book with isbn " +
-            newBook.isbn +
-            " already exists in catalog"
+        Failure(
+          new DuplicateISBNException(
+            newBook.isbn
+          )
         )
       case _ =>
         val descriptionToSave =
@@ -121,7 +127,7 @@ class BookCatalogRepositoryInterpreter
           insertStatement.transact(
             databaseConnection
           ).unsafeRunSync
-        Right(newBook)
+        Success(newBook)
     }
   }
 
@@ -134,7 +140,7 @@ class BookCatalogRepositoryInterpreter
   override def update(
     originalBook: Book,
     updatedBook: Book
-  ): Either[String, Book] = {
+  ): Try[Book] = {
     // Remove original book from repository
     val bookRemovalStatement =
       sql"DELETE FROM bookCatalog WHERE ISBN=${originalBook.isbn};"

@@ -1,6 +1,7 @@
 package com.github.dcm.unitTests.client.books.bookCatalog.repository.modifyingBook
 
 import scala.collection.Set
+import scala.util.{Try, Failure}
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
@@ -69,7 +70,7 @@ class ModifyingTitleAndAuthorToTitleAndAuthorOfDifferentBookSpec
     database: StubDatabase,
     repository: BookCatalogRepositoryInterpreter,
     bookData: DuplicateTitleAuthorDataType
-  ) : Either[String, Book] =
+  ) : Try[Book] =
     bookData match {
       case (
         (
@@ -128,7 +129,7 @@ class ModifyingTitleAndAuthorToTitleAndAuthorOfDifferentBookSpec
         database,
         repository,
         bookData
-      ) should be ('left)
+      ) shouldBe a [Failure[_]]
     }
   }
 }

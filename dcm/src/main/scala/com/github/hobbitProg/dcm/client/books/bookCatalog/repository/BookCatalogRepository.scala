@@ -1,7 +1,7 @@
 package com.github.hobbitProg.dcm.client.books.bookCatalog.repository
 
 import scala.collection.Set
-import scala.util.Either
+import scala.util.Try
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model.{Book, Titles,
   Authors, ISBNs, Categories}
@@ -20,7 +20,7 @@ trait BookCatalogRepository {
     */
   def add(
     newBook: Book
-  ): Either[String, Book]
+  ): Try[Book]
 
   /**
     * Modify given book in repository
@@ -31,7 +31,7 @@ trait BookCatalogRepository {
   def update(
     originalBook: Book,
     updatedBook: Book
-  ): Either[String, Book]
+  ): Try[Book]
 
   /**
     * Retrieve book with given ISBN

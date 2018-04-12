@@ -3,7 +3,7 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogView
 import java.net.URI
 
 import scala.collection.Set
-import scala.util.Either
+import scala.util.{Try, Success}
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
@@ -72,8 +72,8 @@ class TestRepository
     */
   def add(
     newBook: Book
-  ): Either[String, Book] =
-    Right(
+  ): Try[Book] =
+    Success(
       newBook
     )
 
@@ -86,8 +86,8 @@ class TestRepository
   def update(
     originalBook: Book,
     updatedBook: Book
-  ): Either[String, Book] =
-    Right(
+  ): Try[Book] =
+    Success(
       updatedBook
     )
 
