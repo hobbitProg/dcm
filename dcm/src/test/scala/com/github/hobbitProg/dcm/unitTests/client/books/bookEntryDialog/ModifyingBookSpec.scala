@@ -1242,7 +1242,7 @@ class ModifyingBookSpec
             "and the parent window that created the book modification " +
             "dialog" - {
               "when the book dialog is created" - {
-                "and the ISBN of the book is changed to an ISBN of another " -
+                "and the ISBN of the book is changed to an ISBN of another " +
                 "book in the catalog" - {
                   "then the save button is inactive" in (pending)
                 }

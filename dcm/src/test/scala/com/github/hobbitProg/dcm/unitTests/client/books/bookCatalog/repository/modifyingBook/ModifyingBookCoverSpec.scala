@@ -7,7 +7,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
 import Gen.const
 
-import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.{Matchers, PropSpec, TryValues}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.database.StubDatabase
@@ -25,6 +25,7 @@ class ModifyingBookCoverSpec
     extends PropSpec
     with GeneratorDrivenPropertyChecks
     with Matchers
+    with TryValues
     with ModifyingBookSpec {
 
   private type BookDataTypeWithNewCover =
@@ -112,7 +113,7 @@ class ModifyingBookCoverSpec
         database,
         repository,
         bookData
-      ) shouldBe a [Success[_]]
+      ) should be a 'success
     }
   }
   property("the updated book is placed into the repository") {

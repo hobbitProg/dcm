@@ -7,7 +7,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
 import Gen.const
 
-import org.scalatest.{Matchers, PropSpec, EitherValues}
+import org.scalatest.{Matchers, PropSpec, TryValues}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.
@@ -27,7 +27,7 @@ class ModifyingTitleAndAuthorToTitleAndAuthorOfDifferentBookSpec
     extends PropSpec
     with GeneratorDrivenPropertyChecks
     with Matchers
-    with EitherValues
+    with TryValues
     with ModifyingBookSpec {
 
   type DuplicateTitleAuthorDataType =
@@ -129,7 +129,7 @@ class ModifyingTitleAndAuthorToTitleAndAuthorOfDifferentBookSpec
         database,
         repository,
         bookData
-      ) shouldBe a [Failure[_]]
+      ) should be a 'failure
     }
   }
 }

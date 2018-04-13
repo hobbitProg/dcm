@@ -7,7 +7,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
 import Gen.const
 
-import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.{Matchers, PropSpec, TryValues}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.database.StubDatabase
@@ -26,6 +26,7 @@ class RemovingBookAuthorSpec
     extends PropSpec
     with GeneratorDrivenPropertyChecks
     with Matchers
+    with TryValues
     with ModifyingAuthorSpec {
   val removedAuthorDataGenerator = for {
     title <- TitleGen
@@ -57,7 +58,7 @@ class RemovingBookAuthorSpec
         database,
         repository,
         bookData
-      ) shouldBe a [Failure[_]]
+      ) should be a 'failure
     }
   }
   property("the updated book was not placed into the repository") {

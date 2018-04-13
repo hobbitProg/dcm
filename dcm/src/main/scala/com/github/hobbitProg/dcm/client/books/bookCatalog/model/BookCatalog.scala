@@ -91,8 +91,8 @@ object BookCatalog {
     updatedCover: CoverImages,
     updatedCategories: Set[Categories]
   ): Try[BookCatalog] = {
-    (updatedTitle, updatedAuthor) match {
-      case (repeatedTitle, repeatedAuthor)
+    (updatedTitle, updatedAuthor, updatedISBN) match {
+      case (repeatedTitle, repeatedAuthor, _)
           if exists(
             remove(
               catalog,
@@ -107,6 +107,21 @@ object BookCatalog {
             repeatedTitle +
               " by " +
               repeatedAuthor +
+              " already exists in the catalog"
+          )
+        )
+      case (_, _, repeatedISBN)
+          if exists(
+            remove(
+              catalog,
+              originalBook.title,
+              originalBook.author
+            ),
+            updatedISBN
+          ) =>
+        Failure(
+          new InvalidBookException(
+            repeatedISBN +
               " already exists in the catalog"
           )
         )

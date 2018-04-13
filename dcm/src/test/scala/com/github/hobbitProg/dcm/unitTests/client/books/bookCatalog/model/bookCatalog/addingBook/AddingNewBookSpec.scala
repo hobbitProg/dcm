@@ -3,7 +3,7 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.model.bookC
 import scala.collection.Set
 import scala.util.Success
 
-import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.{Matchers, PropSpec, TryValues}
 import org.scalatest.prop._
 
 import org.scalacheck.{Gen, Arbitrary}
@@ -21,6 +21,7 @@ import BookCatalog._
 class AddingNewBookSpec
     extends PropSpec
     with GeneratorDrivenPropertyChecks
+    with TryValues
     with Matchers {
   case class TestBook(
     val title: Titles,
@@ -76,7 +77,7 @@ class AddingNewBookSpec
               coverImage,
               categories
             )
-          resultingCatalog shouldBe a [Success[_]]
+          resultingCatalog should be a 'success
       }
     }
   }

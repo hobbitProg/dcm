@@ -7,7 +7,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
 import Gen.const
 
-import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.{Matchers, PropSpec, TryValues}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.database.StubDatabase
@@ -26,6 +26,7 @@ class RemovingBookISBNSpec
     extends PropSpec
     with GeneratorDrivenPropertyChecks
     with Matchers
+    with TryValues
     with ModifyingISBNSpec {
 
   val emptyISBNDataGenerator = for {
@@ -62,7 +63,7 @@ class RemovingBookISBNSpec
         database,
         repository,
         bookData
-      ) shouldBe a [Failure[_]]
+      ) should be a 'failure
     }
   }
 

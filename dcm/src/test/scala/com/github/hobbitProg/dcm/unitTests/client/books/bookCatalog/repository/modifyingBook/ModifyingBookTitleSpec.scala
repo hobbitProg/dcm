@@ -7,7 +7,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
 import Gen.const
 
-import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.{Matchers, PropSpec, TryValues}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.
@@ -62,7 +62,7 @@ class ModifyingBookTitleSpec
         database,
         repository,
         bookData
-      ) shouldBe a [Success[_]]
+      ) should be a 'success
     }
   }
 

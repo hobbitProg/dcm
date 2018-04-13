@@ -8,7 +8,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Prop, Gen}
 import Gen.const
 
-import org.scalatest.{PropSpec, Matchers}
+import org.scalatest.{PropSpec, Matchers, TryValues}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.database.StubDatabase
@@ -25,6 +25,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
 class AddingValidBookSpec
     extends PropSpec
     with GeneratorDrivenPropertyChecks
+    with TryValues
     with Matchers {
 
   private type BookDataType = (Titles, Authors, ISBNs, Description, CoverImages, Set[Categories])
@@ -107,7 +108,7 @@ class AddingValidBookSpec
         database,
         repository,
         bookData
-      ) shouldBe a [Success[_]]
+      ) should be a 'success
     }
   }
 
