@@ -866,6 +866,14 @@ class ModifyBookSpec
 
     scenario("A book within the book catalog when the modified ISBN is " +
       "associated with a different book") {
+      Given("the pre-defined categories")
+      And("a populated catalog")
+      And("the title of the book to modify")
+      And("The current ISBN of the book")
+      And("the ISBN of a different book in the repository")
+      When("the book to modify is selected")
+      And("the ISBN of the book is changed")
+      Then("the save button on the modify book dialog is inactive")
       pending
     }
   }
