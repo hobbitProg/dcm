@@ -35,13 +35,6 @@ class ChangingTitleAndAuthorToAuthorBookSpec
     with ModifyingBookSpec
     with ValidatedMatchers {
 
-  private type TitleAuthorModificationType =
-    (
-      BookInfoType,
-      Titles,
-      Authors
-    )
-
   private def modifyTitleAndAuthor(
     populatedCatalog: BookCatalog,
     repository: FakeRepository,
