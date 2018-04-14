@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.client.books.view.image
+package com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.image
 
 import java.io.{File, FileInputStream}
 import java.net.URI

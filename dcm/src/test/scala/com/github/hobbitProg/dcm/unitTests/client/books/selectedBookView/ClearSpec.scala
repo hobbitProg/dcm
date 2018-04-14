@@ -17,7 +17,8 @@ import org.scalatest.{FreeSpec, Matchers, BeforeAndAfter}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.
   SelectedBookView
-import com.github.hobbitProg.dcm.client.books.view.image.CoverImage
+import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.image.
+  CoverImage
 
 /**
   * Specifies how the selected book view is cleared

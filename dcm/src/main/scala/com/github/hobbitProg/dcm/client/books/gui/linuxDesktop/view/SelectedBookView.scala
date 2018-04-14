@@ -7,7 +7,7 @@ import scalafx.scene.control._
 import scalafx.scene.layout.AnchorPane
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model.Book
-import com.github.hobbitProg.dcm.client.books.view.image._
+import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.image._
 import com.github.hobbitProg.dcm.client.books.view.label._
 import com.github.hobbitProg.dcm.client.books.view.listView._
 import com.github.hobbitProg.dcm.client.books.view.text._

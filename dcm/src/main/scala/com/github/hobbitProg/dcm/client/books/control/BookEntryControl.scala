@@ -11,7 +11,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
   BookCatalogService
 import com.github.hobbitProg.dcm.client.books.control.model.BookModel
-import com.github.hobbitProg.dcm.client.books.view.image.CoverImage
+import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.image.
+  CoverImage
 import com.github.hobbitProg.dcm.client.dialog.{CategorySelectionDialog,
   ImageChooser}
 
