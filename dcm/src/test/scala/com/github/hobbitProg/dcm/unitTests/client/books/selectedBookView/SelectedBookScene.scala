@@ -1,6 +1,7 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.selectedBookView
 
-import com.github.hobbitProg.dcm.client.books.view.SelectedBookView
+import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.
+  SelectedBookView
 
 import scalafx.scene.Scene
 import scalafx.scene.layout.GridPane

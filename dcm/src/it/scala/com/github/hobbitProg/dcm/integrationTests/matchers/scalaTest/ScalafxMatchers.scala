@@ -12,7 +12,8 @@ import scalafx.scene.layout.{AnchorPane, VBox}
 import scalafx.stage.Window
 
 import com.github.hobbitProg.dcm.client.linuxDesktop.DCMDesktop
-import com.github.hobbitProg.dcm.client.books.view.SelectedBookView
+import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.
+  SelectedBookView
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 
 /**
