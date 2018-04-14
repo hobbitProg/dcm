@@ -867,14 +867,41 @@ class ModifyBookSpec
     scenario("A book within the book catalog when the modified ISBN is " +
       "associated with a different book") {
       Given("the pre-defined categories")
+      placePreDefinedCategoriesIntoDatabase()
+
       And("a populated catalog")
+      placeExistingBooksIntoDatabase()
+      val catalog: BookCatalog =
+        new BookCatalog()
+
+      showMainApplication(
+        catalog,
+        bookTransactor,
+        coverChooser
+      )
+
       And("the title of the book to modify")
+      val titleOfBookToModify: Titles = "Ruins"
+
       And("The current ISBN of the book")
+      val currentISBN: ISBNs = "0061052477"
+
       And("the ISBN of a different book in the repository")
+      val otherISBN: ISBNs = "0061054143"
+
       When("the book to modify is selected")
+      selectBookToModify(
+        titleOfBookToModify
+      )
+
       And("the ISBN of the book is changed")
+      changeISBN(
+        currentISBN,
+        otherISBN
+      )
+
       Then("the save button on the modify book dialog is inactive")
-      pending
+      findBookEntryDialog("Modify Book") should haveInactiveSaveButton()
     }
   }
 }
