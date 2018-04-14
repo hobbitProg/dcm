@@ -4,7 +4,8 @@ import scalafx.scene.layout.GridPane
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   BookCatalogRepository
-import com.github.hobbitProg.dcm.client.books.view.BookCatalogView
+import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.
+  BookCatalogView
 
 /**
   * Scene to use to test control that displays book catalog

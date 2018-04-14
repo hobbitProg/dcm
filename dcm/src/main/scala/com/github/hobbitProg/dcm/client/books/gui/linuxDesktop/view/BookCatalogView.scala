@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.client.books.view
+package com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view
 
 import javafx.scene.control.SelectionMode
 
