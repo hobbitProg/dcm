@@ -57,7 +57,8 @@ class ModifyBookDialog(
     titleIsUndefined ||
   authorIsUndefined ||
   isbnIsUndefined ||
-  modifiedTitleAndAuthorAssociatedWithAnotherBook
+  modifiedTitleAndAuthorAssociatedWithAnotherBook ||
+  modifiedISBNAssociatedWithAnotherBook
 
   titleControl.text =
     originalBook.title
@@ -80,15 +81,13 @@ class ModifyBookDialog(
   categoryControl.items.value ++= originalBook.categories
   unassociatedCategories --= originalBook.categories
 
-  // Determine if the title and author have been modified
-  private def titleAndAuthorModified: Boolean =
+  // Determine if either the title or the author has been modified
+  private def titleOrAuthorModified: Boolean =
     titleControl.text.value != originalBook.title ||
   authorControl.text.value != originalBook.author
 
-  // Determine if the title and author have been changed to the title and author
-  // of another book
-  private def modifiedTitleAndAuthorAssociatedWithAnotherBook: Boolean =
-    titleAndAuthorModified &&
+  // Determine if a book exists with the given title and author
+  private def titleAndAuthorAssociatedWithBook: Boolean =
     bookExists(
       catalog,
       titleControl.text.value,
@@ -96,4 +95,28 @@ class ModifyBookDialog(
     )(
       repository
     )
+
+  // Determine if the title and author have been changed to the title and author
+  // of another book
+  private def modifiedTitleAndAuthorAssociatedWithAnotherBook: Boolean =
+    titleOrAuthorModified &&
+  titleAndAuthorAssociatedWithBook
+
+  // Determine if the ISBN has been modified
+  private def isbnModified: Boolean =
+    isbnControl.text.value != originalBook.isbn
+
+  // Determine if a book exists with the given ISBN
+  private def isbnAssociatedWithBook: Boolean =
+    bookExists(
+      catalog,
+      isbnControl.text.value
+    )(
+      repository
+    )
+
+  // Determine if the ISBN has been changed to the ISBN of another book
+  private def modifiedISBNAssociatedWithAnotherBook: Boolean =
+    isbnModified &&
+  isbnAssociatedWithBook
 }

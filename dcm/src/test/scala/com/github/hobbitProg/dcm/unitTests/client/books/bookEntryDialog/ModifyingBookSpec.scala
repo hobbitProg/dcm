@@ -1235,16 +1235,120 @@ class ModifyingBookSpec
   }
 
   "Given the categories that can be associated with books" - {
+    val definedCategories: Set[String] =
+      Set[String](
+        "sci-fi",
+        "conspiracy",
+        "fantasy",
+        "thriller"
+      )
+
     "and books that already exist in the catalog" - {
+      val existingBooks =
+        Seq[BookData](
+          new BookData(
+            "Ruins",
+            "Kevin J. Anderson",
+            "006105223X",
+            Some("Description for Ground Zero"),
+            Some[URI](
+              bookImageLocation
+            ),
+            Set[String](
+              "sci-fi",
+              "conspiracy"
+            )
+          ),
+          new BookData(
+            "Goblins",
+            "Charles Grant",
+            "0061054143",
+            Some("Description of Goblins"),
+            Some[URI](
+              getClass.getResource(
+                "/Goblins.jpg"
+              ).toURI
+            ),
+            Set[String](
+              "sci-fi",
+              "conspiracy"
+            )
+          )
+        )
+      originalBook =
+        existingBooks.head
+
       "and the catalog that is being updated" - {
+        val catalog =
+          existingBooks.foldLeft(
+            new BookCatalog()
+          ) {
+            (currentCatalog, currentBook) =>
+            addBook(
+              currentCatalog,
+              currentBook.title,
+              currentBook.author,
+              currentBook.isbn,
+              currentBook.description,
+              currentBook.coverImage,
+              currentBook.categories
+            ).get
+          }
+
         "and the repository to place book catalog informatin into"- {
+          val repository =
+            mock[BookCatalogRepository];
+
           "and the service for the book catalog" - {
+            val service =
+              new TestService()
+            service.existingISBN =
+              existingBooks.last.isbn
+            var bookToDelete: Book = null
+            var bookToAdd: TestService.BookData = null
+            service.onModify(
+              (unmodifiedBook, modifiedBook) => {
+                bookToDelete = unmodifiedBook
+                bookToAdd = modifiedBook
+              }
+            )
+
             "and the parent window that created the book modification " +
             "dialog" - {
+              val parent =
+                new TestParent(
+                  catalog
+                )
+
               "when the book dialog is created" - {
+                val bookModificationDialog: Scene =
+                  createBookDialog(
+                    catalog,
+                    repository,
+                    service,
+                    definedCategories,
+                    parent
+                  )
+
                 "and the ISBN of the book is changed to an ISBN of another " +
                 "book in the catalog" - {
-                  "then the save button is inactive" in (pending)
+                  activateControl(
+                    BookEntryDialog.isbnControlId
+                  )
+                  clearControl(
+                    existingBooks.head.isbn.length
+                  )
+                  enterDataIntoControl(
+                    existingBooks.last.isbn
+                  )
+
+                  "then the save button is inactive" in {
+                    val saveButton =
+                      retrieveSaveButton(
+                        bookModificationDialog
+                      )
+                    saveButton should be (disabled)
+                  }
                 }
               }
             }
