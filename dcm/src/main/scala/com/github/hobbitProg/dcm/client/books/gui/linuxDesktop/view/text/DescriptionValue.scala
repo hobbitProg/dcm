@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.client.books.view.text
+package com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.text
 
 import scalafx.scene.control.TextArea
 import scalafx.scene.layout.AnchorPane
