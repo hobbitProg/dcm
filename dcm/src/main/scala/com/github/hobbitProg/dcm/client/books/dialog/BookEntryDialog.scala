@@ -21,7 +21,7 @@ import com.github.hobbitProg.dcm.client.books.control.BookEntryControl
 import com.github.hobbitProg.dcm.client.books.control.model.BookModel
 import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.image._
 import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.label._
-import com.github.hobbitProg.dcm.client.books.view.listView._
+import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.listView._
 import com.github.hobbitProg.dcm.client.books.view.text._
 
 /**

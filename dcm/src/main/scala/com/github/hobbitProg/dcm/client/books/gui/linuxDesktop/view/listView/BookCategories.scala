@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.client.books.view.listView
+package com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.listView
 
 import javafx.collections.FXCollections
 
@@ -46,5 +46,3 @@ object BookCategories {
 
   private val height: Double = 160.0
 }
-
-
