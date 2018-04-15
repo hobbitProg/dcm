@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.client.books.view.label
+package com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.label
 
 import scalafx.scene.control.Label
 import scalafx.scene.layout.AnchorPane
