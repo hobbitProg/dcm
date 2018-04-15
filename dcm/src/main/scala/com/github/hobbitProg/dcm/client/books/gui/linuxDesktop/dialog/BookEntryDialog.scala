@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.client.books.dialog
+package com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.dialog
 
 import java.net.URI
 import javafx.collections.FXCollections

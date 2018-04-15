@@ -20,7 +20,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
   BookCatalogService
 import com.github.hobbitProg.dcm.client.books.control.BookDialogParent
-import com.github.hobbitProg.dcm.client.books.dialog.BookEntryDialog
+import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.dialog.
+  BookEntryDialog
 import com.github.hobbitProg.dcm.client.dialog.ImageChooser
 import com.github.hobbitProg.dcm.matchers.scalafx.ListViewCellMatcher
 

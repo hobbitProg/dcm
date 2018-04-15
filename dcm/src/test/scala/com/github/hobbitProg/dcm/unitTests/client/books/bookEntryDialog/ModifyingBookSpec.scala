@@ -25,7 +25,8 @@ import BookCatalog._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   BookCatalogRepository
 import com.github.hobbitProg.dcm.client.books.control.BookDialogParent
-import com.github.hobbitProg.dcm.client.books.dialog.{ModifyBookDialog, BookEntryDialog}
+import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.dialog.
+  {ModifyBookDialog, BookEntryDialog}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
   BookCatalogService
 import com.github.hobbitProg.dcm.client.dialog.{CategorySelectionDialog, ImageChooser}

@@ -19,9 +19,11 @@ import org.scalatest.{BeforeAndAfter, FreeSpec, Matchers}
 import org.scalamock.scalatest.MockFactory
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookCatalogRepository
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  BookCatalogRepository
 import com.github.hobbitProg.dcm.client.books.control.BookDialogParent
-import com.github.hobbitProg.dcm.client.books.dialog.{AddBookDialog, BookEntryDialog}
+import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.dialog.
+  {AddBookDialog, BookEntryDialog}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
   BookCatalogService
 import com.github.hobbitProg.dcm.client.dialog.{CategorySelectionDialog,

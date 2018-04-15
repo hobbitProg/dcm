@@ -8,7 +8,7 @@ import scalafx.stage.Stage
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model.{Book,
   BookCatalog, Categories}
 import com.github.hobbitProg.dcm.client.books.control.BookDialogParent
-import com.github.hobbitProg.dcm.client.books.dialog._
+import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.dialog._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   BookCatalogRepository
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
