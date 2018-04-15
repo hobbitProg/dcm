@@ -14,7 +14,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
   BookCatalogService
 import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view._
-import com.github.hobbitProg.dcm.client.dialog.ImageChooser
+import com.github.hobbitProg.dcm.client.gui.linuxDesktop.dialog.ImageChooser
 /**
   * Control for the tab contianing information within the book catalog
   * @author Kyle Cranmer

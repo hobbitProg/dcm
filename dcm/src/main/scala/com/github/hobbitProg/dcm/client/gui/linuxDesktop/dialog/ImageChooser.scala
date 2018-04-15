@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.client.dialog
+package com.github.hobbitProg.dcm.client.gui.linuxDesktop.dialog
 
 import java.io.File
 
@@ -12,9 +12,9 @@ import scalafx.stage.Window
 trait ImageChooser {
   /**
     * Select image for catalog entry
-    * 
+    *
     * @param parentWindow Window that requested image
-    * 
+    *
     * @return Information on file containing image
     */
   def selectImage(

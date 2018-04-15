@@ -9,7 +9,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
   BookCatalogService
 import com.github.hobbitProg.dcm.client.books.control.{AddBookControl,
   BookDialogParent, BookEntryControl}
-import com.github.hobbitProg.dcm.client.dialog.ImageChooser
+import com.github.hobbitProg.dcm.client.gui.linuxDesktop.dialog.ImageChooser
 
 /**
   * Dialog for entering information on book to be added to catalog

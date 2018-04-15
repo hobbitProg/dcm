@@ -16,7 +16,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
 import com.github.hobbitProg.dcm.client.books.control.BookDialogParent
 import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view._
 import com.github.hobbitProg.dcm.client.control.BookTabControl
-import com.github.hobbitProg.dcm.client.dialog.ImageChooser
+import com.github.hobbitProg.dcm.client.gui.linuxDesktop.dialog.ImageChooser
 
 /**
   * Tab containing books in catalog

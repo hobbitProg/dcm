@@ -13,8 +13,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
 import com.github.hobbitProg.dcm.client.books.control.model.BookModel
 import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.image.
   CoverImage
-import com.github.hobbitProg.dcm.client.dialog.{CategorySelectionDialog,
-  ImageChooser}
+import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
+import com.github.hobbitProg.dcm.client.gui.linuxDesktop.dialog.ImageChooser
 
 /**
   * Controller for view that enters information on a book

@@ -11,7 +11,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
   BookCatalogService
 import com.github.hobbitProg.dcm.client.books.control.{ModifyBookControl,
   BookDialogParent, BookEntryControl}
-import com.github.hobbitProg.dcm.client.dialog.ImageChooser
+import com.github.hobbitProg.dcm.client.gui.linuxDesktop.dialog.ImageChooser
 
 /**
   * Dialog for entering information on book within catalog being modified

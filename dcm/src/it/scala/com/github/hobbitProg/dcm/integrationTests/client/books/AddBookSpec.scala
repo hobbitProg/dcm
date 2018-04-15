@@ -34,8 +34,8 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.interpreter.
   BookCatalogServiceInterpreter
 import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.dialog.
   BookEntryDialog
-import com.github.hobbitProg.dcm.client.dialog.{CategorySelectionDialog,
-  ImageChooser}
+import com.github.hobbitProg.dcm.client.dialog.CategorySelectionDialog
+import com.github.hobbitProg.dcm.client.gui.linuxDesktop.dialog.ImageChooser
 import com.github.hobbitProg.dcm.client.control.BookTabControl
 import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
 import com.github.hobbitProg.dcm.integrationTests.matchers.scalaTest.
