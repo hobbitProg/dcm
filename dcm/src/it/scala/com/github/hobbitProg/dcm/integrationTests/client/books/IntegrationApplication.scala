@@ -6,7 +6,7 @@ import scalafx.Includes._
 import scalafx.scene.Scene
 import scalafx.stage.Stage
 
-import com.github.hobbitProg.dcm.client.linuxDesktop.DCMDesktop
+import com.github.hobbitProg.dcm.client.gui.linuxDesktop.DCMDesktop
 
 /**
   * Application for intgegration tests for distributed collection manager

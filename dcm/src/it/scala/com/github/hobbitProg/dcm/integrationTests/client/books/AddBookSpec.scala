@@ -37,7 +37,7 @@ import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.dialog.
 import com.github.hobbitProg.dcm.client.gui.linuxDesktop.dialog.
   {CategorySelectionDialog, ImageChooser}
 import com.github.hobbitProg.dcm.client.control.BookTabControl
-import com.github.hobbitProg.dcm.client.linuxDesktop.{BookTab, DCMDesktop}
+import com.github.hobbitProg.dcm.client.gui.linuxDesktop.{BookTab, DCMDesktop}
 import com.github.hobbitProg.dcm.integrationTests.matchers.scalaTest.
   {IntegrationMatchers, ScalafxMatchers}
 import com.github.hobbitProg.dcm.integrationTests.matchers.JavaConversions._

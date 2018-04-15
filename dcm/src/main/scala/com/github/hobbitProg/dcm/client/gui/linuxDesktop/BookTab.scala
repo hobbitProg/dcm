@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.client.linuxDesktop
+package com.github.hobbitProg.dcm.client.gui.linuxDesktop
 
 import scala.collection.Set
 
