@@ -23,7 +23,6 @@ import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.image._
 import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.label._
 import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.listView._
 import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.text._
-import com.github.hobbitProg.dcm.client.books.view.text._
 
 /**
   * Dialog for entering information on book for catalog
