@@ -1,4 +1,4 @@
-package com.github.hobbitProg.dcm.client.dialog
+package com.github.hobbitProg.dcm.client.gui.linuxDesktop.dialog
 
 import javafx.collections.FXCollections
 import javafx.scene.control.SelectionMode
