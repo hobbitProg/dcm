@@ -16,7 +16,9 @@ class BookCatalog(
   private val addSubscribers: Seq[Book => Unit] =
     Seq[Book => Unit](),
   private val modifySubscribers: Seq[(Book, Book) => Unit] =
-    Seq[(Book, Book) => Unit]()
+    Seq[(Book, Book) => Unit](),
+  private val deleteSubscribers: Seq[Book => Unit] =
+    Seq[Book => Unit]()
 ) {
 }
 
@@ -59,7 +61,8 @@ object BookCatalog {
           new BookCatalog(
             catalog.catalog + newBook,
             catalog.addSubscribers,
-            catalog.modifySubscribers
+            catalog.modifySubscribers,
+            catalog.deleteSubscribers
           )
         )
       case Invalid(errorReason) =>
@@ -145,7 +148,8 @@ object BookCatalog {
               new BookCatalog(
                 (catalog.catalog - originalBook) + updatedBook,
                 catalog.addSubscribers,
-                catalog.modifySubscribers
+                catalog.modifySubscribers,
+                catalog.deleteSubscribers
               )
             )
           case Invalid(errorReason) =>
@@ -159,27 +163,38 @@ object BookCatalog {
   }
 
   /**
-    * Remove a book with the given title and author from the given catalog
-    * @param catalog The catalog to remove the book from
-    * @param existingTitle The title of the book to remove from the catalog
-    * @param existingAuthor The author of the book to remove from the catalog
-    * @return The catalog without the book with the given title and author
+    * Remove the book with the given title and author from the catalog
+    * @param titleToDelete The title of the book to delete
+    * @param authorToDelete The author of the book to delete
+    * @return Either the catalog without the given book or an indication thg
+    * book cannot be removed
     */
-  def remove(
+  def deleteBook(
     catalog: BookCatalog,
-    existingTitle: Titles,
-    existingAuthor: Authors
-  ) : BookCatalog =
-    new BookCatalog(
-      catalog.catalog.filterNot {
-        existingBook =>
-        existingBook.title == existingTitle &&
-        existingBook.author == existingAuthor
-      },
-      catalog.addSubscribers,
-      catalog.modifySubscribers
+    titleToDelete: Titles,
+    authorToDelete: Authors
+  ): Try[BookCatalog] = {
+    val Success(
+      bookToDelete
+    ) =
+      getByTitleAndAuthor(
+        catalog,
+        titleToDelete,
+        authorToDelete
+      )
+    for (action <- catalog.deleteSubscribers) {
+      action(
+        bookToDelete
+      )
+    }
+    Success(
+      remove(
+        catalog,
+        titleToDelete,
+        authorToDelete
+      )
     )
-
+  }
 
   /**
     * Register action to perform when book is added to catalog
@@ -193,7 +208,8 @@ object BookCatalog {
     new BookCatalog(
       catalog.catalog,
       catalog.addSubscribers :+ addAction,
-      catalog.modifySubscribers
+      catalog.modifySubscribers,
+      catalog.deleteSubscribers
     )
 
   /**
@@ -203,13 +219,24 @@ object BookCatalog {
   def onModify(
     catalog: BookCatalog,
     modifyAction: (Book, Book) => Unit
-  ): BookCatalog = {
+  ): BookCatalog =
     new BookCatalog(
       catalog.catalog,
       catalog.addSubscribers,
-      catalog.modifySubscribers :+ modifyAction
+      catalog.modifySubscribers :+ modifyAction,
+      catalog.deleteSubscribers
     )
-  }
+
+  def onDelete(
+    catalog: BookCatalog,
+    deleteAction: Book => Unit
+  ): BookCatalog =
+    new BookCatalog(
+      catalog.catalog,
+      catalog.addSubscribers,
+      catalog.modifySubscribers,
+      catalog.deleteSubscribers :+ deleteAction
+    )
 
   /**
     * Attempt to retrieve book from catalog by ISBN
@@ -302,4 +329,21 @@ object BookCatalog {
       currentBook.isbn == requestedISBN
     }
   }
+
+  // Remove a book with the given title and author from the given catalog
+  private def remove(
+    catalog: BookCatalog,
+    existingTitle: Titles,
+    existingAuthor: Authors
+  ) : BookCatalog =
+    new BookCatalog(
+      catalog.catalog.filterNot {
+        existingBook =>
+        existingBook.title == existingTitle &&
+        existingBook.author == existingAuthor
+      },
+      catalog.addSubscribers,
+      catalog.modifySubscribers,
+      catalog.deleteSubscribers
+    )
 }
