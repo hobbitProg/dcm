@@ -56,11 +56,11 @@ class DeletingNonExistentBookSpec
         )
       ) = catalogData
 
-        deleteBook(
-          catalog,
-          title,
-          author
-        ) should be a 'failure
+      deleteBook(
+        catalog,
+        title,
+        author
+      ) should be a 'failure
     }
   }
   property("no book is given to the listener"){
