@@ -174,26 +174,39 @@ object BookCatalog {
     titleToDelete: Titles,
     authorToDelete: Authors
   ): Try[BookCatalog] = {
-    val Success(
-      bookToDelete
-    ) =
-      getByTitleAndAuthor(
-        catalog,
-        titleToDelete,
-        authorToDelete
-      )
-    for (action <- catalog.deleteSubscribers) {
-      action(
-        bookToDelete
-      )
+    val deleteResult =
+      for {
+        bookToDelete <- getByTitleAndAuthor(
+          catalog,
+          titleToDelete,
+          authorToDelete
+        )
+        resultingCatalog <- Success(
+          remove(
+            catalog,
+            titleToDelete,
+            authorToDelete
+          )
+        )
+      } yield (bookToDelete, resultingCatalog)
+    deleteResult match {
+      case Success((bookToDelete, resultingCatalog)) =>
+        catalog.deleteSubscribers.foreach(
+          action =>
+          action(
+            bookToDelete
+          )
+        )
+        Success(
+          resultingCatalog
+        )
+      case Failure(
+        failureReason
+      ) =>
+        Failure(
+          failureReason
+        )
     }
-    Success(
-      remove(
-        catalog,
-        titleToDelete,
-        authorToDelete
-      )
-    )
   }
 
   /**

@@ -10,5 +10,5 @@ import org.scalatest.PropSpec
 class DeletingBookWithNoAuthor
     extends PropSpec {
   property("the catalog is not modified")(pending)
-  property("no book is given to the listener")
+  property("no book is given to the listener")(pending)
 }
