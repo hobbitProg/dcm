@@ -1,6 +1,5 @@
 package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.model.bookCatalog.deletingBook
 
-
 import scala.util.{Try, Success}
 
 import org.scalatest.{PropSpec, TryValues, Matchers}
@@ -22,7 +21,7 @@ class DeletingBookWithNoTitle
     with TryValues {
   protected val catalogGenerator = for {
     bookInfo <- bookDataGen
-    otherAuthor <-AuthorGen.suchThat(
+    otherAuthor <- AuthorGen.suchThat(
       generatedAuthor =>
       generatedAuthor != bookInfo._2
     )
