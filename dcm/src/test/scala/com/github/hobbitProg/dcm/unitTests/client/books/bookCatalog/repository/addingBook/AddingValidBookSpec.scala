@@ -11,9 +11,12 @@ import Gen.const
 import org.scalatest.{PropSpec, Matchers, TryValues}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
-import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.database.StubDatabase
+import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.
+  database.StubDatabase
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  BookCatalogRepository
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   interpreter.BookCatalogRepositoryInterpreter
 
@@ -92,7 +95,7 @@ class AddingValidBookSpec
     database: StubDatabase,
     repository: BookCatalogRepositoryInterpreter,
     bookData: BookDataType
-  ) : Try[Book] = {
+  ) : Try[BookCatalogRepository] = {
     repository.setConnection(
       database.connectionTransactor
     )

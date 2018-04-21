@@ -15,6 +15,8 @@ import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  BookCatalogRepository
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   interpreter.BookCatalogRepositoryInterpreter
 
 /**
@@ -70,7 +72,7 @@ class ModifyingTitleAndAuthorToTitleAndAuthorOfDifferentBookSpec
     database: StubDatabase,
     repository: BookCatalogRepositoryInterpreter,
     bookData: DuplicateTitleAuthorDataType
-  ) : Try[Book] =
+  ) : Try[BookCatalogRepository] =
     bookData match {
       case (
         (

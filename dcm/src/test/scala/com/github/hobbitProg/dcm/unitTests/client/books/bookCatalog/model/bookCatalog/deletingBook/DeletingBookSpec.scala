@@ -12,16 +12,6 @@ import BookCatalog._
   */
 trait DeletingBookSpec
     extends BookGenerators {
-  protected case class TestBook(
-    val title: Titles,
-    val author: Authors,
-    val isbn: ISBNs,
-    val description: Description,
-    val coverImage: CoverImages,
-    val categories: Set[Categories]
-  ) extends Book {
-  }
-
   protected type CatalogInfoType = (
     BookCatalog,
     Titles,

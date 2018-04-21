@@ -3,7 +3,8 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.service.rep
 import scala.util.{Try, Success}
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookCatalogRepository
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  BookCatalogRepository
 
 /**
   * Repository for testing book catalog service
@@ -45,10 +46,10 @@ class FakeRepository
     */
   override def add(
     newBook: Book
-  ): Try[Book] = {
+  ): Try[BookCatalogRepository] = {
     bookPlacedIntoRepository = newBook
     Success(
-      newBook
+      this
     )
   }
 
@@ -61,11 +62,11 @@ class FakeRepository
   override def update(
     originalBook: Book,
     updatedBook: Book
-  ): Try[Book] = {
+  ): Try[BookCatalogRepository] = {
     bookPlacedIntoRepository = updatedBook
     bookRemovedFromRepository = originalBook
     Success(
-      updatedBook
+      this
     )
   }
 

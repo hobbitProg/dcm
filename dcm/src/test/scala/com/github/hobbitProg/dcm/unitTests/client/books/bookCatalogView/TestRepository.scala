@@ -72,9 +72,9 @@ class TestRepository
     */
   def add(
     newBook: Book
-  ): Try[Book] =
+  ): Try[BookCatalogRepository] =
     Success(
-      newBook
+      this
     )
 
   /**
@@ -86,9 +86,9 @@ class TestRepository
   def update(
     originalBook: Book,
     updatedBook: Book
-  ): Try[Book] =
+  ): Try[BookCatalogRepository] =
     Success(
-      updatedBook
+      this
     )
 
   /**

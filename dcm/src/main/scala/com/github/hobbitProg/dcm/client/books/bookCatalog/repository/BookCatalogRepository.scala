@@ -20,7 +20,7 @@ trait BookCatalogRepository {
     */
   def add(
     newBook: Book
-  ): Try[Book]
+  ): Try[BookCatalogRepository]
 
   /**
     * Modify given book in repository
@@ -31,7 +31,7 @@ trait BookCatalogRepository {
   def update(
     originalBook: Book,
     updatedBook: Book
-  ): Try[Book]
+  ): Try[BookCatalogRepository]
 
   /**
     * Retrieve book with given ISBN

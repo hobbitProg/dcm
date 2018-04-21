@@ -11,6 +11,8 @@ import Gen.const
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  BookCatalogRepository
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   interpreter.BookCatalogRepositoryInterpreter
 
 /**
@@ -28,7 +30,7 @@ trait ModifyingAuthorSpec
     database: StubDatabase,
     repository: BookCatalogRepositoryInterpreter,
     bookData: BookDataTypeWithNewAuthor
-  ) : Try[Book] =
+  ) : Try[BookCatalogRepository] =
     bookData match {
       case (
         (

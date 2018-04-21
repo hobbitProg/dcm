@@ -7,6 +7,8 @@ import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.d
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  BookCatalogRepository
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   interpreter.BookCatalogRepositoryInterpreter
 
 
@@ -25,7 +27,7 @@ trait ModifyingTitleSpec
     database: StubDatabase,
     repository: BookCatalogRepositoryInterpreter,
     bookData: BookDataTypeWithNewTitle
-  ) : Try[Book] =
+  ) : Try[BookCatalogRepository] =
     bookData match {
       case (
         (

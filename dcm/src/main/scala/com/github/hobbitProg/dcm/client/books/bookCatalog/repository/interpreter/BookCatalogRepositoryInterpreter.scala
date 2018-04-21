@@ -52,7 +52,7 @@ class BookCatalogRepositoryInterpreter
     */
   override def add(
     newBook: Book
-  ): Try[Book] = {
+  ): Try[BookCatalogRepository] = {
     newBook match {
       case noTitleDefined if newBook.title == "" =>
         Failure(
@@ -127,7 +127,7 @@ class BookCatalogRepositoryInterpreter
           insertStatement.transact(
             databaseConnection
           ).unsafeRunSync
-        Success(newBook)
+        Success(this)
     }
   }
 
@@ -140,7 +140,7 @@ class BookCatalogRepositoryInterpreter
   override def update(
     originalBook: Book,
     updatedBook: Book
-  ): Try[Book] = {
+  ): Try[BookCatalogRepository] = {
     // Remove original book from repository
     val bookRemovalStatement =
       sql"DELETE FROM bookCatalog WHERE ISBN=${originalBook.isbn};"
