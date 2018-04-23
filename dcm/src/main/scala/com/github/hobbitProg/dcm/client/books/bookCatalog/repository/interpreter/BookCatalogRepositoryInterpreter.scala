@@ -158,23 +158,34 @@ class BookCatalogRepositoryInterpreter
   override def delete(
     isbnToDelete: ISBNs
   ): Try[BookCatalogRepository] = {
-    val bookRemovalStatement =
-      sql"DELETE FROM bookCatalog WHERE ISBN=${isbnToDelete};"
-    val categoryRemovalStatement =
-      sql"DELETE FROM categoryMapping WHERE ISBN=${isbnToDelete};"
-    val removalStatement =
-      for {
-        mainTableRemoval <- bookRemovalStatement.update.run
-        categoryTableRemoval <- categoryRemovalStatement.update.run
-      } yield mainTableRemoval + categoryTableRemoval
-    val removedBook =
-      removalStatement.transact(
-        databaseConnection
-      ).unsafeRunSync
+    isbnToDelete match {
+      case isbnNotAssociated if !alreadyContains(
+        isbnToDelete
+      ) =>
+        Failure(
+          new ISBNDoesNotExistException(
+            isbnToDelete
+          )
+        )
+      case _ =>
+        val bookRemovalStatement =
+          sql"DELETE FROM bookCatalog WHERE ISBN=${isbnToDelete};"
+        val categoryRemovalStatement =
+          sql"DELETE FROM categoryMapping WHERE ISBN=${isbnToDelete};"
+        val removalStatement =
+          for {
+            mainTableRemoval <- bookRemovalStatement.update.run
+            categoryTableRemoval <- categoryRemovalStatement.update.run
+          } yield mainTableRemoval + categoryTableRemoval
+        val removedBook =
+          removalStatement.transact(
+            databaseConnection
+          ).unsafeRunSync
 
-    Success(
-      this
-    )
+        Success(
+          this
+        )
+    }
   }
 
   /**

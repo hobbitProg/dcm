@@ -69,7 +69,7 @@ class DeletingExistingBookSpec
       ) = repositoryData
       repository.delete(
         isbnToDelete
-      ) should be ('success)
+      ) should be a 'success
     }
   }
 
