@@ -15,8 +15,7 @@ trait BookCatalogRepository {
   /**
     * Add given book to repository
     * @param newBook Book to add to repository
-    * @return Disjoint union of either description of error or book that was
-    * added to repository
+    * @return Indication if book was added to the repository
     */
   def add(
     newBook: Book
@@ -26,11 +25,20 @@ trait BookCatalogRepository {
     * Modify given book in repository
     * @param originalBook Book that is being modified
     * @param updatedBook Book that has been updated
-    * @return Disjoint union of either description of error or updated book
+    * @return Indication if book was modified within the repository
     */
   def update(
     originalBook: Book,
     updatedBook: Book
+  ): Try[BookCatalogRepository]
+
+  /**
+    * Remove book with given ISBN
+    * @param isbnToDelete ISBN of book to delete
+    * @return Indication if book was removed from repository
+    */
+  def delete(
+    isbnToDelete: ISBNs
   ): Try[BookCatalogRepository]
 
   /**

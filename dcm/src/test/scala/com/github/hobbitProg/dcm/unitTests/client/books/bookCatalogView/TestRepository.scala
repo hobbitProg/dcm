@@ -92,6 +92,18 @@ class TestRepository
     )
 
   /**
+    * Remove book with given ISBN
+    * @param isbnToDelete ISBN of book to delete
+    * @return Indication if book was removed from repository
+    */
+  override def delete(
+    isbnToDelete: ISBNs
+  ): Try[BookCatalogRepository] =
+    Success(
+      this
+    )
+
+  /**
     * Retrieve book with given ISBN
     * @param isbn ISBN of book to retrieve
     * @return Disjoint union of either description of error or book with given

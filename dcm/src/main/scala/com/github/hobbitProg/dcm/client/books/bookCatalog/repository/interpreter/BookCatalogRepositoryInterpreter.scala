@@ -40,15 +40,15 @@ class BookCatalogRepositoryInterpreter
     */
   def setConnection(
     connection: Transactor[IO]
-  ) = {
+  ): BookCatalogRepository = {
     databaseConnection = connection
+    this
   }
 
   /**
     * Add given book to repository
     * @param newBook Book to add to repository
-    * @return Disjoint union of either description of error or book that was
-    * added to repository
+    * @return Indication if book was added to the repository
     */
   override def add(
     newBook: Book
@@ -135,17 +135,33 @@ class BookCatalogRepositoryInterpreter
     * Modify given book in repository
     * @param originalBook Book that is being modified
     * @param updatedBook Book that has been updated
-    * @return Disjoint union of either description of error or updated book
+    * @return Indication if book was modified within the repository
     */
   override def update(
     originalBook: Book,
     updatedBook: Book
+  ): Try[BookCatalogRepository] =
+    for {
+      withoutOriginalBook <- delete(
+        originalBook.isbn
+      )
+      withNewBook <- withoutOriginalBook.add(
+        updatedBook
+      )
+    } yield withNewBook
+
+  /**
+    * Remove book with given ISBN
+    * @param isbnToDelete ISBN of book to delete
+    * @return Indication if book was removed from repository
+    */
+  override def delete(
+    isbnToDelete: ISBNs
   ): Try[BookCatalogRepository] = {
-    // Remove original book from repository
     val bookRemovalStatement =
-      sql"DELETE FROM bookCatalog WHERE ISBN=${originalBook.isbn};"
+      sql"DELETE FROM bookCatalog WHERE ISBN=${isbnToDelete};"
     val categoryRemovalStatement =
-      sql"DELETE FROM categoryMapping WHERE ISBN=${originalBook.isbn};"
+      sql"DELETE FROM categoryMapping WHERE ISBN=${isbnToDelete};"
     val removalStatement =
       for {
         mainTableRemoval <- bookRemovalStatement.update.run
@@ -156,9 +172,8 @@ class BookCatalogRepositoryInterpreter
         databaseConnection
       ).unsafeRunSync
 
-    // Place updated book into repository
-    add(
-      updatedBook
+    Success(
+      this
     )
   }
 
@@ -273,7 +288,7 @@ class BookCatalogRepositoryInterpreter
   ): Boolean = {
     !sql"SELECT Title FROM bookCatalog WHERE Title=${title} AND Author=${author};"
       .query[Titles]
-      .list
+      .to[List]
       .transact(databaseConnection)
       .unsafeRunSync
       .isEmpty
@@ -290,7 +305,7 @@ class BookCatalogRepositoryInterpreter
   ): Boolean = {
     !sql"SELECT ISBN from bookCatalog where ISBN=${isbn};"
       .query[ISBNs]
-      .list
+      .to[List]
       .transact(databaseConnection)
       .unsafeRunSync
       .isEmpty

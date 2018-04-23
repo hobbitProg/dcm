@@ -12,6 +12,9 @@ lazy val root = (project in file(".")).
     parallelExecution in Test := false,
     parallelExecution in IntegrationTest := false,
     Defaults.itSettings,
+    scalacOptions ++= Seq(
+      "-deprecation"
+    ),
     libraryDependencies += scalaTest % "it,test",
     libraryDependencies += "org.typelevel" %% "cats-core" % "1.0.1",
     libraryDependencies += "org.tpolecat" %% "doobie-core" % "0.5.0",
