@@ -159,6 +159,10 @@ class BookCatalogRepositoryInterpreter
     isbnToDelete: ISBNs
   ): Try[BookCatalogRepository] = {
     isbnToDelete match {
+      case noISBNDefined if isbnToDelete == "" =>
+        Failure(
+          new NoISBNException()
+        )
       case isbnNotAssociated if !alreadyContains(
         isbnToDelete
       ) =>
