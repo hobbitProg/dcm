@@ -65,7 +65,7 @@ class ModifyingISBNToISBNOfDifferentBookSpec
       ) =>
       bookData match {
         case (_, newISBN) =>
-          database.existingISBN = newISBN
+          database.otherISBN = newISBN
           modifyISBNOfBook(
             database,
             repository,

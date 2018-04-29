@@ -121,7 +121,7 @@ trait ModifyingBookSpec
           coverImage,
           categories
         ) =>
-          val Valid(populatedCatalog) =
+          val Valid((populatedCatalog, _)) =
             insertBook(
               catalog,
               title,

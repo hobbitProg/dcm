@@ -89,10 +89,12 @@ class ModifyingCategoriesOfBookSpec
           )
         )
       ) = catalogData
-      modifyCategoriesOfBook(
-        catalogData,
-        newCategories
-      ) should  containBook(
+      val Success(updatedCatalog) =
+        modifyCategoriesOfBook(
+          catalogData,
+          newCategories
+        )
+      updatedCatalog should containBook(
         new TestBook(
           title,
           author,

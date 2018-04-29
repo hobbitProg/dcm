@@ -87,10 +87,12 @@ class ModifyingCoverImageOfBookSpec
           )
         )
       ) = catalogData
-      modifyCoverOfBook(
-        catalogData,
-        newCover
-      ) should containBook(
+      val Success(updatedCatalog) =
+        modifyCoverOfBook(
+          catalogData,
+          newCover
+        )
+      updatedCatalog should containBook(
         TestBook(
           title,
           author,

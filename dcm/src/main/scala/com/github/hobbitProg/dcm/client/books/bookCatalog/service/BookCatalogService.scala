@@ -6,7 +6,8 @@ import cats.Id
 import cats.data.{Kleisli, Validated}
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookCatalogRepository
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  BookCatalogRepository
 
 /**
   * Service interface for a book catalog
@@ -14,9 +15,12 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookCatalog
   * @since 0.2
   */
 trait BookCatalogService[Catalog] {
-  type BookCatalogValidation[ResultType] = Validated[BookCatalogError, ResultType]
-  type BookCatalogOperation[ResultType] = Kleisli[BookCatalogValidation, BookCatalogRepository, ResultType]
-  type BookCatalogQuery[ResultType] = Kleisli[Id, BookCatalogRepository, ResultType]
+  type BookCatalogValidation[ResultType] =
+    Validated[BookCatalogError, ResultType]
+  type BookCatalogOperation[ResultType] =
+    Kleisli[BookCatalogValidation, BookCatalogRepository, ResultType]
+  type BookCatalogQuery[ResultType] =
+    Kleisli[Id, BookCatalogRepository, ResultType]
 
   /**
     * Add a book to the given book catalog
@@ -37,7 +41,7 @@ trait BookCatalogService[Catalog] {
     description: Description,
     cover: CoverImages,
     categories: Set[Categories]
-  ): BookCatalogOperation[Catalog]
+  ): BookCatalogOperation[(Catalog, BookCatalogRepository)]
 
   /**
     * Modify a book within the given book catalog

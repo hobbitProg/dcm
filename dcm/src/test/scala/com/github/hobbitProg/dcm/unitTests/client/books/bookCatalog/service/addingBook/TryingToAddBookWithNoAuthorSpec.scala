@@ -64,7 +64,7 @@ class TryingToAddBookWithNoAuthorSpec
             )(
               repository
             )
-          resultingCatalog should be (invalid[BookCatalogError])
+          resultingCatalog should be (invalid)
       }
     }
   }
@@ -85,18 +85,17 @@ class TryingToAddBookWithNoAuthorSpec
           coverImage,
           categories
         ) =>
-          val resultingCatalog =
-            insertBook(
-              catalog,
-              title,
-              author,
-              isbn,
-              description,
-              coverImage,
-              categories
-            )(
-              repository
-            )
+          insertBook(
+            catalog,
+            title,
+            author,
+            isbn,
+            description,
+            coverImage,
+            categories
+          )(
+            repository
+          )
           repository should notIncludeBook(
             TestBook(
               title,

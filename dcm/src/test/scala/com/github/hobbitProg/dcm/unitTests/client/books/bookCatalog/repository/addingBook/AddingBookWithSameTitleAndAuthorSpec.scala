@@ -11,7 +11,8 @@ import Gen.const
 import org.scalatest.{PropSpec, Matchers}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
-import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.database.StubDatabase
+import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.repository.
+  database.StubDatabase
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
@@ -96,6 +97,7 @@ class AddingBookWithSameTitleAndAuthorSpec
         bookToStore.title
       database.existingAuthor =
         bookToStore.author
+      database.removedISBN = ""
       repository.setConnection(
         database.connectionTransactor
       )

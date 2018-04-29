@@ -37,7 +37,7 @@ class TestService
     description: Description,
     cover: CoverImages,
     categories: Set[Categories]
-  ): BookCatalogOperation[BookCatalog] = Kleisli {
+  ): BookCatalogOperation[(BookCatalog, BookCatalogRepository)] = Kleisli {
     repository: BookCatalogRepository =>
     val data: TestService.BookData =
       new TestService.BookData(
@@ -55,7 +55,7 @@ class TestService
       )
     }
 
-    Valid(catalog)
+    Valid((catalog, repository))
   }
 
   /**

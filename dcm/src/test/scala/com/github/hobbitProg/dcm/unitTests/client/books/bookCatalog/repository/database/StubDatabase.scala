@@ -37,6 +37,7 @@ class StubDatabase{
   var existingTitle: Titles = _
   var existingAuthor: Authors = _
   var existingISBN: ISBNs = _
+  var otherISBN: ISBNs = _
 
   var removedISBN: ISBNs = _
   var removedCategoryAssociationISBN: ISBNs = _
@@ -56,9 +57,15 @@ class StubDatabase{
             execution.parameters
           addedTitle =
             parameters.head.value.asInstanceOf[Titles]
+          existingTitle =
+            parameters.head.value.asInstanceOf[Titles]
           addedAuthor =
             parameters(1).value.asInstanceOf[Authors]
+          existingAuthor =
+            parameters(1).value.asInstanceOf[Authors]
           addedISBN =
+            parameters(2).value.asInstanceOf[ISBNs]
+          existingISBN =
             parameters(2).value.asInstanceOf[ISBNs]
           addedDescription =
             if (parameters(3).value.asInstanceOf[String] == "NULL") {
@@ -114,7 +121,8 @@ class StubDatabase{
           queriedAuthor =
             parameters.last.value.asInstanceOf[Authors]
           if (queriedTitle == existingTitle &&
-              queriedAuthor == existingAuthor) {
+            queriedAuthor == existingAuthor &&
+            removedISBN == "") {
             RowLists.stringList(
               existingTitle
             )
@@ -127,7 +135,9 @@ class StubDatabase{
             query.parameters
           queriedISBN =
             parameters.head.value.asInstanceOf[ISBNs]
-          if (queriedISBN == existingISBN) {
+            if ((queriedISBN == existingISBN &&
+              queriedISBN != removedISBN) ||
+              queriedISBN == otherISBN) {
             RowLists.stringList(
               existingISBN
             )

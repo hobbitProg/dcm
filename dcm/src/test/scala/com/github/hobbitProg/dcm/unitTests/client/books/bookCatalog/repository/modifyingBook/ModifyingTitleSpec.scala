@@ -40,6 +40,9 @@ trait ModifyingTitleSpec
         ),
         newTitle
       ) =>
+        database.existingTitle = title
+        database.existingAuthor = author
+        database.existingISBN = isbn
         val originalBook =
           TestBook(
             title,

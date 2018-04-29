@@ -33,7 +33,7 @@ class QueryingUsingTitleAndAuthorSpec
       ) =>
       bookData match {
         case (title, author, isbn, description, coverImage, categories) =>
-          val Valid(resultingCatalog) =
+          val Valid((resultingCatalog, _)) =
             insertBook(
               catalog,
               title,

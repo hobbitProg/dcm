@@ -67,7 +67,7 @@ class TryingToAddBookWithDuplicateISBNSpec
             )(
               repository
             )
-          resultingCatalog should be (invalid[BookCatalogError])
+          resultingCatalog should be (invalid)
       }
     }
   }
@@ -83,18 +83,17 @@ class TryingToAddBookWithDuplicateISBNSpec
         case (title, author, isbn, description, coverImage, categories) =>
           repository.existingISBN =
             isbn
-          val resultingCatalog =
-            insertBook(
-              catalog,
-              title,
-              author,
-              isbn,
-              description,
-              coverImage,
-              categories
-            )(
-              repository
-            )
+          insertBook(
+            catalog,
+            title,
+            author,
+            isbn,
+            description,
+            coverImage,
+            categories
+          )(
+            repository
+          )
           repository should notIncludeBook(
             TestBook(
               title,

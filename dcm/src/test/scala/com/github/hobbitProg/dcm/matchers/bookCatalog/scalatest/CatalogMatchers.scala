@@ -19,9 +19,9 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalogErr
   */
 trait CatalogMatchers {
 
-  class CatalogContainsBookMatcher(val expectedBook: Book) extends Matcher[Try[BookCatalog]] {
+  class CatalogContainsBookMatcher(val expectedBook: Book) extends Matcher[BookCatalog] {
     def apply(
-      left: Try[BookCatalog]
+      left: BookCatalog
     ) =
       MatchResult(
         catalogContainsBook(
@@ -32,18 +32,14 @@ trait CatalogMatchers {
       )
 
     private def catalogContainsBook(
-      catalog: Try[BookCatalog]
+      catalog: BookCatalog
     ) : Boolean =
-      catalog match {
-        case Success(populatedCatalog) =>
-          getByISBN(
-            populatedCatalog,
-            expectedBook.isbn
-          ) match {
-            case Success(matchedBook) =>
-              matchedBook == expectedBook
-            case Failure(_) => false
-          }
+      getByISBN(
+        catalog,
+        expectedBook.isbn
+      ) match {
+        case Success(matchedBook) =>
+          matchedBook == expectedBook
         case Failure(_) => false
       }
   }
@@ -55,9 +51,9 @@ trait CatalogMatchers {
 
   class ServiceGeneratedCatalogContainsBookMatcher(
     val expectedBook: Book
-  ) extends Matcher[Validated[BookCatalogError, BookCatalog]] {
+  ) extends Matcher[BookCatalog]{
     def apply(
-      left: Validated[BookCatalogError, BookCatalog]
+      left:  BookCatalog
     ) =
       MatchResult(
         catalogContainsBook(
@@ -68,20 +64,15 @@ trait CatalogMatchers {
       )
 
     private def catalogContainsBook(
-      catalog:Validated[BookCatalogError, BookCatalog]
+      catalog: BookCatalog
     ) : Boolean =
-      catalog match {
-        case Valid(resultingCatalog) =>
-          getByISBN(
-            resultingCatalog,
-            expectedBook.isbn
-          ) match {
-            case Success(matchedBook) =>
-              matchedBook == expectedBook
-            case Failure(_) => false
-          }
-        case Invalid(_) =>
-          false
+      getByISBN(
+        catalog,
+        expectedBook.isbn
+      ) match {
+        case Success(matchedBook) =>
+          matchedBook == expectedBook
+        case Failure(_) => false
       }
   }
 

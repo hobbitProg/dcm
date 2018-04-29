@@ -91,6 +91,12 @@ class ModifyingBookCoverSpec
             newCover,
             categories
           )
+        database.existingTitle =
+          title
+        database.existingAuthor =
+          author
+        database.existingISBN =
+          isbn
         repository.setConnection(
           database.connectionTransactor
         )

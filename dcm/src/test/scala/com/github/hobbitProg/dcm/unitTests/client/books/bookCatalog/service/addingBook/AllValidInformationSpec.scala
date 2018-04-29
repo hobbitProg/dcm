@@ -64,7 +64,7 @@ class AllValidInformationSpec
             )(
               repository
             )
-          updatedCatalog should be (valid[BookCatalog])
+          updatedCatalog should be (valid)
       }
     }
   }
@@ -78,7 +78,7 @@ class AllValidInformationSpec
       ) =>
       bookData match {
         case (title, author, isbn, description, coverImage, categories) =>
-          val resultingCatalog =
+          val Valid((resultingCatalog, _)) =
             insertBook(
               catalog,
               title,
@@ -113,7 +113,7 @@ class AllValidInformationSpec
       ) =>
         bookData match {
           case (title, author, isbn, description, coverImage, categories) =>
-          val resultingCatalog =
+          val Valid((_, resultingRepository)) =
             insertBook(
               catalog,
               title,
@@ -125,7 +125,7 @@ class AllValidInformationSpec
             )(
               repository
             )
-            repository should includeBook(
+            resultingRepository should includeBook(
               TestBook(
                 title,
                 author,

@@ -57,11 +57,11 @@ class ModifyingBookISBNSpec
         repository: BookCatalogRepositoryInterpreter,
         bookData: BookDataTypeWithNewISBN
       ) =>
-      modifyISBNOfBook(
-        database,
-        repository,
-        bookData
-      ) should be a 'success
+        modifyISBNOfBook(
+          database,
+          repository,
+          bookData
+        ) should be a 'success
     }
   }
 

@@ -36,10 +36,12 @@ class ModifyingAuthorOfBookSpec
       (catalogData: Try[CatalogInfoType], newAuthor: Authors) =>
       val Success((catalog, (title, author, isbn, description, coverImage, categories))) =
         catalogData
-      modifyAuthorOfBook(
-        catalogData,
-        newAuthor
-      ) should containBook(
+      val Success(updatedCatalog) =
+        modifyAuthorOfBook(
+          catalogData,
+          newAuthor
+        )
+      updatedCatalog should containBook(
         TestBook(
           title,
           newAuthor,

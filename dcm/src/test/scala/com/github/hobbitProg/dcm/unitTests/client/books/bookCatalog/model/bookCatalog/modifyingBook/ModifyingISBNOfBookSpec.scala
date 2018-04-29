@@ -43,10 +43,12 @@ class ModifyingISBNOfBookSpec
           )
         )
       ) = catalogData
-      modifyISBNOfBook(
-        catalogData,
-        newISBN
-      ) should containBook(
+      val Success(updatedBook) =
+        modifyISBNOfBook(
+          catalogData,
+          newISBN
+        )
+      updatedBook should containBook(
         TestBook(
           title,
           author,

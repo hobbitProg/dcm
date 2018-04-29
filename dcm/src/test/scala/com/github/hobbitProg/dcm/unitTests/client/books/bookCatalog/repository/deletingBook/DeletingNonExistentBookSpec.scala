@@ -59,7 +59,7 @@ class DeletingNonExistentBookSpec
   } yield (
     database,
     repository,
-    isbn
+    isbnToDelete
   )
 
   property("the repository is marked as being unmodified") {

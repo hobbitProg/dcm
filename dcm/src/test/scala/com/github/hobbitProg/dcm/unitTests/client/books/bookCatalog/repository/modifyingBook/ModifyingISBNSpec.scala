@@ -57,6 +57,13 @@ trait ModifyingISBNSpec
             coverImage,
             categories
           )
+        database.existingTitle =
+          title
+        database.existingAuthor =
+          author
+        database.existingISBN =
+          isbn
+        database.removedISBN = ""
         repository.setConnection(
           database.connectionTransactor
         )
