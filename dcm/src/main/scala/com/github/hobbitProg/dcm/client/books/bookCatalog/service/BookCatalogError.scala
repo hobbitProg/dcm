@@ -21,6 +21,11 @@ case class BookNotAddedToRepository() extends BookCatalogError
 case class BookNotUpdatedWithinCatalog() extends BookCatalogError
 
 /**
+  * Book does not exist in catalog
+  */
+case class BookNotInCatalog() extends BookCatalogError
+
+/**
   * Book was not removed from catalog
   */
 case class BookNotRemovedFromCatalog() extends BookCatalogError

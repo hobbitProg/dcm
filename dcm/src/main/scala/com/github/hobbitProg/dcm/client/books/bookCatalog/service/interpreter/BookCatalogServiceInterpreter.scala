@@ -150,31 +150,32 @@ object BookCatalogServiceInterpreter
     author: Authors
   ): BookCatalogOperation[BookCatalog] = Kleisli {
     repository: BookCatalogRepository =>
-    val Success(
-      bookToDelete
-    ) =
-      getByTitleAndAuthor(
-        catalog,
-        title,
-        author
-      )
-    deleteBook(
+    getByTitleAndAuthor(
       catalog,
       title,
       author
     ) match {
-      case Success(updatedCatalog) =>
-        repository.delete(
-          bookToDelete.isbn
+      case Success(bookToDelete) =>
+        deleteBook(
+          catalog,
+          title,
+          author
         ) match {
-          case Success(_) =>
-            Valid(updatedCatalog)
+          case Success(updatedCatalog) =>
+            repository.delete(
+              bookToDelete.isbn
+            ) match {
+              case Success(_) =>
+                Valid(updatedCatalog)
+              case Failure(_) =>
+                Invalid(BookNotRemovedFromRepository())
+            }
           case Failure(_) =>
-            Invalid(BookNotRemovedFromRepository())
+            Invalid(BookNotRemovedFromCatalog())
         }
       case Failure(_) =>
-        Invalid(BookNotRemovedFromCatalog())
-    }
+        Invalid(BookNotInCatalog())
+      }
   }
 
 
