@@ -10,7 +10,8 @@ import Gen.const
 import org.scalatest.{PropSpec, Matchers}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
-import com.github.hobbitProg.dcm.matchers.bookCatalog.scalatest.{CatalogMatchers, RepositoryMatchers}
+import com.github.hobbitProg.dcm.matchers.bookCatalog.scalatest.
+  {CatalogMatchers, RepositoryMatchers}
 
 import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.service.repository.FakeRepository
 

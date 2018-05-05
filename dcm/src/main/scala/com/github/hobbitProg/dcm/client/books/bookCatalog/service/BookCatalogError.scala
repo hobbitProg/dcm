@@ -6,16 +6,26 @@ package com.github.hobbitProg.dcm.client.books.bookCatalog.service
 sealed abstract class BookCatalogError
 
 /**
-  * Indication that book cannot be added to catalog
+  * Book could not be added to catalog
   */
 case class BookNotAddedToCatalog() extends BookCatalogError
 
 /**
-  * Indication that book cannot be added to repository
+  * Book could be added to repository
   */
 case class BookNotAddedToRepository() extends BookCatalogError
 
 /**
-  * Indicating that book was not updated within catalog
+  * Book was not updated within catalog
   */
 case class BookNotUpdatedWithinCatalog() extends BookCatalogError
+
+/**
+  * Book was not removed from catalog
+  */
+case class BookNotRemovedFromCatalog() extends BookCatalogError
+
+/**
+  * Book was not removed from repository
+  */
+case class BookNotRemovedFromRepository() extends BookCatalogError

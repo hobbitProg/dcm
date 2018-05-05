@@ -39,6 +39,11 @@ class FakeRepository
   var existingISBN: ISBNs = _
 
   /**
+    * ISBN of book that was deleted
+    */
+  var deletedISBN: ISBNs = _
+
+  /**
     * Add given book to repository
     * @param newBook Book to add to repository
     * @return Disjoint union of either description of error or book that was
@@ -77,10 +82,13 @@ class FakeRepository
     */
   override def delete(
     isbnToDelete: ISBNs
-  ): Try[BookCatalogRepository] =
+  ): Try[BookCatalogRepository] = {
+    deletedISBN =
+      isbnToDelete
     Success(
       this
     )
+  }
 
   /**
     * Retrieve book with given ISBN

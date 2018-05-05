@@ -67,6 +67,19 @@ trait BookCatalogService[Catalog] {
   ): BookCatalogOperation[Catalog]
 
   /**
+    * Delete the given book from the catalog
+    * @param catalog Catalog being modified
+    * @param title The title of the book to remove
+    * @param author The author of the book to remove
+    * @return Routine to modify book in catalog and repository
+    */
+  def delete(
+    catalog: Catalog,
+    title: Titles,
+    author: Authors
+  ): BookCatalogOperation[Catalog]
+
+  /**
     * Determine if book with given title and author exists within catalog
     * @param catalog Catalog being queried
     * @param title Title of book being examined

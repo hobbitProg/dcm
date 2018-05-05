@@ -10,7 +10,8 @@ import cats.data.Validated.{Valid, Invalid}
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import BookCatalog._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.BookCatalogRepository
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  BookCatalogRepository
 
 /**
   * Interpreter for service handling catalog containing books
@@ -135,6 +136,47 @@ object BookCatalogServiceInterpreter
       }
     }
   }
+
+  /**
+    * Delete the given book from the catalog
+    * @param catalog Catalog being modified
+    * @param title The title of the book to remove
+    * @param author The author of the book to remove
+    * @return Routine to modify book in catalog and repository
+    */
+  def delete(
+    catalog: BookCatalog,
+    title: Titles,
+    author: Authors
+  ): BookCatalogOperation[BookCatalog] = Kleisli {
+    repository: BookCatalogRepository =>
+    val Success(
+      bookToDelete
+    ) =
+      getByTitleAndAuthor(
+        catalog,
+        title,
+        author
+      )
+    deleteBook(
+      catalog,
+      title,
+      author
+    ) match {
+      case Success(updatedCatalog) =>
+        repository.delete(
+          bookToDelete.isbn
+        ) match {
+          case Success(_) =>
+            Valid(updatedCatalog)
+          case Failure(_) =>
+            Invalid(BookNotRemovedFromRepository())
+        }
+      case Failure(_) =>
+        Invalid(BookNotRemovedFromCatalog())
+    }
+  }
+
 
   /**
     * Determine if book with given title and author exists within catalog
