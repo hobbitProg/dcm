@@ -26,7 +26,7 @@ import com.github.hobbitProg.dcm.client.gui.linuxDesktop.dialog.ImageChooser
 class BookTab(
   private val coverChooser: ImageChooser,
   var catalog: BookCatalog,
-  private val repository: BookCatalogRepository,
+  var repository: BookCatalogRepository,
   private val catalogService: BookCatalogService[BookCatalog],
   private val definedCategories: Set[Categories]
 ) extends Tab

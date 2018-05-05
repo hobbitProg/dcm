@@ -194,7 +194,8 @@ class ModifyingBookSpec
               "dialog" - {
                 val parent =
                   new TestParent(
-                    catalog
+                    catalog,
+                    repository
                   )
 
                 "when the book dialog is created" - {
@@ -307,7 +308,8 @@ class ModifyingBookSpec
               "window" - {
                 val parent =
                   new TestParent(
-                    catalog
+                    catalog,
+                    repository
                   )
 
                 "when the book dialog is created" - {
@@ -420,7 +422,8 @@ class ModifyingBookSpec
               "window" - {
                 val parent =
                   new TestParent(
-                    catalog
+                    catalog,
+                    repository
                   )
 
                 "when the book dialog is created" - {
@@ -536,7 +539,8 @@ class ModifyingBookSpec
               "window" - {
                 val parent =
                   new TestParent(
-                    catalog
+                    catalog,
+                    repository
                   )
 
                 "when the book dialog is created" - {
@@ -660,7 +664,8 @@ class ModifyingBookSpec
               "window" - {
                 val parent =
                   new TestParent(
-                    catalog
+                    catalog,
+                    repository
                   )
 
                 "when the book dialog is created" - {
@@ -771,7 +776,8 @@ class ModifyingBookSpec
               "window" - {
                 val parent =
                   new TestParent(
-                    catalog
+                    catalog,
+                    repository
                   )
 
                 "when the book dialog is created" - {
@@ -888,7 +894,8 @@ class ModifyingBookSpec
             "dialog" - {
               val parent =
                 new TestParent(
-                  catalog
+                  catalog,
+                  repository
                 )
 
               "when the book dialog is created" - {
@@ -974,7 +981,8 @@ class ModifyingBookSpec
             "dialog" - {
               val parent =
                 new TestParent(
-                  catalog
+                  catalog,
+                  repository
                 )
 
               "when the book dialog is created" - {
@@ -1060,7 +1068,8 @@ class ModifyingBookSpec
             "dialog" - {
               val parent =
                 new TestParent(
-                  catalog
+                  catalog,
+                  repository
                 )
 
               "when the book dialog is created" - {
@@ -1182,7 +1191,8 @@ class ModifyingBookSpec
             "dialog" - {
               val parent =
                 new TestParent(
-                  catalog
+                  catalog,
+                  repository
                 )
 
               "when the book dialog is created" - {
@@ -1319,7 +1329,8 @@ class ModifyingBookSpec
             "dialog" - {
               val parent =
                 new TestParent(
-                  catalog
+                  catalog,
+                  repository
                 )
 
               "when the book dialog is created" - {

@@ -191,7 +191,8 @@ class AddingBookSpec
             "and the parent window that created the book additon dialog" - {
               val parent =
                 new TestParent(
-                  catalog
+                  catalog,
+                  repository
                 )
 
               "when the book dialog is created" - {
@@ -333,7 +334,8 @@ class AddingBookSpec
             "and the parent window that created the book additon dialog" - {
               val parent =
                 new TestParent(
-                  catalog
+                  catalog,
+                  repository
                 )
 
               "when the book dialog is created" - {
@@ -459,7 +461,8 @@ class AddingBookSpec
             "and the parent window that created the book additon dialog" - {
               val parent =
                 new TestParent(
-                  catalog
+                  catalog,
+                  repository
                 )
 
               "when the book dialog is created" - {
@@ -599,7 +602,8 @@ class AddingBookSpec
             "and the parent window that created the book additon dialog" - {
               val parent =
                 new TestParent(
-                  catalog
+                  catalog,
+                  repository
                 )
 
               "when the book dialog is created" - {
@@ -729,7 +733,8 @@ class AddingBookSpec
             "and the parent window that created the book additon dialog" - {
               val parent =
                 new TestParent(
-                  catalog
+                  catalog,
+                  repository
                 )
 
               "when the book dialog is created" - {
@@ -866,7 +871,8 @@ class AddingBookSpec
             "and the parent window that created the book additon dialog" - {
               val parent =
                 new TestParent(
-                  catalog
+                  catalog,
+                  repository
                 )
 
               "when the book dialog is created" - {

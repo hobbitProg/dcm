@@ -50,9 +50,10 @@ class AddBookControl(
         repository
       )
     addResult match {
-      case Valid((updatedCatalog, _)) =>
+      case Valid((updatedCatalog, updatedRepository)) =>
         parent.close
         mainWindow.catalog = updatedCatalog
+        mainWindow.repository = updatedRepository
       case Invalid(_) =>
     }
   }
