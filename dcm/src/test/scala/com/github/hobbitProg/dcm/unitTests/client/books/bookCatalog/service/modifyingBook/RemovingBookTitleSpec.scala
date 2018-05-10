@@ -13,11 +13,12 @@ import org.scalacheck.{Gen, Arbitrary}
 import Arbitrary.arbitrary
 import Gen.const
 
-
 import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.service.repository.FakeRepository
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import BookCatalog._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  BookCatalogRepository
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalogError
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.interpreter.
   BookCatalogServiceInterpreter
@@ -39,7 +40,7 @@ class RemovingBookTitleSpec
     populatedCatalog: BookCatalog,
     repository: FakeRepository,
     bookData: BookInfoType
-  ) : Validated[BookCatalogError, BookCatalog] =
+  ) : Validated[BookCatalogError, (BookCatalog, BookCatalogRepository)] =
     bookData match {
       case (
         _,

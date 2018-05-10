@@ -102,7 +102,7 @@ object BookCatalogServiceInterpreter
     newDescription: Description,
     newCover: CoverImages,
     newCategories: Set[Categories]
-  ): BookCatalogOperation[BookCatalog] = Kleisli {
+  ): BookCatalogOperation[(BookCatalog, BookCatalogRepository)] = Kleisli {
     repository: BookCatalogRepository => {
       val updatedInfo =
         for {
@@ -128,7 +128,7 @@ object BookCatalogServiceInterpreter
         } yield (updatedCatalog)
       updatedInfo match {
         case Success(resultingCatalog) =>
-          Valid(resultingCatalog)
+          Valid((resultingCatalog, repository))
         case Failure(_) =>
           Invalid(
             BookNotUpdatedWithinCatalog()

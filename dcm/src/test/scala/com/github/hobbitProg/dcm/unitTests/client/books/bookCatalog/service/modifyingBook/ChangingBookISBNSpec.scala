@@ -13,11 +13,12 @@ import org.scalacheck.{Gen, Arbitrary}
 import Arbitrary.arbitrary
 import Gen.const
 
-
 import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.service.repository.FakeRepository
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import BookCatalog._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  BookCatalogRepository
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalogError
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.interpreter.
   BookCatalogServiceInterpreter
@@ -70,7 +71,7 @@ class ChangingBookISBNSpec
     populatedCatalog: BookCatalog,
     repository: FakeRepository,
     bookData: ISBNModificationType
-  ) : Validated[BookCatalogError, BookCatalog] =
+  ) : Validated[BookCatalogError, (BookCatalog, BookCatalogRepository)] =
     bookData match {
       case (
         (
@@ -133,7 +134,7 @@ class ChangingBookISBNSpec
               repository,
               bookData
             )
-          resultingCatalog should be (valid[BookCatalog])
+          resultingCatalog should be (valid)
       }
     }
   }
@@ -153,7 +154,7 @@ class ChangingBookISBNSpec
               repository,
               originalData
             )
-          val Valid(resultingCatalog) =
+          val Valid((resultingCatalog, _)) =
             modifyISBN(
               populatedCatalog,
               repository,
@@ -275,7 +276,7 @@ class ChangingBookISBNSpec
               repository,
               originalData
             )
-          val Valid(resultingCatalog)=
+          val Valid((resultingCatalog, _))=
             modifyISBN(
               populatedCatalog,
               repository,

@@ -18,6 +18,8 @@ import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.service.repo
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import BookCatalog._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  BookCatalogRepository
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalogError
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.interpreter.
   BookCatalogServiceInterpreter
@@ -69,7 +71,7 @@ class ChangingBookCoverSpec
     populatedCatalog: BookCatalog,
     repository: FakeRepository,
     bookData: CoverModificationType
-  ) : Validated[BookCatalogError, BookCatalog] =
+  ) : Validated[BookCatalogError, (BookCatalog, BookCatalogRepository)] =
     bookData match {
       case (
         (
@@ -136,7 +138,7 @@ class ChangingBookCoverSpec
               repository,
               bookData
             )
-          resultingCatalog should be (valid[BookCatalog])
+          resultingCatalog should be (valid)
       }
     }
   }
@@ -159,7 +161,7 @@ class ChangingBookCoverSpec
               repository,
               originalData
             )
-          val Valid(resultingCatalog) =
+          val Valid((resultingCatalog, _)) =
             modifyCover(
               populatedCatalog,
               repository,

@@ -64,7 +64,7 @@ trait BookCatalogService[Catalog] {
     newDescription: Description,
     newCover: CoverImages,
     newCategories: Set[Categories]
-  ): BookCatalogOperation[Catalog]
+  ): BookCatalogOperation[(Catalog, BookCatalogRepository)]
 
   /**
     * Delete the given book from the catalog

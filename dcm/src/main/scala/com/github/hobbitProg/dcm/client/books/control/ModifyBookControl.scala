@@ -61,9 +61,10 @@ class ModifyBookControl(
         repository
       )
     modifyResult match {
-      case Valid(updatedCatalog) =>
+      case Valid((updatedCatalog, updatedRepository)) =>
         parent.close
         mainWindow.catalog = updatedCatalog
+        mainWindow.repository = updatedRepository
       case Invalid(_) =>
     }
   }

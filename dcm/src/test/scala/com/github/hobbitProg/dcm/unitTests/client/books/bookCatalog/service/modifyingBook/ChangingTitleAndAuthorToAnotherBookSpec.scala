@@ -17,6 +17,8 @@ import com.github.hobbitProg.dcm.unitTests.client.books.bookCatalog.service.repo
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model._
 import BookCatalog._
+import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
+  BookCatalogRepository
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.BookCatalogError
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.interpreter.
   BookCatalogServiceInterpreter
@@ -40,7 +42,7 @@ class ChangingTitleAndAuthorToAuthorBookSpec
     repository: FakeRepository,
     firstBook: BookInfoType,
     secondBook: BookInfoType
-  ) : Validated[BookCatalogError, BookCatalog] = {
+  ) : Validated[BookCatalogError, (BookCatalog, BookCatalogRepository)] = {
     repository.bookPlacedIntoRepository = null
     repository.bookRemovedFromRepository = null
     firstBook match {
