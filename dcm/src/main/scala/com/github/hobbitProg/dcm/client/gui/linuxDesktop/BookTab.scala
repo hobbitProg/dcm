@@ -9,6 +9,7 @@ import scalafx.scene.layout.AnchorPane
 
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model.{Categories,
   BookCatalog}
+import BookCatalog._
 import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   BookCatalogRepository
 import com.github.hobbitProg.dcm.client.books.bookCatalog.service.
@@ -33,13 +34,20 @@ class BookTab(
     with BookDialogParent {
   text = "Books"
 
+  // Load catalog
+  catalog =
+    load(
+      catalog,
+      repository.contents
+    )
+
   // Do not allow tab to control
   closable = false
 
   // Add control to display books within catalog
   val catalogDisplay: BookCatalogView =
     new BookCatalogView(
-      repository
+      catalog
     )
   AnchorPane.setTopAnchor(
     catalogDisplay,
@@ -88,6 +96,24 @@ class BookTab(
     BookTab.modifyButtonLeft
   )
 
+  // Add button to remove book from catalog
+  private val deleteButton: Button =
+    new Button(
+      "Delete"
+    )
+
+  deleteButton.disable = true
+  deleteButton.id =
+    BookTab.deleteButtonID
+  AnchorPane.setTopAnchor(
+    deleteButton,
+    BookTab.deleteButtonTop
+  )
+  AnchorPane.setLeftAnchor(
+    deleteButton,
+    BookTab.deleteButtonLeft
+  )
+
   // Add control to display currently added book
   private val selectedBookControl: SelectedBookView =
     new SelectedBookView()
@@ -118,9 +144,23 @@ class BookTab(
         catalogDisplay.selectionModel.value.selectedItem.value
       )
     }
+  deleteButton.onAction =
+    (event: ActionEvent) => {
+      bookControl.deleteBook(
+        this,
+        catalog,
+        repository,
+        catalogService,
+        catalogDisplay.selectionModel.value.selectedItem.value
+      )
+    }
   catalogDisplay.selectionModel.value.selectedItem.onChange {
     bookControl.determineModifyButtonActivation(
       modifyButton,
+      catalogDisplay.selectionModel.value
+    )
+    bookControl.determineDeleteButtonActivation(
+      deleteButton,
       catalogDisplay.selectionModel.value
     )
   }
@@ -141,6 +181,7 @@ class BookTab(
           catalogDisplay,
           addButton,
           modifyButton,
+          deleteButton,
           selectedBookControl
         )
     }
@@ -149,6 +190,7 @@ class BookTab(
 object BookTab {
   val addButtonId = "AddBookButton"
   val modifyButtonID = "ModifyBookButton"
+  val deleteButtonID = "DeleteBookButton"
 
   private val catalogDisplayTop: Double = 4.0
   private val catalogDisplayLeft: Double = 4.0
@@ -157,6 +199,8 @@ object BookTab {
   private val addButtonMinWidth: Double = 62.0
   private val modifyButtonTop: Double = 205.0
   private val modifyButtonLeft: Double = 255.0
+  private val deleteButtonTop: Double = 235.0
+  private val deleteButtonLeft: Double = 255.0
   private val selectedBookTop: Double = 4.0
   private val selectedBookLeft: Double = 320.0
 }

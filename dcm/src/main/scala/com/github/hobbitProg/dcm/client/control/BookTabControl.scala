@@ -2,6 +2,8 @@ package com.github.hobbitProg.dcm.client.control
 
 import scala.collection.Set
 
+import cats.data.Validated._
+
 import scalafx.scene.control.{Button, MultipleSelectionModel}
 import scalafx.stage.Stage
 
@@ -81,6 +83,37 @@ class BookTabControl {
         originalBook
       )
     dialogStage.showAndWait()
+  }
+
+  def deleteBook(
+    parent: BookDialogParent,
+    catalog: BookCatalog,
+    repository: BookCatalogRepository,
+    service: BookCatalogService[BookCatalog],
+    bookToDelete: Book
+  ): Unit = {
+    import service._
+
+    delete(
+      catalog,
+      bookToDelete.title,
+      bookToDelete.author
+    )(
+      repository
+    ) match {
+      case Valid(updatedCatalog) =>
+        parent.catalog =
+          updatedCatalog
+      case Invalid(_) =>
+    }
+  }
+
+  def determineDeleteButtonActivation(
+    deleteBookButton: Button,
+    catalogViewSelectionModel: MultipleSelectionModel[Book]
+  ) = {
+    deleteBookButton.disable =
+      catalogViewSelectionModel.isEmpty
   }
 }
 

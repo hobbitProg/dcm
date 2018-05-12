@@ -80,12 +80,6 @@ class BookCatalogControl
       displayedBooks,
       TitleOrdering
     )
-//    displayedBooks sort {
-//      (left: Book, right: Book) =>
-//      lt(
-//        left.title, right.title
-//      )
-//    }
   }
 
   /**
@@ -108,14 +102,21 @@ class BookCatalogControl
       displayedBooks,
       TitleOrdering
     )
-//    displayedBooks sort {
-//      (left: Book, right: Book) =>
-//      lt(
-//        left.title, right.title
-//      )
-//    }
 
     // Clear selected book
     selectionModel.clearSelection()
   }
+
+  def removeDeletedBook(
+    displayedBooks: ObservableBuffer[Book],
+    selectionModel: MultipleSelectionModel[Book],
+    deletedBook: Book) = {
+    displayedBooks -= deletedBook
+    FXCollections.sort(
+      displayedBooks,
+      TitleOrdering
+    )
+    selectionModel.clearSelection()
+  }
+
 }

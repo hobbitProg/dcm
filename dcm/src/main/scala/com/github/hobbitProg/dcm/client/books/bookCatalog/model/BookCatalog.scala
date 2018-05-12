@@ -10,19 +10,27 @@ import cats.data.Validated.{Valid, Invalid}
   * @author Kyle Cranmer
   * @since 0.1
   */
-class BookCatalog(
-  private val catalog: Set[Book] =
+case class BookCatalog(
+  val catalog: Set[Book] =
     Set[Book](),
-  private val addSubscribers: Seq[Book => Unit] =
+  val addSubscribers: Seq[Book => Unit] =
     Seq[Book => Unit](),
-  private val modifySubscribers: Seq[(Book, Book) => Unit] =
+  val modifySubscribers: Seq[(Book, Book) => Unit] =
     Seq[(Book, Book) => Unit](),
-  private val deleteSubscribers: Seq[Book => Unit] =
+  val deleteSubscribers: Seq[Book => Unit] =
     Seq[Book => Unit]()
 ) {
 }
 
 object BookCatalog {
+  def load(
+    initialCatalog: BookCatalog,
+    initialBooks: Set[Book]
+  ) : BookCatalog =
+    initialCatalog.copy(
+      catalog = initialBooks
+    )
+
   /**
     * Place new book into catalog
     * @param catalog Catalog to place book into
@@ -58,11 +66,8 @@ object BookCatalog {
           )
         }
         Success(
-          new BookCatalog(
-            catalog.catalog + newBook,
-            catalog.addSubscribers,
-            catalog.modifySubscribers,
-            catalog.deleteSubscribers
+          catalog.copy(
+            catalog = catalog.catalog + newBook
           )
         )
       case Invalid(errorReason) =>
@@ -145,11 +150,9 @@ object BookCatalog {
               )
             }
             Success(
-              new BookCatalog(
-                (catalog.catalog - originalBook) + updatedBook,
-                catalog.addSubscribers,
-                catalog.modifySubscribers,
-                catalog.deleteSubscribers
+              catalog.copy(
+                catalog =
+                  (catalog.catalog - originalBook) + updatedBook
               )
             )
           case Invalid(errorReason) =>
@@ -218,11 +221,9 @@ object BookCatalog {
     catalog: BookCatalog,
     addAction: Book => Unit
   ): BookCatalog =
-    new BookCatalog(
-      catalog.catalog,
-      catalog.addSubscribers :+ addAction,
-      catalog.modifySubscribers,
-      catalog.deleteSubscribers
+    catalog.copy(
+      addSubscribers =
+        catalog.addSubscribers :+ addAction
     )
 
   /**
@@ -233,22 +234,18 @@ object BookCatalog {
     catalog: BookCatalog,
     modifyAction: (Book, Book) => Unit
   ): BookCatalog =
-    new BookCatalog(
-      catalog.catalog,
-      catalog.addSubscribers,
-      catalog.modifySubscribers :+ modifyAction,
-      catalog.deleteSubscribers
+    catalog.copy(
+      modifySubscribers =
+        catalog.modifySubscribers :+ modifyAction
     )
 
   def onDelete(
     catalog: BookCatalog,
     deleteAction: Book => Unit
   ): BookCatalog =
-    new BookCatalog(
-      catalog.catalog,
-      catalog.addSubscribers,
-      catalog.modifySubscribers,
-      catalog.deleteSubscribers :+ deleteAction
+    catalog.copy(
+      deleteSubscribers =
+        catalog.deleteSubscribers :+ deleteAction
     )
 
   /**
@@ -349,14 +346,12 @@ object BookCatalog {
     existingTitle: Titles,
     existingAuthor: Authors
   ) : BookCatalog =
-    new BookCatalog(
-      catalog.catalog.filterNot {
-        existingBook =>
-        existingBook.title == existingTitle &&
-        existingBook.author == existingAuthor
-      },
-      catalog.addSubscribers,
-      catalog.modifySubscribers,
-      catalog.deleteSubscribers
+    catalog.copy(
+      catalog =
+        catalog.catalog.filterNot {
+          existingBook =>
+          existingBook.title == existingTitle &&
+          existingBook.author == existingAuthor
+        }
     )
 }

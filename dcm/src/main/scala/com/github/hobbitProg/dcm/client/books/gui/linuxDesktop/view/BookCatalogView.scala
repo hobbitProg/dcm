@@ -13,8 +13,6 @@ import scalafx.scene.control.{ListCell, ListView}
 import com.github.hobbitProg.dcm.client.books.bookCatalog.model.{Book,
   BookCatalog}
 import BookCatalog._
-import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
-  BookCatalogRepository
 import com.github.hobbitProg.dcm.client.books.control.BookCatalogControl
 
 /**
@@ -23,7 +21,7 @@ import com.github.hobbitProg.dcm.client.books.control.BookCatalogControl
   * @since 0.1
   */
 class BookCatalogView(
-  private val repository: BookCatalogRepository
+  private val catalog: BookCatalog
 ) extends ListView[Book]
     with StringOrdering {
 
@@ -56,7 +54,7 @@ class BookCatalogView(
   )
 
   // Display books that are initially in catalog
-  for (initialBook <- repository.contents) {
+  for (initialBook <- catalog.catalog) {
     items.value += initialBook
   }
   items.value sort {
@@ -75,7 +73,7 @@ class BookCatalogView(
     catalog: BookCatalog
   ): BookCatalog = {
     // Display all books that are added to catalog
-    val updatedCatalog =
+    val catalogWithAdd =
       onAdd(
         catalog,
         newBook =>
@@ -86,16 +84,28 @@ class BookCatalogView(
       )
 
     // Replace original book with modified book
-    onModify(
-      updatedCatalog,
-      (originalBook, updatedBook) => {
-        control.displayUpdatedBook(
-          items.value,
-          selectionModel.value,
-          originalBook,
-          updatedBook
-        )
-      }
+    val catalogWithModify =
+      onModify(
+        catalogWithAdd,
+        (originalBook, updatedBook) => {
+          control.displayUpdatedBook(
+            items.value,
+            selectionModel.value,
+            originalBook,
+            updatedBook
+          )
+        }
+      )
+
+    // Remove selected book
+    onDelete(
+      catalogWithModify,
+      deletedBook =>
+      control.removeDeletedBook(
+        items.value,
+        selectionModel.value,
+        deletedBook
+      )
     )
   }
 }

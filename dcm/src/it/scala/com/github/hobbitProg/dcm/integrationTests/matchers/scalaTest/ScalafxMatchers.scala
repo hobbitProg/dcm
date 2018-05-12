@@ -563,7 +563,7 @@ trait ScalafxMatchers {
     /**
       * Determine if the modify button for books is not active
       * @param left The book tab
-      * @return The result indicting if the modify button for books is not
+      * @return The result indicating if the modify button for books is not
       * active
       */
     def apply(
@@ -621,6 +621,69 @@ trait ScalafxMatchers {
     */
   def haveDisabledModifyButton() =
     new DeactivatedModifyButtonMatcher()
+
+  /**
+    * The matcher that determines if the button to delete the curently selected
+    * button is not active
+    */
+  class DeactivatedDeleteButtonMatcher
+      extends Matcher[Option[javafx.scene.control.Tab]] {
+    /**
+      * Determine if the delete button for books is not active
+      * @param left The book tab
+      * @return The result indicating if the delete button for books is not
+      * active
+      */
+    def apply(
+      left: Option[javafx.scene.control.Tab]
+    ) = {
+      MatchResult(
+        deleteButtonDisabled(
+          retrieveDeleteButton(
+            left
+          )
+        ),
+        "Delete button disabled",
+        "Delete button not disabled"
+      )
+    }
+
+    // Retrieve the button to delete the currently selected book
+    private def retrieveDeleteButton(
+      bookTab: Option[javafx.scene.control.Tab]
+    ) : Option[javafx.scene.Node] = {
+      bookTab match {
+        case Some(actualTab) =>
+          val tabPane: AnchorPane =
+            actualTab.content.value.asInstanceOf[javafx.scene.layout.AnchorPane]
+          tabPane.children.find {
+            childControl =>
+            childControl match {
+              case childButton: javafx.scene.control.Button =>
+                childButton.text.value == "Delete"
+              case _ => false
+            }
+          }
+        case None =>
+          None
+      }
+    }
+
+    // Determine if the given delete button is disabled
+    private def deleteButtonDisabled(
+      deleteButton: Option[javafx.scene.Node]
+    ): Boolean = {
+      deleteButton match {
+        case Some(deleteButtonNode) =>
+          deleteButtonNode.disable.value
+        case None =>
+          false
+      }
+    }
+  }
+
+  def haveDisabledDeleteButton() =
+    new DeactivatedDeleteButtonMatcher()
 }
 
 object ScalafxMatchers extends ScalafxMatchers {

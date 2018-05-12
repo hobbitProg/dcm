@@ -86,19 +86,28 @@ trait GUIAutomation {
     FxToolkit.showStage()
   }
 
+  // Select the book to work on
+  protected def selectBook(
+    title: Titles
+  ) =
+    bookClientRobot.clickOn(
+      NodeQueryUtils hasText title,
+      MouseButton.PRIMARY
+    )
+
   // Select the book to modify
   protected def selectBookToModify(
     title: Titles
   ) = {
-    bookClientRobot.clickOn(
-      NodeQueryUtils hasText title,
-      MouseButton.PRIMARY
+    selectBook(
+      title
     )
     bookClientRobot.clickOn(
       NodeQueryUtils hasId BookTab.modifyButtonID,
       MouseButton.PRIMARY
     )
   }
+
   // Enter data into currently active control
   protected def enterDataIntoControl(
     dataToEnter: String
