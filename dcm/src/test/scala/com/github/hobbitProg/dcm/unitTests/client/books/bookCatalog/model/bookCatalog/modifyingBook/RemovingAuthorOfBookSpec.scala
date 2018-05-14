@@ -46,7 +46,7 @@ class RemovingAuthorOfBookSpec
     }
   }
 
-  property("no book is given to the listener"){
+  property("no book is given to the modification listener"){
     forAll (catalogGenerator) {
       (catalogData: Try[CatalogInfoType]) =>
       val Success(

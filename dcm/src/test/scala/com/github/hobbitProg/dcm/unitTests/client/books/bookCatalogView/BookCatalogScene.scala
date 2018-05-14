@@ -2,8 +2,7 @@ package com.github.hobbitProg.dcm.unitTests.client.books.bookCatalogView
 import scalafx.scene.Scene
 import scalafx.scene.layout.GridPane
 
-import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
-  BookCatalogRepository
+import com.github.hobbitProg.dcm.client.books.bookCatalog.model.BookCatalog
 import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.
   BookCatalogView
 
@@ -13,12 +12,12 @@ import com.github.hobbitProg.dcm.client.books.gui.linuxDesktop.view.
   * @since 0.1
   */
 class BookCatalogScene(
-  private val bookRepository: BookCatalogRepository
+  private val catalog: BookCatalog
 ) extends Scene {
   // Create control that displays books within catalog
   val catalogControl: BookCatalogView =
     new BookCatalogView(
-      bookRepository
+      catalog
     )
   catalogControl.id = BookCatalogScene.catalogControlId
   GridPane.setColumnIndex(

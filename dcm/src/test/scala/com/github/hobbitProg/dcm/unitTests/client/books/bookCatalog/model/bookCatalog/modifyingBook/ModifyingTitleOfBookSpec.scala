@@ -25,50 +25,7 @@ class ModifyingExistingBookSpec
     with GeneratorDrivenPropertyChecks
     with Matchers
     with CatalogMatchers
-    with BookModificationSpec {
-
-  // Modify the title of a book in the catalog
-  private def modifyTitleOfBook(
-    catalogData: Try[CatalogInfoType],
-    newTitle: Titles
-  ) : Try[BookCatalog] = {
-    val Success(
-      (
-        catalog,
-        (
-          title,
-          author,
-          isbn,
-          description,
-          coverImage,
-          categories
-        )
-      )
-    ) = catalogData
-    val catalogWithSubscriber =
-      onModify(
-        catalog,
-        (originalBook, updatedBook) => {
-          givenOriginalBook = originalBook
-          givenUpdatedBook = updatedBook
-        }
-      )
-    val Success(originalBook) =
-      getByISBN(
-        catalogWithSubscriber,
-        isbn
-      )
-    updateBook(
-      catalogWithSubscriber,
-      originalBook,
-      newTitle,
-      author,
-      isbn,
-      description,
-      coverImage,
-      categories
-    )
-  }
+    with TitleModificationSpec {
 
   property("the book with the new title is placed into the catalog") {
     forAll(catalogGenerator, TitleGen) {
@@ -104,7 +61,7 @@ class ModifyingExistingBookSpec
     }
   }
 
-  property("the original book is given to all listeners") {
+  property("the original book is given to all modification listeners") {
     forAll(catalogGenerator, TitleGen) {
       (catalogData: Try[CatalogInfoType], newTitle: Titles) =>
       val Success(
@@ -137,7 +94,7 @@ class ModifyingExistingBookSpec
     }
   }
 
-  property("the modified book is given to all listeners") {
+  property("the modified book is given to all modification listeners") {
     forAll(catalogGenerator, TitleGen) {
       (catalogData: Try[CatalogInfoType], newTitle: Titles) =>
       val Success(

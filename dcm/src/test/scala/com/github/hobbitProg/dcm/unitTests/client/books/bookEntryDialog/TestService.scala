@@ -112,9 +112,9 @@ class TestService
     catalog: BookCatalog,
     title: Titles,
     author: Authors
-  ): BookCatalogOperation[BookCatalog] =  Kleisli {
+  ): BookCatalogOperation[(BookCatalog, BookCatalogRepository)] =  Kleisli {
     repository: BookCatalogRepository =>
-    Valid(catalog)
+    Valid((catalog, repository))
   }
 
   /**

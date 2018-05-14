@@ -123,7 +123,7 @@ class DeleteExistingBookSpec
       ) =>
       val Success((catalog, repository, title, author, _)) =
         testData
-      val Valid(updatedCatalog) =
+      val Valid((updatedCatalog, _)) =
         delete(
           catalog,
           title,

@@ -133,13 +133,5 @@ class DeleteBookSpec
       And("the delete button is inactive")
       findBookTab should haveDisabledDeleteButton()
     }
-
-    scenario("The delete button is inactive when no books are selected"){
-      Given("the pre-defined catgories")
-      And("a populated catalog")
-      When("no books are selected")
-      Then("the delete button is inactive")
-      (pending)
-    }
   }
 }

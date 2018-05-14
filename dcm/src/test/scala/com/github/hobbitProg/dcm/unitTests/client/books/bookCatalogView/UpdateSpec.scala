@@ -24,6 +24,16 @@ class UpdateSpec
     extends FreeSpec
     with BeforeAndAfter
     with Matchers {
+  private class TestBook(
+    val title: Titles,
+    val author: Authors,
+    val isbn: ISBNs,
+    val description: Description,
+    val coverImage: CoverImages,
+    val categories: Set[Categories]
+  ) extends Book {
+  }
+
   var runningApp: Application = null
 
   after {
@@ -35,7 +45,45 @@ class UpdateSpec
 
   "Given a book catalog" - {
     val testCatalog: BookCatalog =
-      new BookCatalog()
+      load(
+        new BookCatalog(),
+        Set[Book](
+          new TestBook(
+            "Goblins",
+            "Charles Grant",
+            "0061054143",
+            Some(
+              "Description for goblins"
+            ),
+            Some(
+              getClass.getResource(
+                "/Goblins.jpg"
+              ).toURI()
+            ),
+            Set[Categories](
+              "Sci-fi",
+              "Conspiracy"
+            )
+          ),
+          new TestBook(
+            "Ruins",
+            "Kevin J. Anderson",
+            "0061057363",
+            Some(
+              "Description for Ruins"
+            ),
+            Some(
+              getClass.getResource(
+                "/Ruins.jpg"
+              ).toURI()
+            ),
+            Set[Categories](
+              "Sci-fi",
+              "Conspiracy"
+            )
+          )
+        )
+      )
 
     "and a populated book repository" - {
       val testRepository: TestRepository =
@@ -44,7 +92,7 @@ class UpdateSpec
       "and a book catalog view" - {
         val testScene: BookCatalogScene =
           createBookCatalogControlScene(
-            testRepository
+            testCatalog
           )
         val trackedCatalog: BookCatalog =
           testScene.catalogControl register testCatalog
@@ -119,7 +167,45 @@ class UpdateSpec
 
   "Given a book catalog" - {
     val testCatalog: BookCatalog =
-      new BookCatalog()
+      load(
+        new BookCatalog(),
+        Set[Book](
+          new TestBook(
+            "Goblins",
+            "Charles Grant",
+            "0061054143",
+            Some(
+              "Description for goblins"
+            ),
+            Some(
+              getClass.getResource(
+                "/Goblins.jpg"
+              ).toURI()
+            ),
+            Set[Categories](
+              "Sci-fi",
+              "Conspiracy"
+            )
+          ),
+          new TestBook(
+            "Ruins",
+            "Kevin J. Anderson",
+            "0061057363",
+            Some(
+              "Description for Ruins"
+            ),
+            Some(
+              getClass.getResource(
+                "/Ruins.jpg"
+              ).toURI()
+            ),
+            Set[Categories](
+              "Sci-fi",
+              "Conspiracy"
+            )
+          )
+        )
+      )
 
     "and a populated book repository" - {
       val testRepository: TestRepository =
@@ -128,7 +214,7 @@ class UpdateSpec
       "and a book catalog view" - {
         val testScene: BookCatalogScene =
           createBookCatalogControlScene(
-            testRepository
+            testCatalog
           )
         val trackedCatalog: BookCatalog =
           testScene.catalogControl register testCatalog
@@ -233,13 +319,9 @@ class UpdateSpec
     }
   }
 
-  /**
-    * Create scene that contains book catalog control
-    * @param repository Repository containing book catalog
-    * @return Scene that contains book catalog control
-    */
+  // Create scene that contains book catalog control
   private def createBookCatalogControlScene(
-    repository: BookCatalogRepository
+    catalog: BookCatalog
   ): BookCatalogScene = {
     // Create test application
     FxToolkit.registerPrimaryStage()
@@ -256,7 +338,7 @@ class UpdateSpec
     // Create scene that contains book catalog control
     val catalogScene: BookCatalogScene =
       new BookCatalogScene(
-        repository
+        catalog
       )
     FxToolkit.setupStage(
       new Consumer[Stage] {

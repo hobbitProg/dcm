@@ -77,7 +77,7 @@ trait BookCatalogService[Catalog] {
     catalog: Catalog,
     title: Titles,
     author: Authors
-  ): BookCatalogOperation[Catalog]
+  ): BookCatalogOperation[(Catalog, BookCatalogRepository)]
 
   /**
     * Determine if book with given title and author exists within catalog

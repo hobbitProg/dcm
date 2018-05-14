@@ -120,15 +120,15 @@ object BookCatalogServiceInterpreter
             updatedCatalog,
             newISBN
           )
-          updatedBook <- repository.update(
+          updatedRepository <- repository.update(
             originalBook,
             newBook
           )
 
-        } yield (updatedCatalog)
+        } yield (updatedCatalog, updatedRepository)
       updatedInfo match {
-        case Success(resultingCatalog) =>
-          Valid((resultingCatalog, repository))
+        case Success((resultingCatalog, resultingRepository)) =>
+          Valid((resultingCatalog, resultingRepository))
         case Failure(_) =>
           Invalid(
             BookNotUpdatedWithinCatalog()
@@ -148,7 +148,7 @@ object BookCatalogServiceInterpreter
     catalog: BookCatalog,
     title: Titles,
     author: Authors
-  ): BookCatalogOperation[BookCatalog] = Kleisli {
+  ): BookCatalogOperation[(BookCatalog, BookCatalogRepository)] = Kleisli {
     repository: BookCatalogRepository =>
     getByTitleAndAuthor(
       catalog,
@@ -165,8 +165,8 @@ object BookCatalogServiceInterpreter
             repository.delete(
               bookToDelete.isbn
             ) match {
-              case Success(_) =>
-                Valid(updatedCatalog)
+              case Success(updatedRepository) =>
+                Valid((updatedCatalog, updatedRepository))
               case Failure(_) =>
                 Invalid(BookNotRemovedFromRepository())
             }

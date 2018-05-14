@@ -54,7 +54,7 @@ class ModifyingAuthorOfBookSpec
     }
   }
 
-  property("the original book is given to all listeners") {
+  property("the original book is given to all modification listeners") {
     forAll(catalogGenerator, authorGenerator) {
       (catalogData: Try[CatalogInfoType], newAuthor: Authors) => {
         modifyAuthorOfBook(
@@ -77,7 +77,7 @@ class ModifyingAuthorOfBookSpec
     }
   }
 
-  property("the modified book is given to all listeners") {
+  property("the modified book is given to all modification listeners") {
     forAll(catalogGenerator, authorGenerator) {
       (catalogData: Try[CatalogInfoType], newAuthor: Authors) => {
         modifyAuthorOfBook(

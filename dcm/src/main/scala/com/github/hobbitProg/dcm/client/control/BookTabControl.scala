@@ -101,7 +101,7 @@ class BookTabControl {
     )(
       repository
     ) match {
-      case Valid(updatedCatalog) =>
+      case Valid((updatedCatalog, _)) =>
         parent.catalog =
           updatedCatalog
       case Invalid(_) =>
