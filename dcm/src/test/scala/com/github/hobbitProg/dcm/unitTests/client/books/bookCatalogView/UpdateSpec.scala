@@ -18,7 +18,7 @@ import com.github.hobbitProg.dcm.client.books.bookCatalog.repository.
   BookCatalogRepository
 
 /**
-  *
+  * Specification for updating the view containing the book catalog
   */
 class UpdateSpec
     extends FreeSpec
