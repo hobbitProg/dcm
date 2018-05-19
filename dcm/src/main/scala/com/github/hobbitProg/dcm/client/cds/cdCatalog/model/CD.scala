@@ -37,6 +37,13 @@ trait CD {
 }
 
 object CD {
+  // Verify given data is valid
+  private def isValid(
+    title: Titles
+  ) : Boolean = {
+    title != ""
+  }
+
   /**
     * Create a valid CD
     * @param title The title of the CD
@@ -53,15 +60,24 @@ object CD {
     cover: CoverImages,
     categories: Set[Categories]
   ): Validated[String, CD] = {
-    Valid(
-      new CDImplementation(
-        title,
-        artist,
-        isrc,
-        cover,
-        categories
+    if (isValid(
+          title
+        )) {
+      Valid(
+        new CDImplementation(
+          title,
+          artist,
+          isrc,
+          cover,
+          categories
+        )
       )
-    )
+    }
+    else {
+      Invalid(
+        "Given information is invalid for a CD"
+      )
+    }
   }
 
   // Implementation of CD information
