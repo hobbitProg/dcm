@@ -39,9 +39,11 @@ trait CD {
 object CD {
   // Verify given data is valid
   private def isValid(
-    title: Titles
+    title: Titles,
+    artist: Artists
   ) : Boolean = {
-    title != ""
+    title != "" &&
+    artist != ""
   }
 
   /**
@@ -61,7 +63,8 @@ object CD {
     categories: Set[Categories]
   ): Validated[String, CD] = {
     if (isValid(
-          title
+          title,
+          artist
         )) {
       Valid(
         new CDImplementation(
