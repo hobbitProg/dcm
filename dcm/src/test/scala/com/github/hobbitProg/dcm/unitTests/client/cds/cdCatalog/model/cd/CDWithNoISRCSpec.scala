@@ -15,41 +15,41 @@ import com.github.hobbitProg.dcm.generator.CDGenerators
 import com.github.hobbitProg.dcm.client.cds.cdCatalog.model._
 
 /**
-  * Specification for trying to create a CD with no title
+  * Specification for trying to create a CD with no IRSC
   * @author Kyle Cranmer
   * @since 0.4
   */
-class CDWithNoTitleSpec
+class CDWithNoISRCSpec
     extends PropSpec
     with GeneratorDrivenPropertyChecks
     with Matchers
     with ValidatedMatchers
     with CDGenerators {
 
-  private class TestCD(
-    val title: Titles,
-    val artist: Artists,
-    val isrc: ISRCs,
-    val cover: CoverImages,
-    val categories: Set[Categories]
-  ) extends CD {}
+    private class TestCD(
+      val title: Titles,
+      val artist: Artists,
+      val isrc: ISRCs,
+      val cover: CoverImages,
+      val categories: Set[Categories]
+    ) extends CD {}
 
-  private val NoTitleCDGen = for {
+  private val NoISRCGen = for {
+    title <- TitleGen
     artist <- ArtistGen
-    isrc <- ISRCGen
     cover <- CoverImageGen
     categories <- CategoriesGen
   } yield (
-    "",
+    title,
     artist,
-    isrc,
+    "",
     cover,
     categories
   )
 
-  property("No CD is created") {
+  property("no CD is created") {
     forAll (
-      NoTitleCDGen
+      NoISRCGen
     ) {
       (cdData : CDDataType) =>
       cdData match {

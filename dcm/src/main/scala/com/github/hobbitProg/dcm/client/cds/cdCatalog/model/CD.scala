@@ -40,10 +40,12 @@ object CD {
   // Verify given data is valid
   private def isValid(
     title: Titles,
-    artist: Artists
+    artist: Artists,
+    isrc: ISRCs
   ) : Boolean = {
     title != "" &&
-    artist != ""
+    artist != "" &&
+    isrc != ""
   }
 
   /**
@@ -64,7 +66,8 @@ object CD {
   ): Validated[String, CD] = {
     if (isValid(
           title,
-          artist
+          artist,
+          isrc
         )) {
       Valid(
         new CDImplementation(
