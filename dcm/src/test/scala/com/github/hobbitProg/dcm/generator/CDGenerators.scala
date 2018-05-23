@@ -100,4 +100,8 @@ trait CDGenerators {
     cover,
     categories
   )
+
+  protected val CatalogGenerator = for {
+    catalog <- new CDCatalog
+  } yield catalog
 }
