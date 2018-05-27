@@ -22,6 +22,16 @@ trait CDGenerators {
     Set[Categories]
   )
 
+  protected case class TestCD(
+    val title: Titles,
+    val artist: Artists,
+    val isrc: ISRCs,
+    val cover: CoverImages,
+    val categories: Set[Categories]
+  ) extends CD{
+  };
+
+
   protected val availableCovers =
     Seq(
       "/aerosmith_draw_the_line.jpg",

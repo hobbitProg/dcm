@@ -25,15 +25,6 @@ class AddingCDSpec
     with Matchers
     with TryValues
     with CDGenerators {
-  case class TestCD(
-    val title: Titles,
-    val artist: Artists,
-    val isrc: ISRCs,
-    cover: CoverImages,
-    categories: Set[Categories]
-  ) extends CD {
-
-  }
 
   property("indicates the catalog was updated") {
     forAll(
