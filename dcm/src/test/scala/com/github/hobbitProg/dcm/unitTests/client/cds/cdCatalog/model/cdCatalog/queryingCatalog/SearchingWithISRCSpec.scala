@@ -16,6 +16,11 @@ import com.github.hobbitProg.dcm.generator.CDGenerators
 import com.github.hobbitProg.dcm.client.cds.cdCatalog.model._
 import CDCatalog._
 
+/**
+  * Specification for searching for a CD in the catalog using its ISRC
+  * @author Kyle Cranmer
+  * @since 0.4
+  */
 class SearchingWithISRCSpec
     extends PropSpec
     with GeneratorDrivenPropertyChecks

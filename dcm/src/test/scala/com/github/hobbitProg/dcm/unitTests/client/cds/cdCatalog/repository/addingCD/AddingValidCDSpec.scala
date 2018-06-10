@@ -13,6 +13,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 import com.github.hobbitProg.dcm.generator.CDGenerators
 
+import com.github.hobbitProg.dcm.mockDatabase.CDStubDatabase
+
 import com.github.hobbitProg.dcm.client.cds.cdCatalog.model._
 import com.github.hobbitProg.dcm.client.cds.cdCatalog.repository.
   CDCatalogRepository
@@ -32,7 +34,7 @@ class AddingValidCDSpec
     with Matchers  {
 
   val databaseGenerator = for {
-    database <- new StubDatabase()
+    database <- new CDStubDatabase()
   } yield database
 
   val repositoryGenerator = for {
@@ -54,7 +56,7 @@ class AddingValidCDSpec
     }
 
   private def addCDToRepository(
-    database: StubDatabase,
+    database: CDStubDatabase,
     repository: CDCatalogRepositoryInterpreter,
     cdData: CDDataType
   ) : Try[CDCatalogRepository] = {
@@ -69,7 +71,7 @@ class AddingValidCDSpec
       CDDataGen
     ) {
       (
-        database: StubDatabase,
+        database: CDStubDatabase,
         repository: CDCatalogRepositoryInterpreter,
         cdData: CDDataType
       ) =>
@@ -88,7 +90,7 @@ class AddingValidCDSpec
       CDDataGen
     ) {
       (
-        database: StubDatabase,
+        database: CDStubDatabase,
         repository: CDCatalogRepositoryInterpreter,
         cdData: CDDataType
       ) =>
